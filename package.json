@@ -1,0 +1,46 @@
+{
+  "name": "blog",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "scripts": {
+    "beautiful": "prettier --write --single-quote --trailing-comma all --tab-width 4 'src/**/*.{js,json,scss}'",
+    "start": "nodemon --inspect src/app.js",
+    "watch": "sass --watch src/resources/scss/app.scss src/public/css/app.css",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NgoHuuPhat/NodeJS_Blog.git"
+  },
+  "keywords": [
+    "nodejs",
+    "express",
+    "mongodb",
+    "blog"
+  ],
+  "author": "HuuPhat",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NgoHuuPhat/NodeJS_Blog/issues"
+  },
+  "homepage": "https://github.com/NgoHuuPhat/NodeJS_Blog#readme",
+  "description": "",
+  "lint-staged": {
+    "src/**/*.{js,json,scss}": "prettier --write --single-quote --trailing-comma all --tab-width 4"
+  },
+  "hooks": {
+    "pre-commit": "lint-staged"
+  },
+  "dependencies": {
+    "express": "^4.21.1",
+    "express-handlebars": "^8.0.1",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3"
+  },
+  "devDependencies": {
+    "morgan": "^1.10.0",
+    "nodemon": "^3.1.7",
+    "sass": "^1.80.6"
+  }
+}
