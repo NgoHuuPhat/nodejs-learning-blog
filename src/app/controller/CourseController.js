@@ -24,12 +24,11 @@ class CourseController {
 
         try {
         //Gán giá trị image (Tương tự như default ở bên Schema)
-        const formData = req.body
-        formData.image = `https://i.ytimg.com/vi/${req.body.videoID}/hqdefault.jpg?s%E2%80%A6EIYAXABwAEG&rs=AOn4CLBwYwrOaKarfa87-f5y6U_UtM0Cfg`
-        await Course.create(formData); //Lưu vào database (có thể dùng .save())
+        req.body.image = `https://i.ytimg.com/vi/${req.body.videoID}/hqdefault.jpg?s%E2%80%A6EIYAXABwAEG&rs=AOn4CLBwYwrOaKarfa87-f5y6U_UtM0Cfg`
+        await Course.create(req.body); //Lưu vào database (có thể dùng .save())
 
         //Điều hướng về trang home
-        res.redirect('/')
+        res.redirect('/me/stored/courses')
     
         } catch (error) {
             next(error)
@@ -56,9 +55,19 @@ class CourseController {
             next(error)
         }
     }
-
+    
     //[DELETE] /courses/:id
     async destroy(req, res, next) {
+        try {
+            await Course.delete({_id: req.params.id});
+            res.redirect('back') //'back' về lại trang trước đó
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    //[DELETE] /courses/:id/force
+    async forceDestroy(req, res, next) {
         try {
             await Course.deleteOne({_id: req.params.id});
             res.redirect('back') //'back' về lại trang trước đó
@@ -66,6 +75,19 @@ class CourseController {
             next(error)
         }
     }
+    
+    //[PATCH] /courses/:id/restore
+    async restore(req, res, next) {
+        try {
+            await Course.restore({ _id: req.params.id });
+            res.redirect('back')
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    
+    
 }
 
 module.exports = new CourseController();

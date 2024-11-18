@@ -1,8 +1,11 @@
 @import 'variables';
 
+a {
+    text-decoration: none !important; 
+}
+
 .card-link {
     color: black; 
-    text-decoration: none;
 }
 
 .user-avatar {
@@ -12,6 +15,3 @@
     margin-right: 4px;
 }
 
-.btn.btn-link {
-    text-decoration: none; 
-}
