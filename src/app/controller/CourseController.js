@@ -86,8 +86,22 @@ class CourseController {
         }
     }
 
-    
-    
+    //[POST] /courses/handle-form-actions
+    async handleFormActions(req, res, next){
+        switch(req.body.action){
+            case 'delete':
+                try {
+                    await Course.delete({_id: req.body.courseIDs});
+                    res.redirect('back') //'back' về lại trang trước đó
+                } catch (error) {
+                    next(error)
+                }
+                break;
+            default:
+                res.json({message: 'Action in valid'})
+        }
+    }
+
 }
 
 module.exports = new CourseController();
