@@ -5,8 +5,10 @@ class CourseController {
     //[GET] /me/stored/courses
     async storedCourses(req, res, next) {
         try {
-            const courses = await Course.find({}).lean()
-            res.render('me/stored-courses', { courses })
+            
+            //Dùng destructuring
+            const [courses, countDeleted] = await Promise.all([Course.find({}).lean(), Course.countDocumentsWithDeleted({deleted: true})]) 
+            res.render('me/stored-courses', { courses, countDeleted })
         } catch (error) {
             next(error)
         }
