@@ -1,4 +1,4 @@
-const Course = require('../models/Course');
+const Course = require('../models/Course')
 class SiteController {
     //[GET] /
     async home(req, res, next) {
@@ -7,7 +7,7 @@ class SiteController {
             C1: lean() => Ưu tiên
             C2: toObject() (thay const = let)
             */
-            const courses = await Course.find({}).lean(); // Đợi Promise trả về kết quả (find() trả về Array)
+            const courses = await Course.find({}).lean() // Đợi Promise return kết quả (find() return Array)
             // courses = courses.map(course => course.toObject()) 
             res.render('home',{ courses })
         } catch (error) {
@@ -18,8 +18,8 @@ class SiteController {
 
     //[GET] /search
     search(req, res) {
-        res.render('search');
+        res.render('search')
     }
 }
 
-module.exports = new SiteController();
+module.exports = new SiteController()

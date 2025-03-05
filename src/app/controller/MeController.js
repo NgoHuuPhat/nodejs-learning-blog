@@ -1,13 +1,23 @@
-const Course = require('../models/Course');
+const Course = require('../models/Course')
 
 class CourseController {
 
     //[GET] /me/stored/courses
     async storedCourses(req, res, next) {
         try {
-            
+
+
+
+            let courseQuery = Course.find({}).lean()
+        
+            if(req.query.hasOwnProperty('_sort')){
+                courseQuery = courseQuery.sort({
+                    [req.query.column] : req.query.type
+                })
+            }
+
             //Dùng destructuring
-            const [courses, countDeleted] = await Promise.all([Course.find({}).lean(), Course.countDocumentsWithDeleted({deleted: true})]) 
+            const [courses, countDeleted] = await Promise.all([courseQuery, Course.countDocumentsWithDeleted({deleted: true})]) 
             res.render('me/stored-courses', { courses, countDeleted })
         } catch (error) {
             next(error)
@@ -25,4 +35,4 @@ class CourseController {
     }
 }
 
-module.exports = new CourseController();
+module.exports = new CourseController()

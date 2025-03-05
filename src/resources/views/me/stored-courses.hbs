@@ -12,55 +12,66 @@
     <button class="btn btn-primary btn-submit btn-sm disabled">Thực hiện</button>
   </div>
 
-    <table class="table mt-4">
-        <thead>
-            <tr>
-                {{!-- Nếu có giá trị truthy thì nó sẽ hiển thị --}}
-                {{#if courses.length}}
-                <th scope="col">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="checkbox-all" >
-                  </div>
+  {{_sort.type}}
+
+  <table class="table mt-4">
+      <thead>
+          <tr>
+              {{!-- Nếu có giá trị truthy thì nó sẽ hiển thị --}}
+              {{#if courses.length}}
+              <th scope="col">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="checkbox-all" >
+                </div>
+              </th>
+              {{/if}}
+              <th scope="col">STT</th>
+              <th scope="col">
+                Tên khóa học
+                {{{sortTable 'name' _sort}}}
+              </th>
+              <th scope="col">
+                Trình độ
+                {{{sortTable 'level' _sort}}}
+              </th>
+              <th scope="col">
+                Thời gian tạo
+                {{{sortTable 'createdAt' _sort}}}
                 </th>
-                {{/if}}
-                <th scope="col">STT</th>
-                <th scope="col">Tên khóa học</th>
-                <th scope="col">Trình độ</th>
-                <th scope="col">Thời gian tạo</th>
-                <th scope="col"></th>
-            </tr>
-        </thead>
-        <tbody>
-            {{#each courses}}
-            <tr>
-                {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
-                <td>
-                  <div class="form-check">
-                    
-                    {{!-- name="courseIDs[]" Luôn luôn trả về mảng --}}
-                    <input class="form-check-input" type="checkbox" name="courseIDs[]" value="{{this._id}}">
-                  </div>
-                </td>
-                <th scope="row"> {{sum @index 1}}</th>  
-                <td>{{this.name}}</td>
-                <td>{{this.level}}</td>
-                <td>{{this.createdAt}}</td>
-                <td>
-                    <a href="/courses/{{this._id}}/edit" class="btn btn-link">Sửa</a>
-                    <!-- Button trigger modal 
-                         Trước tiên phải lấy được ID-->
-                    <a href="" class="btn btn-link" data-bs-toggle="modal" data-id = "{{this._id}}" data-bs-target="#delete-course-modal">Xóa</a> 
-                </td>
-            </tr>
-            {{else}}
-            <tr>
-              <td class="text-center" colspan="5">Bạn chưa đăng khóa học nào
-                <a href="/courses/create">Đăng khóa học</a>
-              </td>   
-            </tr>
-            {{/each}}
-        </tbody>
-    </table>
+              <th scope="col"></th>
+          </tr>
+      </thead>
+      <tbody>
+          {{#each courses}}
+          <tr>
+              {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
+              <td>
+                <div class="form-check">
+                  
+                  {{!-- name="courseIDs[]" Luôn luôn trả về mảng --}}
+                  <input class="form-check-input" type="checkbox" name="courseIDs[]" value="{{this._id}}">
+                </div>
+              </td>
+              <th scope="row"> {{sum @index 1}}</th>  
+              <td>{{this.name}}</td>
+              <td>{{this.level}}</td>
+              <td>{{this.createdAt}}</td>
+              <td>
+                  <a href="/courses/{{this._id}}/edit" class="btn btn-link">Sửa</a>
+                  <!-- Button trigger modal 
+                        Trước tiên phải lấy được ID-->
+                  <a href="" class="btn btn-link" data-bs-toggle="modal" data-id = "{{this._id}}" data-bs-target="#delete-course-modal">Xóa</a> 
+              </td>
+          </tr>
+          {{else}}
+          <tr>
+            <td class="text-center" colspan="5">Bạn chưa đăng khóa học nào
+              <a href="/courses/create">Đăng khóa học</a>
+            </td>   
+          </tr>
+          {{/each}}
+      </tbody>
+  </table>
 </form>
 
 
