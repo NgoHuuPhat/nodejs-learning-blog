@@ -5,7 +5,7 @@ const mongooseDelete = require('mongoose-delete')
 
 const Schema = mongoose.Schema
 
-const Course = new Schema({
+const CourseSchema = new Schema({
     name: { type: String, required: true },
     description: { type: String, maxLength: 600 },
     image: { type: String },
@@ -17,9 +17,20 @@ const Course = new Schema({
 
 mongoose.plugin(slug)
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
-Course.plugin(mongooseDelete, { 
+CourseSchema.plugin(mongooseDelete, { 
     deletedAt : true,
     overrideMethods: 'all',
 })
 
-module.exports = mongoose.model('Course', Course) //Collection - Schema
+//Custom query helpers (Tối ưu hardcode => Xây dựng method sử dụng được nhiều lần)
+CourseSchema.query.sortTable = function(req) {
+    if(req.query.hasOwnProperty('_sort')){
+        const isValidType = ['asc', 'desc'].includes(req.query.type)
+        return this.sort({
+            [req.query.column] : isValidType ? req.query.type : 'desc'
+        })
+    }
+    return this
+  };
+
+module.exports = mongoose.model('Course', CourseSchema) //Collection - Schema
