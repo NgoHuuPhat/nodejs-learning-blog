@@ -6,7 +6,7 @@ const morgan = require('morgan')
 const app = express()
 const port = 3000
 
-const SortMiddleware = require('./app/middleware/SortMiddleware')
+const SortMiddleware = require('./app/middleware/sortMiddleware')
 
 const route = require('./routes/index')
 const db = require('./config/db') //Ghi tắt vì trong db chỉ có 1 thư mục index.js
