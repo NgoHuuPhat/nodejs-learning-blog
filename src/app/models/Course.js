@@ -1,21 +1,31 @@
 const mongoose = require('mongoose')
 const slug = require('mongoose-slug-updater')
 const mongooseDelete = require('mongoose-delete')
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 
 const Schema = mongoose.Schema
 
-const CourseSchema = new Schema({
-    name: { type: String, required: true },
-    description: { type: String, maxLength: 600 },
-    image: { type: String },
-    videoID: { type: String, required: true },
-    level: { type: String },
-    //Tạo slug (unique duy nhất)
-    slug: { type: String, slug: 'name', unique: true}
-}, { timestamps: true })
+const CourseSchema = new Schema(
+    {
+        _id: { type: Number },
+        name: { type: String, required: true },
+        description: { type: String, maxLength: 600 },
+        image: { type: String },
+        videoID: { type: String, required: true },
+        level: { type: String },
+        //Tạo slug (unique duy nhất)
+        slug: { type: String, slug: 'name', unique: true}
+    }, 
+    { 
+        _id: false,
+        timestamps: true 
+    }
+)
 
 mongoose.plugin(slug)
+CourseSchema.plugin(AutoIncrement)
+
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
 CourseSchema.plugin(mongooseDelete, { 
     deletedAt : true,
