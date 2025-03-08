@@ -27,7 +27,7 @@ app.use(SortMiddleware)
 app.engine('hbs', engine({ 
     extname: '.hbs',
     // Sử dụng helpers: Để tạo hàm sum index
-    helpers: require('./helpers/handlebars')
+    helpers: require('./helpers/sortHandlebars')
 }))
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'resources','views')) //Hoặc có thể // nhưng nó có thể sai với hệ điều hành khác 

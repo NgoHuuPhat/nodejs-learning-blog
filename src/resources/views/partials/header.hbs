@@ -1,6 +1,10 @@
 <nav class="navbar navbar-expand-lg bg-danger-subtle">
   <div class="container">
     <a class="navbar-brand" href="/">Keep Going</a>
+    <form class="search-container" method="GET" action="/search">
+      <i class="fa fa-search"></i>
+      <input type="text" placeholder="Tìm kiếm khóa học, bài viết, ..." name="keyword" id="searchInput" value="{{keyWord}}">
+    </form>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
