@@ -16,7 +16,7 @@ const db = require('./config/db') //Ghi tắt vì trong db chỉ có 1 thư mụ
 db.connect()
 
 //HTTP Logger
-app.use(morgan('dev'))
+// app.use(morgan('dev'))
 
 app.use(methodOverride('_method'))
 
@@ -27,7 +27,7 @@ app.use(SortMiddleware)
 app.engine('hbs', engine({ 
     extname: '.hbs',
     // Sử dụng helpers: Để tạo hàm sum index
-    helpers: require('./helpers/sortHandlebars')
+    helpers: require('./helpers/handlebars')
 }))
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'resources','views')) //Hoặc có thể // nhưng nó có thể sai với hệ điều hành khác 
