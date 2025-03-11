@@ -8,6 +8,7 @@ const port = 3000
 
 const SortMiddleware = require('./app/middlewares/sortMiddleware')
 
+
 const route = require('./routes/index')
 const db = require('./config/db') //Ghi tắt vì trong db chỉ có 1 thư mục index.js
 

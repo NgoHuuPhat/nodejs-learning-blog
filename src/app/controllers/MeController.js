@@ -1,4 +1,5 @@
 const Course = require('../models/Course')
+const paginatitonHelper = require('../../helpers/pagination')
 
 class CourseController {
 
@@ -6,28 +7,23 @@ class CourseController {
     async storedCourses(req, res, next) {
         try {
 
-            let objectPagination = {
-                limitItems: 4,
-                currentPage: 1
-            }
-            if(req.query.page){
-                objectPagination.currentPage = parseInt(req.query.page) // String nên phải chuyển sang number
-            }
-
-            //Công thức phân trang 
-            objectPagination.skip = (objectPagination.currentPage - 1) * objectPagination.limitItems
-
-            //Tính tổng số trang
+            //Đếm số lượng khóa học
             const countCourses = await Course.countDocuments({ deleted: false }) 
-            const totalPage = Math.ceil(countCourses/objectPagination.limitItems)
-            objectPagination.totalPage = totalPage
+            let objectPagination = paginatitonHelper(
+                {
+                    limitItems: 4,
+                    currentPage: 1
+                },
+                req.query,
+                countCourses
+            )
 
             //Dùng destructuring
             const [courses, countDeleted] = await Promise.all([
-                Course.find({}).lean().limit(objectPagination.limitItems).skip(objectPagination.skip), // sortTable có thể dùng sau khi fix
+                Course.find({deleted: false}).sortTable(req).skip(objectPagination.skip).limit(objectPagination.limitItems).lean(), 
                 Course.countDocumentsWithDeleted({deleted: true})
             ]) 
-            res.render('me/stored-courses', { courses, countDeleted, objectPagination })
+            res.render('me/stored-courses', { courses, countDeleted, objectPagination, query: req.query })
         } catch (error) {
             next(error)
         }

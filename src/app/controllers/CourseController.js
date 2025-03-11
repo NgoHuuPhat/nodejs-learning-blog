@@ -4,7 +4,6 @@ class CourseController {
 
     //[GET] /courses/:slug
     async details(req, res, next) {
-
         try {
             //Lấy khóa học trường slug = giá trị req.params.slug
             const course = await Course.findOne({slug: req.params.slug}).lean() 
@@ -16,20 +15,17 @@ class CourseController {
 
     //[GET] /courses/create
     create(req, res, next) {
-        res.render()
+        res.render('courses/create')
     }
 
     //[POST] /courses/store
     async store(req, res, next) {
-
         try {
-        //Gán giá trị image (Tương tự như default ở bên Schema)
-        req.body.image = `https://i.ytimg.com/vi/${req.body.videoID}/hqdefault.jpg?s%E2%80%A6EIYAXABwAEG&rs=AOn4CLBwYwrOaKarfa87-f5y6U_UtM0Cfg`
-        await Course.create(req.body) //Lưu vào database (có thể dùng .save())
-            
-        //Điều hướng về trang home
-        res.redirect('/me/stored/courses')
-    
+            //Gán giá trị image (Tương tự như default ở bên Schema)
+            req.body.image = `https://i.ytimg.com/vi/${req.body.videoID}/hqdefault.jpg?s%E2%80%A6EIYAXABwAEG&rs=AOn4CLBwYwrOaKarfa87-f5y6U_UtM0Cfg`
+            await Course.create(req.body) //Lưu vào database (có thể dùng .save())
+            //Điều hướng về trang home
+            res.redirect('/me/stored/courses')
         } catch (error) {
             next(error)
         }

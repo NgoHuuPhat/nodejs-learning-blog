@@ -14,8 +14,7 @@ module.exports = {
 
     eq: (a, b) => a === b,
 
-
-    sortTable: (field, sort) => {
+    sortTable: (field, sort, query) => { // Thêm query vào tham số
         const sortType = field === sort.column ? sort.type : 'default';
         const icons = {
             default: 'fa-solid fa-sort',
@@ -32,8 +31,13 @@ module.exports = {
         const icon = icons[sortType];
         const type = types[sortType];
 
+        let queryString = `?_sort&column=${field}&type=${type}`
+        if(query.page){
+            queryString += `&page=${query.page}`
+        }
+
         // Bảo mật XSS 
-        const address = Handlebars.escapeExpression(`?_sort&column=${field}&type=${type}`);
+        const address = Handlebars.escapeExpression(queryString);
         const output = `<a href="${address}"><i class="${icon}"></i></a>`;
 
         return new Handlebars.SafeString(output);
