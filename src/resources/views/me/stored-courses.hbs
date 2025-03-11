@@ -94,23 +94,36 @@
   </div>
 </div>
 
-{{!-- Pagination --}}
-<nav aria-label="...">
-  <ul class="pagination">
-    <li class="page-item disabled">
-      <a class="page-link">Previous</a>
-    </li>
-    <li class="page-item"><a class="page-link" href="#">1</a></li>
-    <li class="page-item active" aria-current="page">
-      <a class="page-link" href="#">2</a>
-    </li>
-    <li class="page-item"><a class="page-link" href="#">3</a></li>
-    <li class="page-item"> 
-      <a class="page-link" href="#">Next</a>
-    </li>
-  </ul>
-</nav>  
-{{!-- End Pagination --}}
+<div class="d-flex justify-content-between align-items-center mt-4">
+  {{!-- Page number --}}
+    <div class="">
+      <span class="pagination-text small">Page {{objectPagination.currentPage}} of {{objectPagination.totalPage}}</span>
+    </div>
+  {{!-- End Page number --}}
+  {{!-- 1 to 10 of 100 courses --}}
+
+  {{!-- Pagination --}}
+  <nav aria-label="...">
+    <ul class="pagination pagination-sm d-flex mb-0 justify-content-end">
+      <li class="page-item">
+        <a class="page-link{{#if (eq objectPagination.currentPage 1)}} disabled {{/if}}" href="?page={{sub objectPagination.currentPage 1}}">Previous</a>
+      </li>
+      {{#for 1 objectPagination.totalPage}}
+        <li class="page-item {{#if (eq @root.objectPagination.currentPage this)}}active{{/if}}">
+        {{!-- C1: Dùng thẻ a để tạo link --}}
+          <a class="page-link" href="?page={{this}}">{{this}}</a> 
+        {{!-- C2: Dùng thẻ button để tạo page-id thay đổi link href
+          <button class="page-link" page-pagination={{this}}>{{this}}</button> 
+        </li> --}}
+      {{/for}}
+      <li class="page-item">
+        <a class="page-link{{#if (eq objectPagination.currentPage objectPagination.totalPage)}} disabled {{/if}}" href="?page={{sum objectPagination.currentPage 1}}">Next</a>
+      </li>
+    </ul>
+  </nav>  
+  {{!-- End Pagination --}}
+</div>
+
 
 {{!-- Delete hidden form --}}
 {{!-- Không có action tại vì đây nó nhận 1 list nên không dùng course._id được --}}
@@ -165,6 +178,22 @@
         checkAllSubmitBtn.addClass('disabled')
       }
     }
+
+    /* //Pagination
+    const buttonPagination = document.querySelectorAll('[page-pagination]').forEach(item => {
+      item.onclick = function(event){
+        event.preventDefault()
+        var url = this.getAttribute('page-pagination')
+        window.location.href = '/me/stored/courses?page=' + url
+
+        //Hoặc
+        var url = new URL(window.location.href)
+        url.searchParams.set('page', this.getAttribute('page-pagination'))
+        window.location.href = url
+      }
+    })
+    //End Pagination */
+    
 }
 
 </script>

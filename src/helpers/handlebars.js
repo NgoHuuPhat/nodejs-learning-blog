@@ -2,6 +2,18 @@ const Handlebars = require('handlebars');
 
 module.exports = {
     sum: (a, b) => a + b,
+    sub: (a, b) => a - b,
+
+    for: (start, end, block) => {
+        let accum = '';
+        for (let i = start; i <= end; i++) {
+            accum += block.fn(i);
+        }
+        return accum;
+    },
+
+    eq: (a, b) => a === b,
+
 
     sortTable: (field, sort) => {
         const sortType = field === sort.column ? sort.type : 'default';
