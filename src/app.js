@@ -34,6 +34,7 @@ app.engine('hbs', engine({
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'resources','views')) //Hoặc có thể // nhưng nó có thể sai với hệ điều hành khác 
 
+console.log(path.join(__dirname, 'public'))
 //Static file
 app.use(express.static(path.join(__dirname, 'public'))) //Hoặc không dùng _dirname ('./src/public')
 
