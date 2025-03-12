@@ -3,6 +3,7 @@ const Handlebars = require('handlebars');
 module.exports = {
     sum: (a, b) => a + b,
     sub: (a, b) => a - b,
+    multiply : (a, b) => a * b,
 
     for: (start, end, block) => {
         let accum = '';

@@ -11,7 +11,7 @@ class CourseController {
             const countCourses = await Course.countDocuments({ deleted: false }) 
             let objectPagination = paginatitonHelper(
                 {
-                    limitItems: 4,
+                    limitItems: 5,
                     currentPage: 1
                 },
                 req.query,

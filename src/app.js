@@ -4,13 +4,10 @@ const { engine } = require('express-handlebars')
 const methodOverride = require('method-override') //Sử dụng các phương thức HTTP khác ngoài GET, POST (PUT, PATCH, DELETE)
 const morgan = require('morgan')
 const app = express()
-const port = 3000
-
-const SortMiddleware = require('./app/middlewares/sortMiddleware')
-
-
-const route = require('./routes/index')
 const db = require('./config/db') //Ghi tắt vì trong db chỉ có 1 thư mục index.js
+const route = require('./routes/index')
+const port = 3000 
+const SortMiddleware = require('./app/middlewares/sortMiddleware')
 
 //Connect to DB
 //{connect: function: connect}
