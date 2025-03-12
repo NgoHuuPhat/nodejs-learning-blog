@@ -1,3 +1,7 @@
+//Đọc file .env
+require('dotenv').config()
+
+
 const path = require('path')
 const express = require('express')
 const { engine } = require('express-handlebars')
@@ -6,7 +10,7 @@ const morgan = require('morgan')
 const app = express()
 const db = require('./config/db') //Ghi tắt vì trong db chỉ có 1 thư mục index.js
 const route = require('./routes/index')
-const port = 3000 
+const port = process.env.PORT 
 const SortMiddleware = require('./app/middlewares/sortMiddleware')
 
 //Connect to DB
