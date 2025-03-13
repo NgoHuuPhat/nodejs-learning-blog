@@ -10,6 +10,7 @@ const morgan = require('morgan')
 const app = express()
 const db = require('./config/db') //Ghi tắt vì trong db chỉ có 1 thư mục index.js
 const route = require('./routes/index')
+const routeAdmin = require('./routes/admin/index')
 const port = process.env.PORT 
 const SortMiddleware = require('./app/middlewares/sortMiddleware')
 
@@ -44,6 +45,7 @@ app.use(express.json()) //Sử dụng code JS để submit
 
 //Định nghĩa router xử lí yêu cầu HTTP GET đến /news
 route(app)
+routeAdmin(app)
 
 app.listen(port, () => {
     console.log(`🚀 App listening on http://localhost:${port}`)

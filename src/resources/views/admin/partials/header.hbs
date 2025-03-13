@@ -1,0 +1,30 @@
+<nav class="navbar navbar-expand-lg bg-danger-subtle">
+  <div class="container">
+    <a class="navbar-brand" href="/"><img src="/img/LOGO FINAL.png" alt="logo" style="width: 100px; height: auto;"></a>  
+    <form class="search-container" method="GET" action="/search">
+      <i class="fa fa-search"></i>
+      <input type="text" placeholder="Tìm kiếm khóa học, bài viết, ..." name="keyword" id="searchInput" value="{{keyWord}}">
+    </form>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://www.rainforest-alliance.org/wp-content/uploads/2021/06/capybara-square-1.jpg.optimal.jpg" alt="Ca-py-ba-ra" class="user-avatar">
+            Hữu Phát
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/courses/create">Đăng khóa học</a></li>
+            <div class="dropdown-divider"></div>
+            <li><a class="dropdown-item" href="/me/stored/courses">Khóa học của tôi</a></li>
+            <li><a class="dropdown-item" href="/me/stored/news">Bài viết của tôi</a></li>
+            <div class="dropdown-divider"></div>
+            <li><a class="dropdown-item" href="#">Đăng xuất</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -5,11 +5,12 @@ const courseRoute = require('./courses')
 const searchRoute = require('./search')
 
 function route(app) {
+
+    //Client 
     app.use('/news', newsRoute)
     app.use('/me', meRoute)
     app.use('/courses', courseRoute)
     app.use('/search', searchRoute)
-
     app.use('/', siteRoute)
 
 }
