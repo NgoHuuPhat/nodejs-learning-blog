@@ -9,7 +9,7 @@ class SeachController {
                 const regex = new RegExp(keyWord,  "i"); //Lấy giá trị không phân biệt hoa thường
                 
                 const courses = await Course.find({name: regex}).lean() 
-                res.render('search', { courses, keyWord })
+                res.render('client/search', { courses, keyWord })
             } catch (error) {
                 next(error)
             }

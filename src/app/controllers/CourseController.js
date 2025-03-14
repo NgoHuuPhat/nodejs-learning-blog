@@ -7,7 +7,7 @@ class CourseController {
         try {
             //Lấy khóa học trường slug = giá trị req.params.slug
             const course = await Course.findOne({slug: req.params.slug}).lean() 
-            res.render('courses/details', { course })
+            res.render('client/courses/details', { course })
         } catch (error) {
             next(error)
         }
@@ -15,7 +15,7 @@ class CourseController {
 
     //[GET] /courses/create
     create(req, res, next) {
-        res.render('courses/create')
+        res.render('client/courses/create')
     }
 
     //[POST] /courses/store
@@ -36,7 +36,7 @@ class CourseController {
         try {
             //Lấy khóa học trường _id = giá trị req.params.id
             const course = await Course.findById(req.params.id).lean() 
-            res.render('courses/edit', { course })
+            res.render('client/courses/edit', { course })
         } catch (error) {
             next(error)
         }

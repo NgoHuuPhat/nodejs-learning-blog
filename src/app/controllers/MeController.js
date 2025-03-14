@@ -23,7 +23,7 @@ class CourseController {
                 Course.find({deleted: false}).sortTable(req).skip(objectPagination.skip).limit(objectPagination.limitItems).lean(), 
                 Course.countDocumentsWithDeleted({deleted: true})
             ]) 
-            res.render('me/stored-courses', { courses, countDeleted, objectPagination, query: req.query })
+            res.render('client/me/stored-courses', { courses, countDeleted, objectPagination, query: req.query })
         } catch (error) {
             next(error)
         }
@@ -35,7 +35,7 @@ class CourseController {
     async trashCourses(req, res, next){
         try {
             const courses = await Course.findWithDeleted({deleted: true}).lean()
-            res.render('me/trash-courses', { courses })
+            res.render('client/me/trash-courses', { courses })
         } catch (error) {
             next(error)
         }

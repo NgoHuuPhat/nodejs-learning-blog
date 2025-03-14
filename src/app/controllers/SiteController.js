@@ -9,7 +9,7 @@ class SiteController {
             */
             const courses = await Course.find({}).lean() // Đợi Promise return kết quả (find() return Array)
             // courses = courses.map(course => course.toObject()) 
-            res.render('home',{ courses })
+            res.render('client/home',{ courses })
         } catch (error) {
             next(error) //Xử lí lỗi ở 1 nơi khác
         }
