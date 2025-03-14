@@ -1,5 +1,5 @@
-const Course = require('../models/Course')
-const paginatitonHelper = require('../../helpers/pagination')
+const Course = require('../../models/Course')
+const paginatitonHelper = require('../../../helpers/pagination')
 
 class CourseController {
 
