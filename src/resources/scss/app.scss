@@ -39,3 +39,20 @@ a {
         font-size: 15px;
     }
 }
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px; 
+    height: 100vh; // Chiều cao toàn màn hình
+    overflow-y: auto; // Cuộn khi nội dung dài hơn
+    background-color: #f8f9fa; // Màu nền tùy chỉnh
+    z-index: 1050; // Đảm bảo sidebar luôn trên header
+}
+
+.logo-white {
+    filter: brightness(0) invert(1);
+}
+
+
