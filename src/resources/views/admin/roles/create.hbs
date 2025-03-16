@@ -1,0 +1,30 @@
+
+{{!-- Toast thông báo lỗi --}}
+{{#if error}}
+    <div class="position-fixed top-0 end-0 p-3 mt-5" style="z-index: 11">
+        <div id="toast-error" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    {{error}}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+{{/if}}
+
+<div class="mt-4">
+    <h3>Thêm mới nhóm quyền</h3>
+
+    <form class="mt-4" method="post" action="/admin/roles/store">
+        <div class="mb-3">
+            <label for="name" class="form-label">Tiêu đề</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{role.name}}"  oninput="hideError()">
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Mô tả</label>
+            <input type="text" class="form-control" id="description" name="description" value="{{role.description}}">
+        </div>
+        <button type="submit" class="btn btn-primary">Tạo mới</button>
+    </form>
+</div>

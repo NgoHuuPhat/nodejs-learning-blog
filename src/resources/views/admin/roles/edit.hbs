@@ -1,0 +1,14 @@
+<div class="mt-4">
+    <h3>Sửa khóa học</h3>
+    <form class="mt-4" method="POST" action="/admin/roles/{{role._id}}?_method=PATCH">
+        <div class="mb-3">
+            <label for="name" class="form-label">Tiêu đề</label>
+            <input type="text" class="form-control" value="{{role.name}}" id="name" name="name">
+        </div>
+              <div class="mb-3">
+            <label for="name" class="form-label">Mô tả</label>
+            <input type="text" class="form-control" value="{{role.description}}" id="description" name="description">
+        </div>
+        <button type="submit" class="btn btn-primary">Lưu lại</button>
+    </form>
+</div>

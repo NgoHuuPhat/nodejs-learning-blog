@@ -1,11 +1,11 @@
-<div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark sidebar" style="width: 250px;">
-    <a class="navbar-brand text-center d-block logo-white" href="#">
+<div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark sidebar" style="width: 240px;">
+    <a class="navbar-brand text-center d-block logo-white" href="/admin">
         <img src="/img/LOGO FINAL.png" alt="logo" style="width: 100px; height: auto;">
     </a>  
-    <hr>
-    <ul class="nav nav-pills flex-column mb-auto mt-3">
+    <ul class="nav nav-pills flex-column mb-auto mt-4">
         <li class="nav-item">
-            <a href="#" class="nav-link active">
+            {{!-- active --}}
+            <a href="#" class="nav-link text-white "> 
                 <i class="fas fa-chart-line me-2"></i>
                 Tổng quan
             </a>
@@ -23,7 +23,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="nav-link text-white">
+            <a href="/admin/roles" class="nav-link text-white">
                 <i class="fas fa-users-cog me-2"></i>
                 Nhóm quyền
             </a>
