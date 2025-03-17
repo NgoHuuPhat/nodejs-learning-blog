@@ -1,0 +1,74 @@
+<div class="container">
+  <!-- Tiêu đề -->
+  <div class="mb-3">
+    <h3>Thiết lập phân quyền</h3>
+  </div>
+
+{{#if success}}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {{success}}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+{{/if}}
+
+  {{#if records.length}}
+    <table class="table table-bordered mt-5 table-permissions">
+      <thead class="table-light">
+        <tr>
+          <th>Thiết lập phân quyền</th>
+          {{#each records}}
+            <th class="text-center">{{this.name}}</th>
+          {{/each}}
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Nhóm quyền: Danh sách khóa học -->
+        <tr data-name="id" class="d-none">
+          <td></td>
+            {{#each records}}
+              <td class="text-center"><input type="text" value={{this._id}}></td>
+            {{/each}}
+        </tr>
+        <tr class="bg-white" style="height: 30px;">
+          <td colspan="{{colspan}}"></td>
+        </tr>
+        <tr class="table-secondary">
+          <td colspan="{{colspan}}"><strong>Danh sách khóa học</strong></td>
+        </tr>
+        <tr data-name="courses-category_view">
+          <td>Xem</td>
+              {{#each records}}
+                <td class="text-center"><input type="checkbox"></td>
+              {{/each}}
+        </tr>
+        <tr data-name="courses-category_create">
+          <td>Thêm mới</td>
+              {{#each records}}
+                <td class="text-center"><input type="checkbox"></td>
+              {{/each}}
+        </tr>
+        <tr data-name="courses-category_edit">
+          <td>Cập nhật</td>
+              {{#each records}}
+                <td class="text-center"><input type="checkbox"></td>
+              {{/each}}
+        </tr>
+        <tr data-name="courses-category_delete">
+          <td class="text-danger">Xóa</td>
+              {{#each records}}
+                <td class="text-center"><input type="checkbox"></td>
+              {{/each}}
+        </tr>
+      </tbody>
+    </table>
+    <div class="d-flex justify-content-end mt-3">
+      <button type="submit" class="btn btn-primary button-submit">Cập nhật</button>
+    </div>
+  {{else}}
+    <p class="text-muted">Không có nhóm quyền nào.</p>
+  {{/if}}
+</div>
+
+<form id="form-change-permissions" method="POST" action="/admin/roles/permissions?_method=PATCH">
+    <input class="form-control" type="hidden" name="permissions">
+</form>

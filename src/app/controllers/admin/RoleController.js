@@ -62,7 +62,6 @@ class RoleController {
     //[PATCH] /admin/roles/:id
     async update(req, res, next) {
         try {
-            console.log(req.body)
             await Role.updateOne({_id: req.params.id}, req.body)
             res.redirect('/admin/roles')
         } catch (error) {
@@ -81,6 +80,34 @@ class RoleController {
         }
     }
 
+    //[GET] /admin/roles/permissions
+    async permissions(req, res, next) {
+        try {
+
+            //Lấy nhóm quyền trường _id = giá trị req.params.id
+            const records = await Role.find().lean() 
+            res.render('admin/roles/permissions', { records, colspan: records.length + 1 })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    //[PATCH] /admin/roles/permissions
+    async permissionsPatch(req, res, next) {
+        try {
+            const permissions = JSON.parse(req.body.permissions)
+            console.log(permissions)
+
+            for(const item of permissions){
+                await Role.updateOne({_id: item.id}, {permissions: item.permissions})
+            }
+            res.redirect('back')
+        } catch (error) {
+            next(error)
+        }
+    }
+    
+    
 }
 
 module.exports = new RoleController()
