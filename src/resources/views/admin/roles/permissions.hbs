@@ -4,12 +4,9 @@
     <h3>Thiết lập phân quyền</h3>
   </div>
 
-{{#if success}}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-      {{success}}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-{{/if}}
+
+  {{!-- Form ẩn hỗ trợ lấy data từ BE để defaut checked --}}
+  <div class="d-none" data-records='{{formatRecords}}'></div>
 
   {{#if records.length}}
     <table class="table table-bordered mt-5 table-permissions">
@@ -19,9 +16,23 @@
           {{#each records}}
             <th class="text-center">{{this.name}}</th>
           {{/each}}
-        </tr>
+        </tr>   
       </thead>
       <tbody>
+        {{!-- Khoảng cách trắng --}}
+        <tr class="bg-white" style="height: 10px;">
+          <td colspan="{{colspan}}"></td>
+        </tr>
+        <tr>
+        {{!-- Chọn tất cả --}}
+        <td>Chọn tất cả</td>
+          {{#each records}}
+            <td class="text-center">
+              <input class="form-check-input checkbox-all" type="checkbox" data-column="{{@index}}">
+            </td>
+          {{/each}}
+        </tr>
+
         <!-- Nhóm quyền: Danh sách khóa học -->
         <tr data-name="id" class="d-none">
           <td></td>
@@ -29,6 +40,7 @@
               <td class="text-center"><input type="text" value={{this._id}}></td>
             {{/each}}
         </tr>
+        {{!-- Khoảng cách trắng --}}
         <tr class="bg-white" style="height: 30px;">
           <td colspan="{{colspan}}"></td>
         </tr>

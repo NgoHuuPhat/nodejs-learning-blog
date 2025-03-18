@@ -73,5 +73,40 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     }
 
+    // Permissions data default
+     const dataRecords = document.querySelector('[data-records]')
+     if(dataRecords){
+        const records = JSON.parse(decodeURIComponent(dataRecords.getAttribute('data-records')));
+        const tablePermissions = document.querySelector('.table-permissions')
+
+        records.forEach((record,index)=>{
+            const permissions = record.permissions
+            
+            permissions.forEach((permission)=>{
+                const row = tablePermissions.querySelector(`[data-name = "${permission}"]`)
+                const input = row.querySelectorAll('input')[index]
+                
+                input.checked = true
+            })
+        })
+     }
+
+     //Checkbox All
+     const checkboxAll = document.querySelectorAll('.checkbox-all')
+     checkboxAll.forEach((checkboxAll)=>{
+        checkboxAll.addEventListener('change', function(){
+            const columIndex = this.getAttribute('data-column')
+
+            //Tìm tất cả các checkbox trong cột tương ứng
+            const checkboxes = document.querySelectorAll(
+                `tr[data-name] td:nth-child(${+columIndex + 2}) input[type="checkbox"]` //+columnIndex: Chuyển columnIndex từ string thành number
+            )
+            checkboxes.forEach((checkbox)=>{
+                checkbox.checked = checkboxAll.checked //checkboxAll.checked => Boolean True/False
+            })
+        })  
+     })
+ 
+
 })
 

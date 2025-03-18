@@ -85,8 +85,11 @@ class RoleController {
         try {
 
             //Lấy nhóm quyền trường _id = giá trị req.params.id
-            const records = await Role.find().lean() 
-            res.render('admin/roles/permissions', { records, colspan: records.length + 1 })
+            const records = await Role.find({ name: { $ne: "User" } }).lean() //Loại bỏ User
+
+            //Lấy JSON string để sử dụng ở FE (Dùng en... để mã hóa fix lỗi khi render HTML)
+            const formatRecords = encodeURIComponent(JSON.stringify(records));
+            res.render('admin/roles/permissions', { records, formatRecords, colspan: records.length + 1 })
         } catch (error) {
             next(error)
         }

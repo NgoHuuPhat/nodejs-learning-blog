@@ -1,7 +1,6 @@
 //Đọc file .env
 require('dotenv').config()
 
-
 const path = require('path')
 const express = require('express')
 const { engine } = require('express-handlebars')
@@ -47,6 +46,7 @@ app.use(express.json()) //Sử dụng code JS để submit
 //Định nghĩa router xử lí yêu cầu HTTP GET đến /news
 route(app)
 routeAdmin(app)
+
 
 app.listen(port, () => {
     console.log(`🚀 App listening on http://localhost:${port}`)
