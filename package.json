@@ -32,9 +32,11 @@
     "pre-commit": "lint-staged"
   },
   "dependencies": {
+    "connect-flash": "^0.1.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
     "express-handlebars": "^8.0.1",
+    "express-session": "^1.18.1",
     "hbs": "^4.2.0",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",

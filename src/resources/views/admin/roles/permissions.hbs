@@ -4,10 +4,6 @@
     <h3>Thiết lập phân quyền</h3>
   </div>
 
-
-  {{!-- Form ẩn hỗ trợ lấy data từ BE để defaut checked --}}
-  <div class="d-none" data-records='{{formatRecords}}'></div>
-
   {{#if records.length}}
     <table class="table table-bordered mt-5 table-permissions">
       <thead class="table-light">
@@ -84,3 +80,28 @@
 <form id="form-change-permissions" method="POST" action="/admin/roles/permissions?_method=PATCH">
     <input class="form-control" type="hidden" name="permissions">
 </form>
+
+{{!-- Div ẩn hỗ trợ lấy data từ BE để defaut checked --}}
+<div class="d-none" data-records='{{formatRecords}}'></div>
+
+<!-- Hiển thị thông báo thành công -->
+{{#if success}}
+  <div class="alert alert-success alert-dismissible mt-5" role="alert">
+    {{success}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<!-- Hiển thị thông báo lỗi -->
+{{#if error}}
+  <div class="alert alert-danger alert-dismissible mt-5" role="alert">
+    {{error}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+

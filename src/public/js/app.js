@@ -2,34 +2,52 @@ document.addEventListener('DOMContentLoaded', function () {
     
 // (Client) 
     // Search 
-    const searchForm = document.querySelector('.search-container');
+    const searchForm = document.querySelector('.search-container')
     if (searchForm) {
         searchForm.addEventListener('submit', function (e) {
-            const keyword = document.getElementById('searchInput').value.trim();
+            const keyword = document.getElementById('searchInput').value.trim()
             if (!keyword) {
-                e.preventDefault();
+                e.preventDefault()
             }
-        });
+        })
     }
 
 // (Admin) 
     // Active menu
 
     // Create roles form 
-    const btnAddRole = document.getElementById('btn-add-role');
+    const btnAddRole = document.getElementById('btn-add-role')
     if (btnAddRole) {
         btnAddRole.addEventListener('click', function() {
-            document.getElementById('create-roles-form').submit();
-        });
+            document.getElementById('create-roles-form').submit()
+        })
     }
 
     // Timeout toast
-    const toastEl = document.getElementById('toast-error');
+    const toastEl = document.getElementById('toast-error')
 
     if (toastEl) {
-        const toast = new bootstrap.Toast(toastEl, { delay: 2500, autohide: true });
-        toast.show();
+        const toast = new bootstrap.Toast(toastEl, { delay: 2500, autohide: true })
+        toast.show()
     }
+
+    // Timeout alert
+    const alerts = document.querySelectorAll('.alert')
+  
+    alerts.forEach(alert => {
+      // Tự động tắt thông báo sau 3 giây
+      setTimeout(() => {
+        alert.classList.add('fade-out')
+      }, 3000) //
+      
+      // Nếu người dùng nhấn nút đóng, tắt thông báo ngay lập tức
+      const closeButton = alert.querySelector('.close')
+      if (closeButton) {
+        closeButton.addEventListener('click', function() {
+          alert.classList.add('fade-out')
+        })
+      }
+    })
 
     // Permissions
     const tablePermissions = document.querySelector('.table-permissions')
@@ -76,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Permissions data default
      const dataRecords = document.querySelector('[data-records]')
      if(dataRecords){
-        const records = JSON.parse(decodeURIComponent(dataRecords.getAttribute('data-records')));
+        const records = JSON.parse(decodeURIComponent(dataRecords.getAttribute('data-records')))
         const tablePermissions = document.querySelector('.table-permissions')
 
         records.forEach((record,index)=>{

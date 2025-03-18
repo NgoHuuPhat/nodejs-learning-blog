@@ -104,8 +104,12 @@ class RoleController {
             for(const item of permissions){
                 await Role.updateOne({_id: item.id}, {permissions: item.permissions})
             }
+            // Thông báo thành công
+            req.flash('success', 'Cập nhật phân quyền thành công!');
             res.redirect('back')
         } catch (error) {
+            // Thông báo thất bại
+            req.flash('error', 'Có lỗi xảy ra khi cập nhật phân quyền!');
             next(error)
         }
     }

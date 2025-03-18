@@ -12,6 +12,21 @@ const route = require('./routes/client/index')
 const routeAdmin = require('./routes/admin/index')
 const port = process.env.PORT 
 const SortMiddleware = require('./app/middlewares/sortMiddleware')
+const flash = require('connect-flash');
+const session = require('express-session');
+
+//Flash thông báo Alert (Middleware)
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: true
+}));
+app.use(flash());
+app.use((req, res, next) => {
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+});
 
 //Connect to DB
 //{connect: function: connect}
