@@ -15,6 +15,13 @@ module.exports = {
 
     eq: (a, b) => a === b,
 
+    toString: (value) => {
+        if (value && value.toString) {
+            return value.toString();
+        }
+        return value;
+    },
+
     sortTable: (field, sort, query) => { // Thêm query vào tham số
         const sortType = field === sort.column ? sort.type : 'default';
         const icons = {

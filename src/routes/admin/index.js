@@ -1,5 +1,6 @@
 const dashboardRoute = require('./dashboard')
 const roleRoute = require('./roles')
+const accountRoute = require('./accounts')
 const setAdminLayout = require('../../app/middlewares/setAdminLayout')
 
 function routeAdmin(app) {
@@ -9,6 +10,7 @@ function routeAdmin(app) {
     //Admin
     app.use('/admin', dashboardRoute)
     app.use('/admin/roles', roleRoute)
+    app.use('/admin/accounts', accountRoute)
 
 }
 

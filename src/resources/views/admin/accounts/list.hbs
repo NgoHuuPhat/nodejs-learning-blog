@@ -1,0 +1,182 @@
+<div class="container">
+  <!-- Tiêu đề -->
+  <div class="mb-3">
+    <h3>Danh sách tài khoản</h3>
+  </div>
+
+  <!-- Nút thêm mới -->
+  <div class="d-flex justify-content-end mb-3">
+    <a href="/admin/accounts/create" class="btn btn-success">
+      <i class="fas fa-plus-circle me-1"></i> Thêm mới
+    </a>
+  </div>
+
+  <!-- Bảng danh sách tài khoản -->
+  <table class="table mt-3">
+    <thead>
+      <tr>
+        {{#if accounts.length}}
+        <th scope="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox-all">
+          </div>
+        </th>
+        {{/if}}
+        <th scope="col">STT</th>
+        <th scope="col">
+          Họ và tên
+          {{{sortTable 'fullName' _sort query}}}
+        </th>
+        <th scope="col">
+          Phân quyền
+        </th>
+        <th scope="col">
+          Email
+        </th>
+        <th scope="col">
+          Ngày tạo
+          {{{sortTable 'createdAt' _sort query}}}
+        </th>
+        <th scope="col">
+          Trạng thái
+        </th>
+        <th scope="col">Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each accounts}}
+      <tr>
+        <td>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="accountIDs[]" value="{{this._id}}">
+          </div>
+        </td>
+        <th scope="row">
+          {{ sum (sum (multiply (sub @root.objectPagination.currentPage 1) @root.objectPagination.limitItems) @index) 1 }}
+        </th>
+        <td>{{this.fullName}}</td>
+        <td>{{this.role.name}}</td>
+        <td>{{this.email}}</td>
+        <td>{{this.createdAt}}</td>
+        <td>
+          {{#if (eq this.status 'active')}}
+            <span class="badge bg-success">Kích hoạt</span>
+          {{else}}
+            <span class="badge bg-danger">Vô hiệu hóa</span>
+          {{/if}}
+        </td>
+        <td>
+          <a href="/admin/accounts/{{this._id}}/edit" class="btn btn-link">Sửa</a>
+          <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-account-modal">Xóa</a>
+        </td>
+      </tr>
+      {{else}}
+      <tr>
+        <td class="text-center" colspan="6">
+          Bạn chưa có tài khoản nào.
+          <a href="/admin/accounts/create">Thêm mới</a>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="delete-account-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa tài khoản?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Bạn có chắc chắn muốn xóa tài khoản này?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button id="btn-delete-account" type="button" class="btn btn-danger">Xóa bỏ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Phân trang -->
+<div class="d-flex justify-content-between align-items-center mt-4">
+  <div class="">
+    <span class="pagination-text small">{{objectPagination.startIndex}} to {{objectPagination.endIndex}} of {{objectPagination.count}}</span>
+  </div>
+
+  <nav aria-label="...">
+    <ul class="pagination pagination-sm d-flex mb-0 justify-content-end">
+      <li class="page-item">
+        <a class="page-link{{#if (eq objectPagination.currentPage 1)}} disabled {{/if}}" href="?page={{sub objectPagination.currentPage 1}}">Previous</a>
+      </li>
+      {{#for 1 objectPagination.totalPage}}
+        <li class="page-item {{#if (eq @root.objectPagination.currentPage this)}}active{{/if}}">
+          <a class="page-link" href="?page={{this}}">{{this}}</a> 
+        </li>
+      {{/for}}
+      <li class="page-item">
+        <a class="page-link{{#if (eq objectPagination.currentPage objectPagination.totalPage)}} disabled {{/if}}" href="?page={{sum objectPagination.currentPage 1}}">Next</a>
+      </li>
+    </ul>
+  </nav>  
+</div>
+
+<!-- Form xóa tài khoản -->
+<form id="delete-account-form" method="POST"></form>
+
+<!-- Script xử lý -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+
+    var accountID
+    var deleteForm = document.getElementById('delete-account-form')
+    var btnDeleteAccount = document.getElementById('btn-delete-account')
+    var checkboxAll = $('#checkbox-all')
+    var accountItemCheckbox = $('input[name="accountIDs[]"]')
+    var checkAllSubmitBtn = $('.btn-submit')
+
+    // Khi hộp thoại modal show
+    const deleteModal = document.getElementById('delete-account-modal')
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget
+        accountID = button.getAttribute('data-id') 
+    })
+
+    // Khi click vào button xóa bỏ
+    btnDeleteAccount.onclick = function(event){
+      deleteForm.action = '/admin/accounts/' + accountID + '?_method=DELETE'
+      deleteForm.submit()
+    }
+
+    // Khi click checkboxAll
+    checkboxAll.change(function(){
+      var isCheckedAll = $(this).prop('checked')
+      accountItemCheckbox.prop('checked', isCheckedAll)
+      renderCheckAllSubmitBtn()
+    })
+
+    // Khi click checkboxItem
+    accountItemCheckbox.change(function(){ 
+      var isCheckedAll = accountItemCheckbox.length === $('input[name="accountIDs[]"]:checked').length
+      checkboxAll.prop('checked', isCheckedAll )
+      renderCheckAllSubmitBtn()
+    })
+
+    // Xử lý disable button khi không có tài khoản nào được chọn
+    function renderCheckAllSubmitBtn(){
+      var checkedCount = $('input[name="accountIDs[]"]:checked').length
+      if(checkedCount > 0) {
+        checkAllSubmitBtn.removeClass('disabled')
+      } 
+      else {
+        checkAllSubmitBtn.addClass('disabled')
+      }
+    }
+
+}
+
+</script>

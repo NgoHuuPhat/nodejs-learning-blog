@@ -4,7 +4,6 @@ const mongooseDelete = require('mongoose-delete')
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 const { sortTable } = require('../../helpers/queryHelper'); 
 
-
 const Schema = mongoose.Schema
 
 const CourseSchema = new Schema(
