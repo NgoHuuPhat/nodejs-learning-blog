@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const slug = require('mongoose-slug-updater')
 const mongooseDelete = require('mongoose-delete')
 const AutoIncrement = require('mongoose-sequence')(mongoose);
+const { sortTable } = require('../../helpers/queryHelper'); 
 
 
 const Schema = mongoose.Schema
@@ -32,15 +33,7 @@ CourseSchema.plugin(mongooseDelete, {
     overrideMethods: 'all',
 })
 
-//Custom query helpers (Tối ưu hardcode => Xây dựng method sử dụng được nhiều lần)
-CourseSchema.query.sortTable = function(req) {
-    if(req.query.hasOwnProperty('_sort')){
-        const isValidType = ['asc', 'desc'].includes(req.query.type)
-        return this.sort({
-            [req.query.column] : isValidType ? req.query.type : 'desc'
-        })
-    }
-    return this
-  };
+// Sử dụng query helper chung
+CourseSchema.query.sortTable = sortTable;
 
 module.exports = mongoose.model('Course', CourseSchema) //Collection - Schema
