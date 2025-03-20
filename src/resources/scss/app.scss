@@ -113,6 +113,25 @@ a {
     cursor: pointer;
 }
   
+// SCSS cho Dropdown Menu
+.dropdown {
+    .dropdown-menu {
+        .dropdown-item {
+            padding: 0px 40px; 
+            line-height: 2; 
+
+            i {
+                font-size: 15px;  
+                margin-right: 20px; 
+            }
+
+            &:hover {
+                background-color: #f8f9fa;
+                color: #333;  
+            }
+        }
+    }
+}
 
   
 
