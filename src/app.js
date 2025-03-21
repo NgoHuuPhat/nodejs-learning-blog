@@ -14,6 +14,10 @@ const port = process.env.PORT
 const SortMiddleware = require('./app/middlewares/sortMiddleware')
 const flash = require('connect-flash');
 const session = require('express-session');
+const cookieParser = require('cookie-parser')
+
+// Sử dụng cookie-parse
+app.use(cookieParser())
 
 //Flash thông báo Alert (Middleware)
 app.use(session({
