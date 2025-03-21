@@ -7,7 +7,6 @@ const AccountSchema = new Schema(
         fullName: { type: String, required: true},
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true },
-        token: { type: String, default: ""},
         phone: { type: String},
         avatar: { type: String},
         role_id: { type: String, required: true },
