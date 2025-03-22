@@ -66,11 +66,15 @@ class AuthController {
                 fullName: checkEmail.fullName,
                 avatar: checkEmail.avatar
             }
-            console.log("Payload:", payload);
-            const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRE})
 
-            // Lưu accessToken vào cookie
+            // Create accessToken - refreshToken
+            const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRE})
+            const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRE})
+
+            // Lưu accessToken - refreshToken vào cookie
             res.cookie('accessToken', accessToken, { httpOnly: true });
+            res.cookie('refreshToken', refreshToken, { httpOnly: true });
+
             res.redirect('/admin/dashboard')
         } catch (error) {
             next(error)
@@ -80,9 +84,41 @@ class AuthController {
     //[GET] /admin/auth/logout
     logout(req,res){
         res.clearCookie('accessToken')
+        res.clearCookie('refreshToken')
         res.redirect('/admin/auth/login')
     }
-    
+
+    //[GET] /admin/auth/refresh-token
+    async refreshToken(req, res, next) {
+
+        const token = req.cookies.refreshToken
+        if(!token){
+            return res.redirect('/admin/auth/login'); 
+        }
+        try {
+
+            // Kiểm tra refreshToken
+            const decode = jwt.verify(token, process.env.JWT_REFRESH_SECRET)
+
+            // Create Access Token (Lưu ý không truyền password ...)
+            const payload = {
+                email: decode.email,
+                fullName: decode.fullName,
+                avatar: decode.avatar
+            }
+
+            // Tạo mới AccessToken
+            const newAccessToken = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: process.env.JWT_EXPIRE})
+
+            // Trả về JSON chứa accessToken mới cho middleware sử dụng
+            res.json({ accessToken: newAccessToken });
+
+        } catch (error) {
+            console.log('refreshToken không hợp lệ')
+            res.redirect('/admin/auth/login');
+            next(error);
+        }
+    }
 }
 
 module.exports = new AuthController()

@@ -32,6 +32,7 @@
     "pre-commit": "lint-staged"
   },
   "dependencies": {
+    "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
     "connect-flash": "^0.1.1",
     "cookie": "^1.0.2",
