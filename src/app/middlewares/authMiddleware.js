@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const axios = require('axios')
+const Role = require('../models/Role')
 
 module.exports = async function authMiddleware(req, res, next){
     
@@ -8,12 +9,22 @@ module.exports = async function authMiddleware(req, res, next){
         return res.redirect('/admin/auth/login')
     } else{
         try {
-            
-            const decoded = jwt.verify(token, process.env.JWT_SECRET)
-            // Gán vào res.locals để HBS có thể sử dụng
-            res.locals.account = decoded
-            next()
 
+            const decoded = jwt.verify(token, process.env.JWT_SECRET)
+
+            // Lấy giá trị từ Collection Role tương ứng với _id
+            const role = await Role.findOne({_id: decoded.role_id})
+
+            if(role){
+                // Gán vào res.locals để HBS có thể sử dụng
+                res.locals.account = {
+                    ...decoded,
+                    role_name: role.name,
+                    role_permissions: role.permissions
+                }
+            }
+            next()
+            
         } catch (err){
 
             console.log('AccessToken hết hạn, thử làm mới')

@@ -49,5 +49,12 @@ module.exports = {
         const output = `<a href="${address}"><i class="${icon}"></i></a>`;
 
         return new Handlebars.SafeString(output);
+    },
+
+    includes: (array, value, options) => {
+        if (Array.isArray(array) && array.includes(value)) {
+            return options.fn(this); // Render nội dung bên trong block
+        }
+        return options.inverse(this); // Không hiển thị nội dung nếu không tìm thấy
     }
 };

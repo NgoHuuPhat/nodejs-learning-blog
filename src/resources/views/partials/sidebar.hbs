@@ -10,41 +10,68 @@
                 Tổng quan
             </a>
         </li>
+
+        {{#includes account.role_permissions 'courses-category_view'}}
+            <li>
+                <a href="#" class="nav-link text-white">
+                    <i class="fas fa-graduation-cap me-2"></i>
+                    Quản lý khóa học
+                </a>
+            </li>
+        {{/includes}}
+
+        {{#includes account.role_permissions 'posts_view'}}
         <li>
             <a href="#" class="nav-link text-white">
                 <i class="fas fa-newspaper me-2"></i>
                 Quản lý bài viết
             </a>
         </li>
+        {{/includes}}
+
+        {{#includes account.role_permissions 'comments_view'}}
         <li>
             <a href="#" class="nav-link text-white">
-                <i class="fas fa-graduation-cap me-2"></i>
-                Quản lý khóa học
+                <i class="fas fa-comments me-2"></i>
+                Quản lý bình luận
             </a>
         </li>
-        <li>
-            <a href="/admin/roles" class="nav-link text-white">
-                <i class="fas fa-users-cog me-2"></i>
-                Nhóm quyền
-            </a>
-        </li>
-        <li>
-            <a href="/admin/roles/permissions" class="nav-link text-white">
-                <i class="fas fa-user-shield me-2"></i>
-                Phân quyền
-            </a>
-        </li>
-        <li>
-            <a href="/admin/accounts" class="nav-link text-white">
-                <i class="fas fa-users me-2"></i>
-                Danh sách tài khoản
-            </a>
-        </li>
-                <li>
-            <a href="#" class="nav-link text-white">
-                <i class="fas fa-cog me-2"></i>
-                Cài đặt hệ thống
-            </a>
-        </li>
+        {{/includes}}
+
+        {{#includes account.role_permissions 'roles_view'}}
+            <li>
+                <a href="/admin/roles" class="nav-link text-white">
+                    <i class="fas fa-users-cog me-2"></i>
+                    Nhóm quyền
+                </a>
+            </li>
+        {{/includes}}
+
+        {{#includes account.role_permissions 'permissions_view'}}
+            <li>
+                <a href="/admin/roles/permissions" class="nav-link text-white">
+                    <i class="fas fa-user-shield me-2"></i>
+                    Phân quyền
+                </a>
+            </li>
+        {{/includes}}
+
+        {{#includes account.role_permissions 'users_view'}}
+            <li>
+                <a href="/admin/accounts" class="nav-link text-white">
+                    <i class="fas fa-users me-2"></i>
+                    Danh sách tài khoản
+                </a>
+            </li>
+        {{/includes}}
+
+        {{#includes account.role_permissions 'settings_update'}}
+            <li>
+                <a href="#" class="nav-link text-white">
+                    <i class="fas fa-cog me-2"></i>
+                    Cài đặt hệ thống
+                </a>
+            </li>
+        {{/includes}}
     </ul>
 </div>

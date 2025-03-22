@@ -64,7 +64,8 @@ class AuthController {
             const payload = {
                 email: checkEmail.email,
                 fullName: checkEmail.fullName,
-                avatar: checkEmail.avatar
+                avatar: checkEmail.avatar,
+                role_id: checkEmail.role_id
             }
 
             // Create accessToken - refreshToken
@@ -104,7 +105,8 @@ class AuthController {
             const payload = {
                 email: decode.email,
                 fullName: decode.fullName,
-                avatar: decode.avatar
+                avatar: decode.avatar,
+                role_id: decode.role_id
             }
 
             // Tạo mới AccessToken
