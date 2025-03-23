@@ -51,10 +51,16 @@ module.exports = {
         return new Handlebars.SafeString(output);
     },
 
-    includes: (array, value, options) => {
-        if (Array.isArray(array) && array.includes(value)) {
-            return options.fn(this); // Render nội dung bên trong block
+    includes: function (array, value, options) {
+        // Kiểm tra nếu `array` không phải là một mảng
+        if (!Array.isArray(array)) return false;
+
+        const exists = array.includes(value);
+
+        if (typeof options === "object" && options.fn) {
+            return exists ? options.fn(this) : options.inverse(this);
         }
-        return options.inverse(this); // Không hiển thị nội dung nếu không tìm thấy
+
+        return exists;
     }
 };

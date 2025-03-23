@@ -1,264 +1,273 @@
-<div class="container">
-  <!-- Tiêu đề -->
-  <div class="mb-3">
-    <h3>Thiết lập phân quyền</h3>
-  </div>
 
-  {{#if records.length}}
-    <table class="table table-bordered mt-5 table-permissions">
-      <thead class="table-light">
-        <tr>
-          <th>Thiết lập phân quyền</th>
-          {{#each records}}
-            <th class="text-center">{{this.name}}</th>
-          {{/each}}
-        </tr>   
-      </thead>
-      <tbody>
-        {{!-- Khoảng cách trắng --}}
-        <tr class="bg-white" style="height: 10px;">
-          <td colspan="{{colspan}}"></td>
-        </tr>
-        <tr>
-        {{!-- Chọn tất cả --}}
-        <td>Chọn tất cả</td>
-          {{#each records}}
-            <td class="text-center">
-              <input class="form-check-input checkbox-all" type="checkbox" data-column="{{@index}}">
-            </td>
-          {{/each}}
-        </tr>
-
-        <!-- Nhóm quyền: Danh sách khóa học -->
-        <tr data-name="id" class="d-none">
-          <td></td>
-            {{#each records}}
-              <td class="text-center"><input type="text" value={{this._id}}></td>
-            {{/each}}
-        </tr>
-        {{!-- Khoảng cách trắng --}}
-        <tr class="bg-white" style="height: 30px;">
-          <td colspan="{{colspan}}"></td>
-        </tr>
-        <tr class="table-secondary">
-          <td colspan="{{colspan}}"><strong>Danh sách khóa học</strong></td>
-        </tr>
-        <tr data-name="courses-category_view">
-          <td>Xem</td>
-              {{#each records}}
-                <td class="text-center"><input type="checkbox"></td>
-              {{/each}}
-        </tr>
-        <tr data-name="courses-category_create">
-          <td>Thêm mới</td>
-              {{#each records}}
-                <td class="text-center"><input type="checkbox"></td>
-              {{/each}}
-        </tr>
-        <tr data-name="courses-category_edit">
-          <td>Cập nhật</td>
-              {{#each records}}
-                <td class="text-center"><input type="checkbox"></td>
-              {{/each}}
-        </tr>
-        <tr data-name="courses-category_delete">
-          <td class="text-danger">Xóa</td>
-              {{#each records}}
-                <td class="text-center"><input type="checkbox"></td>
-              {{/each}}
-        </tr>
-
-        <!-- Nhóm quyền: Quản lý nhóm quyền -->
-        <tr class="bg-white" style="height: 30px;">
-          <td colspan="{{colspan}}"></td>
-        </tr>
-        <tr class="table-secondary">
-          <td colspan="{{colspan}}"><strong>Quản lý nhóm quyền</strong></td>
-        </tr>
-        <tr data-name="roles_view">
-          <td>Xem</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-        <tr data-name="roles_create">
-          <td>Thêm mới</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-        <tr data-name="roles_edit">
-          <td>Cập nhật</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-        <tr data-name="roles_delete">
-          <td class="text-danger">Xóa</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-
-        <!-- Nhóm quyền: Quản lý phân quyền -->
-        <tr class="bg-white" style="height: 30px;">
-          <td colspan="{{colspan}}"></td>
-        </tr>
-        <tr class="table-secondary">
-          <td colspan="{{colspan}}"><strong>Quản lý phân quyền</strong></td>
-        </tr>
-        <tr data-name="permissions_view">
-          <td>Xem</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-        <tr data-name="permissions_edit">
-          <td>Cập nhật</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-
-        <!-- Nhóm quyền: Quản lý người dùng -->
-        <tr class="bg-white" style="height: 30px;">
-          <td colspan="{{colspan}}"></td>
-        </tr>
-        <tr class="table-secondary">
-          <td colspan="{{colspan}}"><strong>Quản lý người dùng</strong></td>
-        </tr>
-        <tr data-name="users_view">
-          <td>Xem</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-        <tr data-name="users_edit">
-          <td>Cập nhật</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-        <tr data-name="users_delete">
-          <td class="text-danger">Xóa</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-        <tr data-name="users_manage_roles">
-          <td>Phân quyền</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-
-        <!-- Nhóm quyền: Quản lý bài viết -->
-        <tr class="bg-white" style="height: 30px;">
-          <td colspan="{{colspan}}"></td>
-        </tr>
-        <tr class="table-secondary">
-          <td colspan="{{colspan}}"><strong>Quản lý bài viết</strong></td>
-        </tr>
-        <tr data-name="posts_view">
-          <td>Xem</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-        <tr data-name="posts_create">
-          <td>Thêm mới</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-        <tr data-name="posts_edit">
-          <td>Cập nhật</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-        <tr data-name="posts_delete">
-          <td class="text-danger">Xóa</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-
-        <!-- Nhóm quyền: Quản lý bình luận -->
-        <tr class="bg-white" style="height: 30px;">
-          <td colspan="{{colspan}}"></td>
-        </tr>
-        <tr class="table-secondary">
-          <td colspan="{{colspan}}"><strong>Quản lý bình luận</strong></td>
-        </tr>
-        <tr data-name="comments_view">
-          <td>Xem</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-        <tr data-name="comments_approve">
-          <td>Duyệt</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-        <tr data-name="comments_delete">
-          <td class="text-danger">Xóa</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-
-        <!-- Nhóm quyền: Cấu hình hệ thống -->
-        <tr class="bg-white" style="height: 30px;">
-          <td colspan="{{colspan}}"></td>
-        </tr>
-        <tr class="table-secondary">
-          <td colspan="{{colspan}}"><strong>Cấu hình hệ thống</strong></td>
-        </tr>
-        <tr data-name="settings_update">
-          <td>Thay đổi cài đặt chung</td>
-          {{#each records}}
-            <td class="text-center"><input type="checkbox"></td>
-          {{/each}}
-        </tr>
-
-      </tbody>
-    </table>
-    <div class="d-flex justify-content-end mt-3">
-      <button type="submit" class="btn btn-primary button-submit">Cập nhật</button>
+{{!-- Kiểm tra quyền truy cập --}}
+{{#if (includes account.role_permissions 'permissions_view')}}
+  <div class="container">
+    <!-- Tiêu đề -->
+    <div class="mb-3">
+      <h3>Thiết lập phân quyền</h3>
     </div>
-  {{else}}
-    <p class="text-muted">Không có nhóm quyền nào.</p>
+
+    {{#if records.length}}
+      <table class="table table-bordered mt-5 table-permissions">
+        <thead class="table-light">
+          <tr>
+            <th>Thiết lập phân quyền</th>
+            {{#each records}}
+              <th class="text-center">{{this.name}}</th>
+            {{/each}}
+          </tr>   
+        </thead>
+        <tbody>
+          {{!-- Khoảng cách trắng --}}
+          <tr class="bg-white" style="height: 10px;">
+            <td colspan="{{colspan}}"></td>
+          </tr>
+          <tr>
+          {{!-- Chọn tất cả --}}
+          <td>Chọn tất cả</td>
+            {{#each records}}
+              <td class="text-center">
+                <input class="form-check-input checkbox-all" type="checkbox" data-column="{{@index}}">
+              </td>
+            {{/each}}
+          </tr>
+
+          <!-- Nhóm quyền: Danh sách khóa học -->
+          <tr data-name="id" class="d-none">
+            <td></td>
+              {{#each records}}
+                <td class="text-center"><input type="text" value={{this._id}}></td>
+              {{/each}}
+          </tr>
+          {{!-- Khoảng cách trắng --}}
+          <tr class="bg-white" style="height: 30px;">
+            <td colspan="{{colspan}}"></td>
+          </tr>
+          <tr class="table-secondary">
+            <td colspan="{{colspan}}"><strong>Danh sách khóa học</strong></td>
+          </tr>
+          <tr data-name="courses-category_view">
+            <td>Xem</td>
+                {{#each records}}
+                  <td class="text-center"><input type="checkbox"></td>
+                {{/each}}
+          </tr>
+          <tr data-name="courses-category_create">
+            <td>Thêm mới</td>
+                {{#each records}}
+                  <td class="text-center"><input type="checkbox"></td>
+                {{/each}}
+          </tr>
+          <tr data-name="courses-category_edit">
+            <td>Cập nhật</td>
+                {{#each records}}
+                  <td class="text-center"><input type="checkbox"></td>
+                {{/each}}
+          </tr>
+          <tr data-name="courses-category_delete">
+            <td class="text-danger">Xóa</td>
+                {{#each records}}
+                  <td class="text-center"><input type="checkbox"></td>
+                {{/each}}
+          </tr>
+
+          <!-- Nhóm quyền: Quản lý nhóm quyền -->
+          <tr class="bg-white" style="height: 30px;">
+            <td colspan="{{colspan}}"></td>
+          </tr>
+          <tr class="table-secondary">
+            <td colspan="{{colspan}}"><strong>Quản lý nhóm quyền</strong></td>
+          </tr>
+          <tr data-name="roles_view">
+            <td>Xem</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+          <tr data-name="roles_create">
+            <td>Thêm mới</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+          <tr data-name="roles_edit">
+            <td>Cập nhật</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+          <tr data-name="roles_delete">
+            <td class="text-danger">Xóa</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+
+          <!-- Nhóm quyền: Quản lý phân quyền -->
+          <tr class="bg-white" style="height: 30px;">
+            <td colspan="{{colspan}}"></td>
+          </tr>
+          <tr class="table-secondary">
+            <td colspan="{{colspan}}"><strong>Quản lý phân quyền</strong></td>
+          </tr>
+          <tr data-name="permissions_view">
+            <td>Xem</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+          <tr data-name="permissions_edit">
+            <td>Cập nhật</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+
+          <!-- Nhóm quyền: Quản lý người dùng -->
+          <tr class="bg-white" style="height: 30px;">
+            <td colspan="{{colspan}}"></td>
+          </tr>
+          <tr class="table-secondary">
+            <td colspan="{{colspan}}"><strong>Quản lý người dùng</strong></td>
+          </tr>
+          <tr data-name="users_view">
+            <td>Xem</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+          <tr data-name="users_edit">
+            <td>Cập nhật</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+          <tr data-name="users_delete">
+            <td class="text-danger">Xóa</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+          <tr data-name="users_manage_roles">
+            <td>Phân quyền</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+
+          <!-- Nhóm quyền: Quản lý bài viết -->
+          <tr class="bg-white" style="height: 30px;">
+            <td colspan="{{colspan}}"></td>
+          </tr>
+          <tr class="table-secondary">
+            <td colspan="{{colspan}}"><strong>Quản lý bài viết</strong></td>
+          </tr>
+          <tr data-name="posts_view">
+            <td>Xem</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+          <tr data-name="posts_create">
+            <td>Thêm mới</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+          <tr data-name="posts_edit">
+            <td>Cập nhật</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+          <tr data-name="posts_delete">
+            <td class="text-danger">Xóa</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+
+          <!-- Nhóm quyền: Quản lý bình luận -->
+          <tr class="bg-white" style="height: 30px;">
+            <td colspan="{{colspan}}"></td>
+          </tr>
+          <tr class="table-secondary">
+            <td colspan="{{colspan}}"><strong>Quản lý bình luận</strong></td>
+          </tr>
+          <tr data-name="comments_view">
+            <td>Xem</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+          <tr data-name="comments_approve">
+            <td>Duyệt</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+          <tr data-name="comments_delete">
+            <td class="text-danger">Xóa</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+
+          <!-- Nhóm quyền: Cấu hình hệ thống -->
+          <tr class="bg-white" style="height: 30px;">
+            <td colspan="{{colspan}}"></td>
+          </tr>
+          <tr class="table-secondary">
+            <td colspan="{{colspan}}"><strong>Cấu hình hệ thống</strong></td>
+          </tr>
+          <tr data-name="settings_update">
+            <td>Thay đổi cài đặt chung</td>
+            {{#each records}}
+              <td class="text-center"><input type="checkbox"></td>
+            {{/each}}
+          </tr>
+
+        </tbody>
+      </table>
+      <div class="d-flex justify-content-end mt-3">
+        <button type="submit" class="btn btn-primary button-submit">Cập nhật</button>
+      </div>
+    {{else}}
+      <p class="text-muted">Không có nhóm quyền nào.</p>
+    {{/if}}
+  </div>
+
+  <form id="form-change-permissions" method="POST" action="/admin/roles/permissions?_method=PATCH">
+      <input class="form-control" type="hidden" name="permissions">
+  </form>
+
+  {{!-- Div ẩn hỗ trợ lấy data từ BE để defaut checked --}}
+  <div class="d-none" data-records='{{formatRecords}}'></div>
+
+  <!-- Hiển thị thông báo thành công -->
+  {{#if success}}
+    <div class="alert alert-success alert-dismissible mt-5" role="alert">
+      {{success}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <i class="fa-solid fa-circle-xmark"></i>
+      </button>
+    </div>
   {{/if}}
-</div>
 
-<form id="form-change-permissions" method="POST" action="/admin/roles/permissions?_method=PATCH">
-    <input class="form-control" type="hidden" name="permissions">
-</form>
-
-{{!-- Div ẩn hỗ trợ lấy data từ BE để defaut checked --}}
-<div class="d-none" data-records='{{formatRecords}}'></div>
-
-<!-- Hiển thị thông báo thành công -->
-{{#if success}}
-  <div class="alert alert-success alert-dismissible mt-5" role="alert">
-    {{success}}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <i class="fa-solid fa-circle-xmark"></i>
-    </button>
-  </div>
+  <!-- Hiển thị thông báo lỗi -->
+  {{#if error}}
+    <div class="alert alert-danger alert-dismissible mt-5" role="alert">
+      {{error}}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <i class="fa-solid fa-circle-xmark"></i>
+      </button>
+    </div>
+  {{/if}}
+  
+{{else}}
+  {{> 404}}
 {{/if}}
 
-<!-- Hiển thị thông báo lỗi -->
-{{#if error}}
-  <div class="alert alert-danger alert-dismissible mt-5" role="alert">
-    {{error}}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <i class="fa-solid fa-circle-xmark"></i>
-    </button>
-  </div>
-{{/if}}
+
 
 

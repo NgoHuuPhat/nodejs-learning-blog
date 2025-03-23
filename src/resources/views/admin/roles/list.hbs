@@ -1,133 +1,139 @@
 
-<div class="container">
-  <!-- Tiêu đề -->
-  <div class="mb-3">
-    <h3>Nhóm quyền</h3>
+{{!-- Kiểm tra quyền truy cập --}}
+{{#if (includes account.role_permissions 'roles_view')}}
+  <div class="container">
+    <!-- Tiêu đề -->
+    <div class="mb-3">
+      <h3>Nhóm quyền</h3>
+    </div>
+
+    <!-- Nút thêm mới -->
+    <div class="d-flex justify-content-end mb-3">
+      <a href="/admin/roles/create" class="btn btn-success">
+        <i class="fas fa-plus-circle me-1"></i> Thêm mới
+      </a>
+    </div>
+
+    <!-- Bảng danh sách nhóm quyền -->
+    <table class="table mt-3">
+      <thead>
+        <tr>
+          {{#if roles.length}}
+          <th scope="col">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="checkbox-all">
+            </div>
+          </th>
+          {{/if}}
+          <th scope="col">STT</th>
+          <th scope="col">
+            Nhóm quyền
+            {{{sortTable 'name' _sort query}}}
+          </th>
+          <th scope="col">
+            Mô tả ngắn
+          </th>
+          <th scope="col">
+            Thời gian tạo
+            {{{sortTable 'createdAt' _sort query}}}
+          </th>
+          <th scope="col">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each roles}}
+        <tr>
+          <td>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="roleIDs[]" value="{{this._id}}">
+            </div>
+          </td>
+          {{!-- Tính toán số thứ tự STT --}}
+          <th scope="row">
+            {{ sum (sum (multiply (sub @root.objectPagination.currentPage 1) @root.objectPagination.limitItems) @index) 1 }}
+          </th>
+          <td>{{this.name}}</td>
+          <td>{{this.description}}</td>
+          <td>{{this.createdAt}}</td>
+          <td>
+            
+            <a href="/admin/roles/{{this._id}}/edit" class="btn btn-link">Sửa</a>
+            <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-role-modal">Xóa</a>
+          </td>
+        </tr>
+        {{else}}
+        <tr>
+          <td class="text-center" colspan="6">
+            Bạn chưa có nhóm quyền nào.
+            <a href="/admin/roles/create">Thêm mới</a>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
   </div>
 
-  <!-- Nút thêm mới -->
-  <div class="d-flex justify-content-end mb-3">
-    <a href="/admin/roles/create" class="btn btn-success">
-      <i class="fas fa-plus-circle me-1"></i> Thêm mới
-    </a>
-  </div>
-
-  <!-- Bảng danh sách nhóm quyền -->
-  <table class="table mt-3">
-    <thead>
-      <tr>
-        {{#if roles.length}}
-        <th scope="col">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="checkbox-all">
-          </div>
-        </th>
-        {{/if}}
-        <th scope="col">STT</th>
-        <th scope="col">
-          Nhóm quyền
-          {{{sortTable 'name' _sort query}}}
-        </th>
-        <th scope="col">
-          Mô tả ngắn
-        </th>
-        <th scope="col">
-          Thời gian tạo
-          {{{sortTable 'createdAt' _sort query}}}
-        </th>
-        <th scope="col">Thao tác</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each roles}}
-      <tr>
-        <td>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="roleIDs[]" value="{{this._id}}">
-          </div>
-        </td>
-        {{!-- Tính toán số thứ tự STT --}}
-        <th scope="row">
-          {{ sum (sum (multiply (sub @root.objectPagination.currentPage 1) @root.objectPagination.limitItems) @index) 1 }}
-        </th>
-        <td>{{this.name}}</td>
-        <td>{{this.description}}</td>
-        <td>{{this.createdAt}}</td>
-        <td>
-          
-          <a href="/admin/roles/{{this._id}}/edit" class="btn btn-link">Sửa</a>
-          <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-role-modal">Xóa</a>
-        </td>
-      </tr>
-      {{else}}
-      <tr>
-        <td class="text-center" colspan="6">
-          Bạn chưa có nhóm quyền nào.
-          <a href="/admin/roles/create">Thêm mới</a>
-        </td>
-      </tr>
-      {{/each}}
-    </tbody>
-  </table>
-</div>
 
 
+  {{!-- Confirm delete role --}}
 
-{{!-- Confirm delete role --}}
-
-<!-- Modal -->
-<div class="modal fade" id="delete-role-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa nhóm quyền?</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Bạn chắn chắn muốn xóa nhóm quyền này?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-        <button id="btn-delete-role" type="button" class="btn btn-danger">Xóa bỏ</button>
+  <!-- Modal -->
+  <div class="modal fade" id="delete-role-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa nhóm quyền?</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Bạn chắn chắn muốn xóa nhóm quyền này?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button id="btn-delete-role" type="button" class="btn btn-danger">Xóa bỏ</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="d-flex justify-content-between align-items-center mt-4">
-  {{!-- Page number --}}
-    <div class="">
-      <span class="pagination-text small">{{objectPagination.startIndex}} to {{objectPagination.endIndex}} of {{objectPagination.count}}</span>
-    </div>
-  {{!-- End Page number --}}
-  {{!-- 1 to 10 of 100 roles --}}
+  <div class="d-flex justify-content-between align-items-center mt-4">
+    {{!-- Page number --}}
+      <div class="">
+        <span class="pagination-text small">{{objectPagination.startIndex}} to {{objectPagination.endIndex}} of {{objectPagination.count}}</span>
+      </div>
+    {{!-- End Page number --}}
+    {{!-- 1 to 10 of 100 roles --}}
 
-  {{!-- Pagination --}}
-  <nav aria-label="...">
-    <ul class="pagination pagination-sm d-flex mb-0 justify-content-end">
-      <li class="page-item">
-        <a class="page-link{{#if (eq objectPagination.currentPage 1)}} disabled {{/if}}" href="?page={{sub objectPagination.currentPage 1}}">Previous</a>
-      </li>
-      {{#for 1 objectPagination.totalPage}}
-        <li class="page-item {{#if (eq @root.objectPagination.currentPage this)}}active{{/if}}">
-        {{!-- C1: Dùng thẻ a để tạo link --}}
-          <a class="page-link" href="?page={{this}}">{{this}}</a> 
-        {{!-- C2: Dùng thẻ button để tạo page-id thay đổi link href
-          <button class="page-link" page-pagination={{this}}>{{this}}</button> 
-        </li> --}}
-      {{/for}}
-      <li class="page-item">
-        <a class="page-link{{#if (eq objectPagination.currentPage objectPagination.totalPage)}} disabled {{/if}}" href="?page={{sum objectPagination.currentPage 1}}">Next</a>
-      </li>
-    </ul>
-  </nav>  
-  {{!-- End Pagination --}}
-</div>
+    {{!-- Pagination --}}
+    <nav aria-label="...">
+      <ul class="pagination pagination-sm d-flex mb-0 justify-content-end">
+        <li class="page-item">
+          <a class="page-link{{#if (eq objectPagination.currentPage 1)}} disabled {{/if}}" href="?page={{sub objectPagination.currentPage 1}}">Previous</a>
+        </li>
+        {{#for 1 objectPagination.totalPage}}
+          <li class="page-item {{#if (eq @root.objectPagination.currentPage this)}}active{{/if}}">
+          {{!-- C1: Dùng thẻ a để tạo link --}}
+            <a class="page-link" href="?page={{this}}">{{this}}</a> 
+          {{!-- C2: Dùng thẻ button để tạo page-id thay đổi link href
+            <button class="page-link" page-pagination={{this}}>{{this}}</button> 
+          </li> --}}
+        {{/for}}
+        <li class="page-item">
+          <a class="page-link{{#if (eq objectPagination.currentPage objectPagination.totalPage)}} disabled {{/if}}" href="?page={{sum objectPagination.currentPage 1}}">Next</a>
+        </li>
+      </ul>
+    </nav>  
+    {{!-- End Pagination --}}
+  </div>
 
 
-{{!-- Delete hidden form --}}
-{{!-- Không có action tại vì đây nó nhận 1 list nên không dùng role._id được --}}
-<form id="delete-role-form" method="POST"></form>
+  {{!-- Delete hidden form --}}
+  {{!-- Không có action tại vì đây nó nhận 1 list nên không dùng role._id được --}}
+  <form id="delete-role-form" method="POST"></form>
+
+{{else}}
+  {{> 404}}
+{{/if}}
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>

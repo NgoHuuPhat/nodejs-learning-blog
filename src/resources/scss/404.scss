@@ -1,0 +1,97 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    padding: 0;
+    margin: 0;
+  }
+
+  html, body {
+    overflow: hidden;
+  }
+  
+  #notfound {
+    position: relative;
+    height: 100vh;
+  
+    .notfound {
+      position: absolute;
+      left: 50%;
+      top: 30%;
+      transform: translate(-50%, -50%);
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      line-height: 1.4;
+  
+      .notfound-404 {
+        height: 190px;
+  
+        h1 {
+          font-family: 'Montserrat', sans-serif;
+          font-size: 146px;
+          font-weight: 700;
+          margin: 0;
+          color: #232323;
+  
+          span {
+            display: inline-block;
+            width: 120px;
+            height: 120px;
+            background-image: url('../img/emoji.png');
+            background-size: cover;
+            transform: scale(1.4);
+            z-index: -1;
+          }
+        }
+      }
+  
+      h2 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0;
+        text-transform: uppercase;
+        color: #232323;
+      }
+  
+      p {
+        font-family: 'Montserrat', sans-serif;
+        color: #787878;
+        font-weight: 300;
+      }
+  
+      a {
+        font-family: 'Montserrat', sans-serif;
+        display: inline-block;
+        padding: 12px 30px;
+        font-weight: 700;
+        background-color: #f99827;
+        color: #fff;
+        border-radius: 40px;
+        text-decoration: none;
+        transition: 0.2s all;
+  
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+  
+  @media only screen and (max-width: 767px) {
+    .notfound .notfound-404 {
+      height: 115px;
+  
+      h1 {
+        font-size: 86px;
+  
+        span {
+          width: 86px;
+          height: 86px;
+        }
+      }
+    }
+  }
+  
