@@ -62,6 +62,7 @@ class AuthController {
 
             // Create Access Token (Lưu ý không truyền password ...)
             const payload = {
+                id: checkEmail._id,
                 email: checkEmail.email,
                 fullName: checkEmail.fullName,
                 avatar: checkEmail.avatar,
@@ -103,6 +104,7 @@ class AuthController {
 
             // Create Access Token (Lưu ý không truyền password ...)
             const payload = {
+                id: decode.id,
                 email: decode.email,
                 fullName: decode.fullName,
                 avatar: decode.avatar,

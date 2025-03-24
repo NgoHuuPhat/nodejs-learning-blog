@@ -1,4 +1,5 @@
 const Course = require('../../models/Course')
+const Account = require('../../models/Account')
 const paginatitonHelper = require('../../../helpers/pagination')
 
 class CourseController {
@@ -23,6 +24,16 @@ class CourseController {
                 Course.find({deleted: false}).sortTable(req).skip(objectPagination.skip).limit(objectPagination.limitItems).lean(), 
                 Course.countDocumentsWithDeleted({deleted: true})
             ]) 
+
+            //Lây ra tên người tạo
+            for (let course of courses) {
+                const user = await Account.findOne({_id: course.createdBy.account_id}).lean()
+                
+                if(user){
+                    course.createdBy.name = user.fullName
+                }
+            }
+            
             res.render('admin/courses/list', { courses, countDeleted, objectPagination, query: req.query })
         } catch (error) {
             next(error)
@@ -38,12 +49,18 @@ class CourseController {
     async store(req, res, next) {
         try {
 
+            //Lưu người tạo khóa học
+            req.body.createdBy = {
+                account_id: res.locals.account.id,
+            }
+
             //Gán giá trị image (Tương tự như default ở bên Schema)
             req.body.image = `https://i.ytimg.com/vi/${req.body.videoID}/hqdefault.jpg?s%E2%80%A6EIYAXABwAEG&rs=AOn4CLBwYwrOaKarfa87-f5y6U_UtM0Cfg`
             await Course.create(req.body) //Lưu vào database (có thể dùng .save())
 
             //Điều hướng về trang home
             res.redirect('/admin/courses')
+
         } catch (error) {
             next(error)
         }
@@ -80,10 +97,11 @@ class CourseController {
         }
     }
 
-    //[DELETE] /admin/courses/:id Xóa giả
+    //[DELETE] /admin/courses/:id
     async destroy(req, res, next) {
-        try {
-            await Course.delete({_id: req.params.id})
+        try {      
+            //Xóa giả lưu thêm thông tin người xóa
+            await Course.delete({_id: req.params.id},res.locals.account.id)
             res.redirect('back') //'back' về lại trang trước đó
         } catch (error) {
             next(error)

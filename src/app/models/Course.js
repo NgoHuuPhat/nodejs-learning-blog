@@ -14,8 +14,27 @@ const CourseSchema = new Schema(
         image: { type: String },
         videoID: { type: String, required: true },
         level: { type: String },
+
         //Tạo slug (unique duy nhất)
-        slug: { type: String, slug: 'name', unique: true}
+        slug: { type: String, slug: 'name', unique: true},
+
+        //Thêm người tạo
+        createdBy: {
+            account_id: String,
+            createdAt: {
+                type: Date,
+                default: Date.now
+            }
+        },
+
+        //Thêm người xóa
+        deletedBy: {
+            account_id: String,
+            deletedAt: {
+                type: Date,
+                default: null
+            }
+        }
     }, 
     { 
         _id: false,
@@ -30,6 +49,7 @@ CourseSchema.plugin(AutoIncrement)
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
 CourseSchema.plugin(mongooseDelete, { 
     deletedAt : true,
+    deletedBy: true, //Thêm người xóa
     overrideMethods: 'all',
 })
 

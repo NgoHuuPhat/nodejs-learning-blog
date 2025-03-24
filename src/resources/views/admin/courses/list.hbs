@@ -45,8 +45,11 @@
               <th scope="col">
                 Thời gian tạo
                 {{{sortTable 'createdAt' _sort query}}}
-                </th>
-              <th scope="col"></th>
+              </th>
+              <th scope="col">
+                Người tạo
+              </th>
+              <th scope="col">Thao tác</th>
           </tr>
       </thead>
       <tbody>
@@ -64,6 +67,7 @@
               <td>{{this.name}}</td>
               <td>{{this.level}}</td>
               <td>{{this.createdAt}}</td>
+              <td>{{this.createdBy.name}}</td>
               <td>
                   <a href="/admin/courses/{{this._id}}/edit" class="btn btn-link">Sửa</a>
                   <!-- Button trigger modal 
@@ -74,7 +78,7 @@
           {{else}}
           <tr>
             <td class="text-center" colspan="5">Bạn chưa đăng khóa học nào
-              <a href="/courses/create">Đăng khóa học</a>
+              <a href="/admin/courses/create">Đăng khóa học</a>
             </td>   
           </tr>
           {{/each}}
