@@ -109,9 +109,10 @@ document.addEventListener('DOMContentLoaded', function () {
         })
      }
 
-     //Checkbox All
-     const checkboxAll = document.querySelectorAll('.checkbox-all')
-     checkboxAll.forEach((checkboxAll)=>{
+    //Checkbox All
+    const checkboxAllList = document.querySelectorAll('.checkbox-all')
+
+    checkboxAllList.forEach((checkboxAll)=>{
         checkboxAll.addEventListener('change', function(){
             const columIndex = this.getAttribute('data-column')
 
@@ -123,9 +124,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 checkbox.checked = checkboxAll.checked //checkboxAll.checked => Boolean True/False
             })
         })  
-     })
- 
+
+        //Xử lí khi checkbox bất kì trong cột CheckboxAll thay đổi
+        const columIndex = checkboxAll.getAttribute('data-column')
+        const checkboxes = document.querySelectorAll(
+            `tr[data-name] td:nth-child(${+columIndex + 2}) input[type="checkbox"]` //+columnIndex: Chuyển columnIndex từ string thành number
+        )
+
+        checkboxes.forEach((checkbox)=>{
+            checkbox.addEventListener('change',function(){
+                const allChecked = Array.from(checkboxes).every((cb)=>cb.checked) //Kiểm tra tất cả các checkbox trong cột có đều được chọn không
+                checkboxAll.checked = allChecked
+            })
+        })
+    })
+
+    
 })
-
-
 
