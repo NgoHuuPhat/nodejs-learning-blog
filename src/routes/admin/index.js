@@ -2,6 +2,7 @@ const dashboardRoute = require('./dashboard')
 const roleRoute = require('./roles')
 const accountRoute = require('./accounts')
 const authRoute = require('./auth')
+const courseRoute = require('./courses')
 
 const setAuthLayout = require('../../app/middlewares/setAuthLayout')
 const setAdminLayout = require('../../app/middlewares/setAdminLayout')
@@ -16,6 +17,7 @@ function routeAdmin(app) {
     app.use('/admin', authMiddleware, dashboardRoute);
     app.use('/admin/roles',authMiddleware, roleRoute);
     app.use('/admin/accounts', authMiddleware, accountRoute);
+    app.use('/admin/courses', authMiddleware, courseRoute);
 }
 
 module.exports = routeAdmin

@@ -26,6 +26,7 @@ const CourseSchema = new Schema(
 mongoose.plugin(slug)
 CourseSchema.plugin(AutoIncrement)
 
+
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
 CourseSchema.plugin(mongooseDelete, { 
     deletedAt : true,

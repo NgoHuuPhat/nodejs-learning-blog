@@ -1,6 +1,6 @@
 module.exports = (objectPagination, query, count) => {
     if(query.page){
-        objectPagination.currentPage = parseInt(query.page) // String nên phải chuy ển sang number
+        objectPagination.currentPage = parseInt(query.page) // String nên phải chuyển sang number
     }
 
     //Công thức phân trang 
