@@ -30,10 +30,13 @@ const CourseSchema = new Schema(
         //Thêm người xóa
         deletedBy: {
             account_id: String,
-            deletedAt: {
-                type: Date,
-                default: null
-            }
+            deletedAt: Date
+        },
+
+        //Thêm người cập nhật
+        updatedBy: {
+            account_id: String,
+            updatedAt: Date
         }
     }, 
     { 
@@ -49,7 +52,6 @@ CourseSchema.plugin(AutoIncrement)
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
 CourseSchema.plugin(mongooseDelete, { 
     deletedAt : true,
-    deletedBy: true, //Thêm người xóa
     overrideMethods: 'all',
 })
 

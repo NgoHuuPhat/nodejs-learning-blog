@@ -90,6 +90,12 @@ class CourseController {
     //[PUT] /admin/courses/:id
     async update(req, res, next) {
         try {
+
+            //Thêm người cập nhật
+            req.body.updatedBy = {
+                account_id: res.locals.account.id,
+                updatedAt: new Date()
+            }
             await Course.updateOne({_id: req.params.id}, req.body)
             res.redirect('/admin/courses')
         } catch (error) {
@@ -100,8 +106,19 @@ class CourseController {
     //[DELETE] /admin/courses/:id
     async destroy(req, res, next) {
         try {      
-            //Xóa giả lưu thêm thông tin người xóa
-            await Course.delete({_id: req.params.id},res.locals.account.id)
+
+            //Xóa mềm lưu thông tin người xóa
+            await Course.updateOne({_id: req.params.id},
+                {
+                    deletedBy: {
+                        account_id: res.locals.account.id,
+                        deletedAt: new Date()
+                    }
+                }
+            )
+
+            //Chính thức xóa mềm
+            await Course.delete({_id: req.params.id})
             res.redirect('back') //'back' về lại trang trước đó
         } catch (error) {
             next(error)
