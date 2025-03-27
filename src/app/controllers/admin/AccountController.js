@@ -101,7 +101,7 @@ class AccountController {
 
             // Nếu có file avatar được upload, cập nhật đường dẫn avatar
             if (req.file) {
-                updateData.avatar = `/uploads/${req.file.filename}`;
+                updateData.avatar = `/img/${req.file.filename}`;
             }
 
             // Kiểm tra xem email đã tồn tại chưa (loại trừ email hiện tại &ne _id)

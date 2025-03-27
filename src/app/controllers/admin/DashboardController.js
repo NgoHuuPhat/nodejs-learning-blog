@@ -1,5 +1,5 @@
 class DashboardController {
-    //[GET] /news
+    //[GET] /admin/dashboard
     index(req, res) {
         res.render('admin/dashboard')  
     }

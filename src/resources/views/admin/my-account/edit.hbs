@@ -1,0 +1,54 @@
+
+<div class="mt-4">
+    <h3>Cập nhật thông tin cá nhân</h3>
+    <form class="mt-4" method="POST" action="/admin/my-account/{{myAccount._id}}?_method=PATCH" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label for="fullName" class="form-label">Họ tên <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="fullName" name="fullName" value="{{myAccount.fullName}}">
+        </div>
+
+        <div class="mb-3">
+            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+            <input type="email" class="form-control" id="email" name="email" value="{{myAccount.email}}">
+        </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+            <input type="tel" class="form-control" id="phone" name="phone" value="{{myAccount.phone}}"
+                    pattern="0[35789][0-9]{8}" required
+                    title="Số điện thoại không đúng">
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label">Mật khẩu</label>
+            <input type="password" class="form-control" id="password" name="password">
+        </div>
+
+        <div class="mb-3">
+            <label for="avatar" class="form-label">Avatar</label>
+            <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Lưu lại</button>
+    </form>
+</div>
+
+<!-- Hiển thị thông báo thành công -->
+{{#if success}}
+  <div class="alert alert-success alert-dismissible mt-5" role="alert">
+    {{success}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<!-- Hiển thị thông báo lỗi -->
+{{#if error}}
+  <div class="alert alert-danger alert-dismissible mt-5" role="alert">
+    {{error}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}

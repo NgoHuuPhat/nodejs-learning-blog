@@ -3,12 +3,12 @@
     <form class="mt-4" method="POST" action="/admin/accounts/store" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="fullName" class="form-label">Họ tên <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="fullName" name="fullName" value="{{user.fullName}}" oninput="hideError()">
+            <input type="text" class="form-control" id="fullName" name="fullName">
         </div>
 
         <div class="mb-3">
             <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-            <input type="email" class="form-control" id="email" name="email" value="{{user.email}}">
+            <input type="email" class="form-control" id="email" name="email">
         </div>
 
         <div class="mb-3">
@@ -18,7 +18,7 @@
 
         <div class="mb-3">
             <label for="phone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
-            <input type="tel" class="form-control" id="phone" name="phone" 
+            <input type="tel" class="form-control" id="phone" name="phone"
                     pattern="0[35789][0-9]{8}" required
                     title="Số điện thoại phải có 10 chữ số">
         </div>
