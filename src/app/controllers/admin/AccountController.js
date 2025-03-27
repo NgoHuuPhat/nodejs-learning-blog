@@ -67,7 +67,7 @@ class AccountController {
                 fullName: req.body.fullName,
                 email: req.body.email,
                 password: hashedPassword,
-                token: req.body.token,
+                phone: req.body.phone,
                 role_id: req.body.role_id,
                 status: req.body.status,
                 avatar: avatarPath

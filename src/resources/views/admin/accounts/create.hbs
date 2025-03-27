@@ -17,6 +17,13 @@
         </div>
 
         <div class="mb-3">
+            <label for="phone" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+            <input type="tel" class="form-control" id="phone" name="phone" 
+                    pattern="0[35789][0-9]{8}" required
+                    title="Số điện thoại phải có 10 chữ số">
+        </div>
+
+        <div class="mb-3">
             <label for="avatar" class="form-label">Avatar</label>
             <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
         </div>
