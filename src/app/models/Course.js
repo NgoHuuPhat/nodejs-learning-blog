@@ -34,10 +34,12 @@ const CourseSchema = new Schema(
         },
 
         //Thêm người cập nhật
-        updatedBy: {
-            account_id: String,
-            updatedAt: Date
-        }
+        updatedBy: [
+            {
+                account_id: String,
+                updatedAt: Date
+            }
+        ]
     }, 
     { 
         _id: false,

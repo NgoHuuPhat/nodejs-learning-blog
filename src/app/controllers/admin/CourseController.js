@@ -92,11 +92,13 @@ class CourseController {
         try {
 
             //Thêm người cập nhật
-            req.body.updatedBy = {
+            const updatedBy = {
                 account_id: res.locals.account.id,
                 updatedAt: new Date()
             }
-            await Course.updateOne({_id: req.params.id}, req.body)
+
+            //Cập nhật khóa học
+            await Course.updateOne({_id: req.params.id}, { ...req.body, $push: {updatedBy: updatedBy}})
             res.redirect('/admin/courses')
         } catch (error) {
             next(error)
