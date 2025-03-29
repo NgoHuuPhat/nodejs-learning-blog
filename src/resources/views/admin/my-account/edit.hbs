@@ -1,7 +1,7 @@
 
 <div class="mt-4">
     <h3>Cập nhật thông tin cá nhân</h3>
-    <form class="mt-4" method="POST" action="/admin/my-account/{{myAccount._id}}?_method=PATCH" enctype="multipart/form-data">
+    <form id="updateAccountForm" class="mt-4" method="POST" action="/admin/my-account/{{myAccount._id}}?_method=PATCH" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="fullName" class="form-label">Họ tên <span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="fullName" name="fullName" value="{{myAccount.fullName}}">
@@ -52,3 +52,53 @@
     </button>
   </div>
 {{/if}}
+
+<div id="successMessage" class="alert alert-success alert-dismissible mt-5 d-none" role="alert">
+    <span id="successText"></span>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("updateAccountForm");
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        let formData = new FormData(form);
+
+        try {
+            const response = await fetch(form.action, {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Cập nhật thông tin trên header ngay lập tức
+                document.querySelector(".user-avatar").src = data.avatar;
+                document.querySelector(".nav-link.dropdown-toggle").innerHTML = `
+                    <img src="${data.avatar}" alt="Ca-py-ba-ra" class="user-avatar">
+                    ${data.fullName}
+                `;
+
+                // Hiển thị thông báo thành công
+                alert("Cập nhật thành công!");
+
+                // Chuyển hướng về trang hồ sơ sau 1s
+                setTimeout(() => {
+                    window.location.href = data.redirectUrl;
+                }, 1000);
+            } else {
+                alert(data.error || "Có lỗi xảy ra!");
+            }
+        } catch (error) {
+            console.error("Lỗi cập nhật:", error);
+        }
+    });
+});
+</script>
+

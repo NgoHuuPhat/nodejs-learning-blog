@@ -66,9 +66,18 @@ class DashboardController {
             }
 
             const a = await Account.updateOne({_id: req.params.id}, updateData)
-            console.log(a
-            )
-            res.redirect('/admin/my-account')
+
+            // Lấy thông tin mới cập nhật
+            const updatedAccount = await Account.findById(req.params.id).lean();
+
+            // Trả về JSON thay vì redirect
+            res.json({ 
+                success: "Cập nhật thành công!", 
+                fullName: updatedAccount.fullName,
+                avatar: updatedAccount.avatar,
+                redirectUrl: "/admin/my-account"
+            });
+            
         } catch (error) {
             next(error)
         }
