@@ -14,7 +14,6 @@ class DashboardController {
 
             //Lấy ra thông tin account
             const myAccount = await Account.findOne({ _id: res.locals.account.id }).lean()
-            console.log('Account Data:', myAccount);
 
             //Lấy ra tên role
             const myRole = await Role.findOne({ _id: myAccount.role_id }).lean()

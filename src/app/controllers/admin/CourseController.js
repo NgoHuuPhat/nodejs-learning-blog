@@ -121,7 +121,7 @@ class CourseController {
 
             //Chính thức xóa mềm
             await Course.delete({_id: req.params.id})
-            res.redirect('back') //'back' về lại trang trước đó
+            res.redirect(req.get('Referrer') || '/');//'back' về lại trang trước đó
         } catch (error) {
             next(error)
         }
@@ -131,7 +131,7 @@ class CourseController {
     async restore(req, res, next) {
         try {
             await Course.restore({ _id: req.params.id })
-            res.redirect('back')
+            res.redirect(req.get('Referrer') || '/');//'back' về lại trang trước đó
         } catch (error) {
             next(error)
         }
@@ -139,11 +139,12 @@ class CourseController {
 
     //[POST] /admin/courses/handle-form-actions
     async handleFormActions(req, res, next){
+         console.log(req.body);
         switch(req.body.action){
             case 'delete':
                 try {
                     await Course.delete({_id: req.body.courseIDs})
-                    res.redirect('back') //'back' về lại trang trước đó
+                    res.redirect(req.get('Referrer') || '/');//'back' về lại trang trước đó
                 } catch (error) {
                     next(error)
                 }
@@ -157,7 +158,7 @@ class CourseController {
     async forceDestroy(req, res, next) {
         try {
             await Course.deleteOne({_id: req.params.id})
-            res.redirect('back') //'back' về lại trang trước đó
+            res.redirect(req.get('Referrer') || '/');//'back' về lại trang trước đó
         } catch (error) {
             next(error)
         }

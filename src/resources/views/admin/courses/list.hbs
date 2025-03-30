@@ -1,7 +1,7 @@
 
 {{!-- Kiểm tra quyền truy cập --}}
 {{#if (includes account.role_permissions 'courses-category_view')}}
-<form method="POST" action="/courses/handle-form-actions">
+<form method="POST" action="/admin/courses/handle-form-actions">
   <div>
     <h3>Danh sách khóa học</h3>
     <a href="/admin/courses/trash">Thùng rác ({{countDeleted}})</a>
@@ -155,6 +155,7 @@
     var btnDeleteCourse = document.getElementById('btn-delete-course')
     var checkboxAll = $('#checkbox-all') //Jquery
     var courseItemCheckbox = $('input[name="courseIDs[]"]')
+    console.log(courseItemCheckbox)
     var checkAllSubmitBtn = $('.btn-submit')
 
     //Khi hộp thoại modal show
