@@ -131,11 +131,14 @@ document.addEventListener('DOMContentLoaded', function () {
             `tr[data-name] td:nth-child(${+columIndex + 2}) input[type="checkbox"]` //+columnIndex: Chuyển columnIndex từ string thành number
         )
 
+        //Hàm cập nhật trạng thái checkboxAll
+        const updateCheckboxAll = () => {  
+            checkboxAll.checked = Array.from(checkboxes).every((cb) => cb.checked)
+        }
+        updateCheckboxAll()
+
         checkboxes.forEach((checkbox)=>{
-            checkbox.addEventListener('change',function(){
-                const allChecked = Array.from(checkboxes).every((cb)=>cb.checked) //Kiểm tra tất cả các checkbox trong cột có đều được chọn không
-                checkboxAll.checked = allChecked
-            })
+            checkbox.addEventListener('change',updateCheckboxAll())
         })
     })
 
