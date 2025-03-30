@@ -1,33 +1,56 @@
-<section class="min-vh-100 d-flex align-items-center justify-content-center" style="background-color: #f6f9f8;">
-  <div class="container-fluid py-5">
-    <div class="row d-flex justify-content-center align-items-center">
+<section class="min-vh-100 d-flex align-items-center justify-content-center bg-light">
+  <div class="container py-5">
+    <div class="row justify-content-center">
       <div class="col-lg-10 col-md-12">
-        <div class="card mx-auto" style="border-radius: .5rem; max-width: 1200px;">
+        <div class="card mx-auto profile-card">
           <div class="row g-0">
-            <div class="col-md-4 gradient-custom text-center text-black d-flex flex-column align-items-center justify-content-center"
-              style="border-top-left-radius: .5rem; border-bottom-left-radius: .5rem;">
-              <img src="{{myAccount.avatar}}"
-                alt="Avatar" class="img-fluid my-4" style="width: 120px; height: 120px; border-radius: 50%;" />
-              <h5 class="fs-4">{{myAccount.fullName}}</h5>
-              <p class="fs-5">{{myRole.name}}</p>
-              <a href="/admin/my-account/{{myAccount._id}}/edit"><i class="far fa-edit mb-4 fs-5"></i></a>
+
+            <!-- Sidebar -->
+            <div class="col-md-4 profile-sidebar text-center d-flex flex-column align-items-center justify-content-center">
+              <img src="{{myAccount.avatar}}" 
+                   alt="Avatar" 
+                   class="img-fluid rounded-circle profile-avatar mb-3">
+              <h5 class="fw-bold mt-4">{{myAccount.fullName}}</h5>
+              <a href="/admin/my-account/{{myAccount._id}}/edit" class="btn btn-edit mt-3">
+                <i class="far fa-edit"></i> Chỉnh sửa
+              </a>
             </div>
-            <div class="col-md-8">
-              <div class="card-body p-5">
-                <h6 class="fs-4">Thông tin cá nhân</h6>
-                <hr class="mt-0 mb-4">
-                <div class="row pt-5">
-                    <div class="col-6 mb-3">
-                        <h6 class="fs-5">Email</h6>
-                        <p class="text-muted fs-6">{{myAccount.email}}</p>
-                    </div>
-                    <div class="col-6 mb-3">
-                        <h6 class="fs-5">Số điện thoại</h6>
-                        <p class="text-muted fs-6">{{myAccount.phone}}</p>
-                    </div>
+
+            <!-- Profile Details -->
+            <div class="col-md-8 bg-white">
+              <div class="card-body p-4">
+                <h4 class="fw-bold text-primary-custom" >Thông tin cá nhân</h4>
+                <hr class="mb-4">
+
+                <div class="row profile-info">
+                  <div class="col-6 mb-3">
+                    <h6>Email</h6>
+                    <p>{{myAccount.email}}</p>
+                  </div>
+                  <div class="col-6 mb-3">
+                    <h6>Số điện thoại</h6>
+                    <p>{{myAccount.phone}}</p>
+                  </div>
+                </div>
+
+                <div class="row profile-info">
+                  <div class="col-6 mb-3">
+                    <h6>Ngày tham gia</h6>
+                    <p>{{myAccount.createdAt}}</p>
+                  </div>
+                  <div class="col-6 mb-3">
+                    <h6>Vai trò</h6>
+                    <p class="text-primary-custom">{{myRole.name}}</p>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end">
+                  <a href="/admin/dashboard" class="btn-grad p-2 px-4 mt-3">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                  </a>
                 </div>
               </div>
-            </div>
+            </div> <!-- End Profile Details -->
           </div>
         </div>
       </div>

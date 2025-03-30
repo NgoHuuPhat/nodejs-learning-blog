@@ -18,6 +18,13 @@ class DashboardController {
             //Lấy ra tên role
             const myRole = await Role.findOne({ _id: myAccount.role_id }).lean()
 
+            // Chuyển đổi createdAt sang định dạng DD/MM/YYYY
+            myAccount.createdAt = new Date(myAccount.createdAt).toLocaleDateString('vi-VN',{
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+
             res.render('admin/my-account/details', { myAccount, myRole })
         } catch (error) {
             next(error)
