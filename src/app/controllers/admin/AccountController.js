@@ -85,10 +85,10 @@ class AccountController {
         try {
  
             //Lấy trường _id = giá trị req.params.id
-            const account = await Account.findById(req.params.id).lean() 
+            const accountData = await Account.findById(req.params.id).lean() 
             const roles = await Role.find().lean() 
 
-            res.render('admin/accounts/edit', { account, roles })
+            res.render('admin/accounts/edit', { accountData, roles })
         } catch (error) {
             next(error)
         }

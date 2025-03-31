@@ -61,7 +61,6 @@ module.exports = async function authMiddleware(req, res, next){
             role_name: role.name,
             role_permissions: role.permissions
         }
-
         next()
     }
 }
