@@ -142,6 +142,16 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     })
 
-    
+    //Check re password
+    const formRegister = document.getElementById('register-form')
+    formRegister.addEventListener('submit', function(e){
+        const password = document.getElementById('pass').value.trim()
+        const rePassword = document.getElementById('re_pass').value.trim() 
+
+        if(password !== rePassword){
+            e.preventDefault() //Ngăn chặn gửi form nếu mật khẩu không khớp
+            alert('Mật khẩu không khớp!')
+        }
+    })
 })
 

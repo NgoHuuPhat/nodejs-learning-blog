@@ -5,14 +5,10 @@ const authRoute = require('./auth')
 const courseRoute = require('./courses')
 const myAccountRoute = require('./my-account')
 
-const setAuthLayout = require('../../app/middlewares/setAuthLayout')
-const setAdminLayout = require('../../app/middlewares/setAdminLayout')
 const authMiddleware = require('../../app/middlewares/authMiddleware')
 const authorMiddleware = require('../../app/middlewares/authorMiddleware')
 
 function routeAdmin(app) {
-    app.use(setAuthLayout);
-    app.use(setAdminLayout);
 
     // Khai báo route
     app.use('/admin/auth', authRoute);

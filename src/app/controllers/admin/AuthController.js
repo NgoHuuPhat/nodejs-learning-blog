@@ -15,23 +15,6 @@ class AuthController {
         }
     }
 
-    //[POST] /admin/roles/store
-    async store(req, res, next) {
-        try {
-            await Role.create(req.body);
-            res.redirect('/admin/roles');
-        } catch (error) {
-            if (error.code === 11000) { // Mã lỗi 11000 là lỗi unique
-                return res.render('admin/roles/create', { 
-                    error: 'Tên nhóm quyền đã tồn tại!', 
-                    role: req.body 
-                });
-            }
-            next(error);
-            
-        }
-    }
-
     //[POST] /admin/auth/login
     async login(req, res, next) {
         try {

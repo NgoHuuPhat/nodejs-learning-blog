@@ -2,6 +2,7 @@ const newsRoute = require('./news')
 const meRoute = require('./me')
 const siteRoute = require('./site')
 const courseRoute = require('./courses')
+const authRoute = require('./auth')
 
 function route(app) {
 
@@ -10,6 +11,7 @@ function route(app) {
     app.use('/me', meRoute)
     app.use('/courses', courseRoute)
     app.use('/', siteRoute)
+    app.use('/auth', authRoute)
 
 }
 

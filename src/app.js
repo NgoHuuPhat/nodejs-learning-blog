@@ -12,6 +12,7 @@ const route = require('./routes/client/index')
 const routeAdmin = require('./routes/admin/index')
 const port = process.env.PORT 
 const SortMiddleware = require('./app/middlewares/sortMiddleware')
+const setLayout = require('./app/middlewares/setLayout')
 const flash = require('connect-flash');
 const session = require('express-session');
 const cookieParser = require('cookie-parser')
@@ -43,6 +44,8 @@ app.use(methodOverride('_method'))
 
 //Custom Middleware
 app.use(SortMiddleware)
+app.use(setLayout)
+
 
 //Template engine
 app.engine('hbs', engine({ 
