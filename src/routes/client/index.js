@@ -4,14 +4,16 @@ const siteRoute = require('./site')
 const courseRoute = require('./courses')
 const authRoute = require('./auth')
 
+const authClientMiddleware = require('../../app/middlewares/authClient')
+
 function route(app) {
 
     //Client 
-    app.use('/news', newsRoute)
-    app.use('/me', meRoute)
-    app.use('/courses', courseRoute)
-    app.use('/', siteRoute)
-    app.use('/auth', authRoute)
+    app.use('/', authRoute)
+    app.use('/news', authClientMiddleware,newsRoute)
+    app.use('/me',authClientMiddleware, meRoute)
+    app.use('/courses', authClientMiddleware,courseRoute)
+    app.use('/home', authClientMiddleware, siteRoute)
 
 }
 

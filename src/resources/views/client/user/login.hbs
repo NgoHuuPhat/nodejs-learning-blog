@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>404 HTML Template by Colorlib</title>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:300,700" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+
+</head>
+
+<!-- Sing in  Form -->
+<div class="mt-5">
+  <section class="sign-in">
+    <div class="container">
+        <div class="signin-content">
+            <div class="signin-image">
+                <figure><img src="/img/signin-image.jpg" alt="sing up image"></figure>
+                <a href="/register" class="signup-image-link text-info">Create an account</a>
+            </div>
+
+            <div class="signin-form">
+                <h2 class="form-title">Sign up</h2>
+                <form method="POST" action="/login" class="register-form" id="login-form">
+                    <div class="form-group">
+                        <label for="email"><i class="fa-solid fa-envelope"></i></label>
+                        <input type="text" name="email" id="email" placeholder="Email"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="password"><i class="fas fa-lock"></i></label>
+                        <input type="password" name="password" id="password" placeholder="Password"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" name="rememberMe" id="rememberMe" class="agree-term" />
+                        <label for="rememberMe" class="label-agree-term"><span><span></span></span>Remember me</label>
+                    </div>
+                    <div class="form-group form-button">
+                        <input type="submit" name="signin" id="signin" class="form-submit" value="Log in"/>
+                    </div>
+                </form>
+                <div class="social-login">
+                    <span class="social-label">Or login with</span>
+                      <ul class="socials">
+                          <li><a href="#"><i class="display-flex-center fa-brands fa-facebook-f"></i></a></li>
+                          <li><a href="#"><i class="display-flex-center fab fa-twitter"></i></a></li>
+                          <li><a href="#"><i class="display-flex-center fab fa-google"></i></a></li>
+                      </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+  </section>
+</div>
+
+<!-- Hiển thị thông báo thành công -->
+{{#if success}}
+  <div class="alert alert-success alert-dismissible mt-5" role="alert">
+    {{success}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<!-- Hiển thị thông báo lỗi -->
+{{#if error}}
+  <div class="alert alert-danger alert-dismissible mt-5" role="alert">
+    {{error}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
