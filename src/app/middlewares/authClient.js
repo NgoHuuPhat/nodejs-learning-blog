@@ -11,7 +11,7 @@ module.exports = async function authMiddleware(req, res, next){
     let decoded = null
 
     if(!token){ 
-        return res.redirect('/auth/login')
+        return res.redirect('/login')
     } else{
 
         try {
@@ -22,7 +22,7 @@ module.exports = async function authMiddleware(req, res, next){
             try{
 
                 //Nếu AccessToken hết hạn thì chuyển qua trang RefreshToken API
-                const response = await axios.get('http://localhost:3000/auth/refresh-token', {
+                const response = await axios.get('http://localhost:3000/refresh-token', {
                     headers: { Cookie: `refreshToken=${req.cookies.refreshToken}`},
                     withCredentials: true
                 })
@@ -35,7 +35,7 @@ module.exports = async function authMiddleware(req, res, next){
 
             } catch(refreshErr){
                 console.log('Làm mới Access Token thất bại', refreshErr.message)
-                return res.redirect('/auth/login')
+                return res.redirect('/login')
             }
 
         }
@@ -43,7 +43,7 @@ module.exports = async function authMiddleware(req, res, next){
         // Lấy giá trị Account mới nhất từ database
         const account = await Account.findOne({_id: decoded.id}).lean()
         if(!account){
-            return res.redirect('/auth/login')
+            return res.redirect('/login')
         }
 
         // Lấy giá trị từ Collection Role tương ứng với _id

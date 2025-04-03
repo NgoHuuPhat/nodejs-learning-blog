@@ -1,7 +1,9 @@
 const Account = require('../../models/Account')
+const ForgotPassword = require('../../models/ForgotPassword')
 const Role = require('../../models/Role')
 var jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const sendMailHelper = require('../../../helpers/sendMail')
 
 class AuthController {
 
@@ -49,7 +51,12 @@ class AuthController {
 
     //[GET] /login
     showLoginForm(req, res) {    
-        res.render('client/user/login')
+        //Kiểm tra đã có Token thì không đăng nhập lại
+        if(req.cookies.accessToken){
+            res.redirect('/home')
+        } else{
+            res.render('client/user/login')
+        }
     }
 
     //[POST] /login
@@ -110,6 +117,7 @@ class AuthController {
     logout(req,res){
         res.clearCookie('accessToken')
         res.clearCookie('refreshToken')
+        
         res.redirect('/login')
     }
 
@@ -147,6 +155,108 @@ class AuthController {
         }
     }
 
+    //[GET] /forgot-password
+    showforgotPasswordForm(req, res) {    
+        res.render('client/user/forgot-password')
+    }
+
+    //[POST] /forgot-password
+    async forgotPasswordPost(req, res, next) {
+        try {
+            const { email } = req.body;
+
+            // Kiểm tra xem email có tồn tại trong cơ sở dữ liệu không
+            const account = await Account.findOne({ email }).lean();
+            if (!account) {
+                req.flash('error', 'Email không tồn tại!');
+                return res.redirect('back'); 
+            }
+
+            // Tạo OTP ngẫu nhiên lưu vào database
+            const otp = Math.floor(100000 + Math.random() * 900000); // Tạo OTP 6 chữ số
+            const forgotPassword = {
+                email,
+                otp,
+                expireAt: Date.now(),
+            }
+            await ForgotPassword.create(forgotPassword)
+
+            // Gửi email chứa OTP cho người dùng
+            const subject = 'Xác thực OTP lấy lại mật khẩu';
+            const html = `Mã OTP của bạn là: <h1>${otp}</h1>Thời gian hiệu lực là 3 phút.`; 
+            sendMailHelper.sendMail(email, subject, html)
+
+            // Chuyển hướng đến trang xác thực OTP 
+            res.redirect(`/verify-otp?email=${email}`);
+
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    //[GET] /verify-otp
+    showVerifyForm(req, res) {    
+        res.locals.layout = 'auth';
+        res.render('client/user/verify-otp', { email: req.query.email })
+    }
+
+    //[POST] /verify-otp
+    async verifyOTPPost(req, res, next) {
+        try {
+            const { email, otp } = req.body;
+
+            // Kiểm tra result
+            const result = await ForgotPassword.findOne({ email, otp }).lean()
+
+            if (!result) { 
+                req.flash('error', 'OTP không hợp lệ!');
+                return res.redirect('back'); 
+            }
+
+            // Tạo token mới cho người dùng
+            const resetToken = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
+            res.cookie('resetToken', resetToken, { httpOnly: true });
+            
+            // Chuyển hướng đến trang đặt lại mật khẩu
+            res.redirect('/reset-password'); 
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    //[GET] /reset-password
+    showResetPasswordrForm(req, res) {    
+        res.locals.layout = 'auth';
+        res.render('client/user/reset-password')
+    }
+
+    //[POST] /reset-password
+    async resetPasswordrPost(req, res, next) {
+        try {
+
+            // Kiểm tra token lấy giá trị email
+            const decode = jwt.verify(req.cookies.resetToken, process.env.JWT_SECRET, (err, decode) => {
+                if (err) {
+                    req.flash('error', 'Token đã hết hạn. Vui lòng yêu cầu lại mã OTP.');
+                    return res.redirect('back'); 
+                }
+                return decode;
+            })
+            const email = decode.email
+
+            // Mã hóa password mới
+            const hashedPassword  = await bcrypt.hash(req.body.password, 10);
+            req.body.password = hashedPassword
+            
+            // Cập nhật mật khẩu mới vào cơ sở dữ liệu
+            await Account.updateOne({ email }, { password: req.body.password })
+
+            res.clearCookie('resetToken')
+            res.redirect('/login');
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 module.exports = new AuthController()

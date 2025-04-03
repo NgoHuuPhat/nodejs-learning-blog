@@ -1,6 +1,8 @@
 module.exports = (req, res, next) => {
-  if (req.url === '/login' || req.url === '/register' || req.url === '/logout' || req.url === '/refresh-token' || req.url.startsWith('/admin/auth')) {
-    res.locals.layout = 'auth';  
+  const authRoutes = ['/login', '/register', '/logout', '/refresh-token', '/forgot-password', '/verify-otp'];
+  
+  if (authRoutes.includes(req.url) || req.url.startsWith('/admin/auth')) {
+    res.locals.layout = 'auth';
     return next(); 
   }
 
