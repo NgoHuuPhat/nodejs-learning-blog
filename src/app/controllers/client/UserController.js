@@ -5,7 +5,7 @@ var jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const sendMailHelper = require('../../../helpers/sendMail')
 
-class AuthController {
+class UserController {
 
     //[GET] /register
     showRegisterForm(req, res) {    
@@ -64,7 +64,7 @@ class AuthController {
         try {
             const {email,password} = req.body
             const checkEmail = await Account.findOne({email: email}).lean()
-            
+
             // Check hoạt động
             if(checkEmail.status == 'inactive'){
                 req.flash('error', `Tài khoản đã bị khóa!`);
@@ -78,7 +78,7 @@ class AuthController {
                 req.flash('email', email); // Lưu email đã nhập
                 return res.redirect('back'); 
             } 
-
+            
             // Check password
             const match = await bcrypt.compare(password, checkEmail.password)
             if(!match){
@@ -259,4 +259,4 @@ class AuthController {
     }
 }
 
-module.exports = new AuthController()
+module.exports = new UserController()

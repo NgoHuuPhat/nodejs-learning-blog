@@ -4,5 +4,7 @@ const meController = require('../../app/controllers/client/MeController')
 
 router.get('/stored/courses', meController.storedCourses)
 router.get('/trash/courses', meController.trashCourses)
+router.get('/my-profile', meController.myProfileRoute)
+
 
 module.exports = router

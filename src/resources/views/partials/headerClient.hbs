@@ -1,6 +1,8 @@
-<nav class="navbar navbar-expand-lg bg-danger-subtle">
+<nav class="navbar navbar-expand-lg bg-danger-subtle shadow-sm">
   <div class="container">
-    <a class="navbar-brand" href="/home"><img src="/img/LOGO FINAL.png" alt="logo" style="width: 100px; height: auto;"></a>  
+    <a class="navbar-brand" href="/home">
+      <img src="/img/LOGO FINAL.png" alt="logo" style="width: 100px; height: auto;">
+    </a>  
     <form class="search-container" method="GET" action="/home/search">
       <i class="fa fa-search"></i>
       <input type="text" placeholder="Tìm kiếm khóa học, bài viết, ..." name="keyword" id="searchInput" value="{{keyWord}}">{{!-- Hiển thị lại giá trị vừa nhập --}}
@@ -15,9 +17,10 @@
             <img src="{{account.avatar}}" alt="Ca-py-ba-ra" class="user-avatar">
             {{account.fullName}}
           </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="/courses/create">Đăng khóa học</a></li>
+          <ul class="dropdown-menu custom-dropdown bg-light border-0 shadow">
+            <li><a class="dropdown-item " href="/me/my-profile">Trang cá nhân</a></li>
             <div class="dropdown-divider"></div>
+            <li><a class="dropdown-item" href="/courses/create">Đăng khóa học</a></li>
             <li><a class="dropdown-item" href="/me/stored/courses">Khóa học của tôi</a></li>
             <li><a class="dropdown-item" href="/me/stored/news">Bài viết của tôi</a></li>
             <div class="dropdown-divider"></div>
@@ -28,3 +31,4 @@
     </div>
   </div>
 </nav>
+

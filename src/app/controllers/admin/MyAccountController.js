@@ -6,7 +6,7 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-class DashboardController {
+class MyAccountController {
 
     //[GET] /admin/my-account
     async index(req, res) {
@@ -90,4 +90,4 @@ class DashboardController {
     }
 }
 
-module.exports = new DashboardController()
+module.exports = new MyAccountController()

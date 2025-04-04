@@ -7,7 +7,7 @@ module.exports = async function authorMiddleware(req, res, next){
         res.clearCookie('refreshToken');
 
         //Trả về trang 404 nếu không có quyền truy cập 
-        res.status(404).render('partials/404', { layout: false }); 
+        return res.status(404).render('partials/404', { layout: false }); 
     }
     next()
 }

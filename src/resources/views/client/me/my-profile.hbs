@@ -1,0 +1,212 @@
+<style>
+    /* Trong file SCSS của trang cần full width */
+    .full-width-page {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    }
+
+    body, html {
+    overflow-x: hidden;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: white;
+    }
+
+    .profile-container {
+    display: flex;
+    min-height: 100vh;
+    }
+
+    .profile-card {
+    background-color: white;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 20px;
+    width: 30%;
+    }
+
+    .course-list {
+    background-color: white;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 20px;
+    width: 70%;
+    border-left: 1px solid #e9ecef;
+    }
+
+    .profile-header {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 0 15px;
+    }
+
+    .profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px; 
+    font-size: 28px;
+    color: #6c757d;
+    }
+
+    .profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    }
+
+    .profile-info {
+    h1 {
+        font-size: 20px;
+        margin-bottom: 4px;
+        font-weight: 600;
+        text-align: center; /* Căn giữa tên người dùng */
+    }
+
+    .profile-email {
+        color: #6c757d;
+        margin-bottom: 4px;
+        font-size: 14px;
+        text-align: center; /* Căn giữa username */
+    }
+    }
+
+    .profile-stats {
+    color: #6c757d;
+    font-size: 13px;
+    margin-bottom: 4px;
+    text-align: center; /* Căn giữa profile stats */
+    }
+
+    .divider {
+    border-top: 1px solid #e9ecef;
+    margin: 16px 0;
+    }
+
+    .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #212529;
+    padding: 0 15px;
+    }
+
+    .course-card {
+    background-color: white;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid #e9ecef;
+    padding: 12px 15px;
+    margin-bottom: 0;
+
+    .course-subtitle {
+        color: #6c757d;
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    .course-title {
+        font-weight: 600;
+        margin-bottom: 8px;
+        font-size: 15px;
+    }
+
+    .course-price {
+        color: #28a745;
+        font-weight: 500;
+        margin-bottom: 8px;
+        font-size: 13px;
+    }
+
+    .course-stats {
+        display: flex;
+        align-items: center;
+        color: #6c757d;
+        font-size: 13px;
+
+        span {
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+        }
+
+        i {
+        margin-right: 4px;
+        font-size: 12px;
+        }
+    }
+    }
+    .completed-badge {
+    color: #28a745;
+}
+</style>
+
+<div class="profile-container full-width-page">
+    <div class="profile-card">
+        <div class="profile-header mt-5">
+            <div class="profile-avatar">
+                {{#if account.avatar}}
+                    <img src="{{account.avatar}}" alt="Profile Avatar" class="img-fluid rounded-circle">
+                {{else}}
+                    <i class="fas fa-user-circle"></i>
+                {{/if}}
+            </div>
+            <div class="profile-info mt-3">
+                <h1>{{account.fullName}}</h1>
+                <p class="profile-email">{{account.email}}</p>
+                <div class="profile-stats d-flex gap-2">
+                    <span><i class="fas fa-pencil-alt"></i> 3 bài viết</span>  •  
+                    <span><i class="fas fa-book"></i> 6 khóa học đã đăng ký</span>
+                </div>
+                <div class="profile-stats">
+                    <span><i class="fas fa-calendar-alt"></i> Tham gia SURU từ 3 năm trước</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="course-list">
+        <h2 class="section-title mt-5"><i class="fas fa-graduation-cap"></i> Khóa học đã đăng ký (6)</h2>
+        <div class="course-card">
+            <div class="course-subtitle"><i class="fas fa-book-open"></i> Node & ExpressJS</div>
+            <h3 class="course-title">Node & ExpressJS</h3>
+            <div class="course-price"><i class="fas fa-tag"></i> Miễn phí</div>
+            <div class="course-stats">
+                <span><i class="fas fa-check-circle completed-badge"></i>47.090</span>
+                <span><i class="far fa-file-alt"></i>36</span>
+                <span><i class="far fa-clock"></i>12h8p</span>
+            </div>
+        </div>
+        <div class="course-card">
+            <div class="course-subtitle"><i class="fas fa-book-open"></i> Kiến thức nhập môn</div>
+            <h3 class="course-title">Kiến Thức Nhập Môn IT</h3>
+            <div class="course-price"><i class="fas fa-tag"></i> Miễn phí</div>
+            <div class="course-stats">
+                <span><i class="fas fa-check-circle completed-badge"></i>133.845</span>
+                <span><i class="far fa-file-alt"></i>9</span>
+                <span><i class="far fa-clock"></i>3h12p</span>
+            </div>
+        </div>
+        <div class="course-card">
+            <h3 class="course-title">Lập Trình JavaScript Nâng Cao</h3>
+            <div class="course-price"><i class="fas fa-tag"></i> Miễn phí</div>
+            <div class="course-stats">
+                <span><i class="fas fa-check-circle completed-badge"></i>40.348</span>
+                <span><i class="far fa-file-alt"></i>19</span>
+                <span><i class="far fa-clock"></i>8h41p</span>
+            </div>
+        </div>
+        <div class="course-card">
+            <h3 class="course-title">JavaScript</h3>
+            <div class="course-subtitle"><i class="fas fa-laptop-code"></i> Nâng cao</div>
+        </div>
+    </div>
+</div>

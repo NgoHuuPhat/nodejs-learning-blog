@@ -1,7 +1,8 @@
 const Course = require('../../models/Course')
+const Account = require('../../models/Account')
 const paginatitonHelper = require('../../../helpers/pagination')
 
-class CourseController {
+class MeController {
 
     //[GET] /me/stored/courses
     async storedCourses(req, res, next) {
@@ -40,6 +41,15 @@ class CourseController {
             next(error)
         }
     }
+
+    //[GET] /me/my-profile
+    async myProfileRoute(req, res, next){
+        try {
+            res.render('client/me/my-profile')
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
-module.exports = new CourseController()
+module.exports = new MeController()

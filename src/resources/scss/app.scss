@@ -134,7 +134,6 @@ a {
 }
 
 .profile-card {
-    max-width: 900px;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -212,6 +211,20 @@ a {
      color: #fff;
      text-decoration: none;
    }
+
+.custom-dropdown {
+.dropdown-item {
+  transition: all 0.3s ease;
   
+  &:hover {
+    color: #28a745 !important;
+  }
+}
+}
+
+
+
+
+
 
    
