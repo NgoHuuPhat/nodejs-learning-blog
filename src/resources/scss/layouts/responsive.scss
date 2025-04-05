@@ -1,15 +1,13 @@
 @media screen and (max-width: 1600px) {
-
 }
 
 @media screen and (max-width: 1300px) {
-
 }
 
 //end 1200px
 @media screen and (max-width: 1200px) {
     .container {
-        width: calc( 100% - 30px);
+        width: calc(100% - 30px);
         max-width: 100%;
     }
 }
@@ -26,13 +24,12 @@
 
 //end 1024px
 @media screen and (max-width: 992px) {
-    
 }
 
 //end 992px
 @media screen and (max-width: 768px) {
-
-    .signup-content, .signin-content {
+    .signup-content,
+    .signin-content {
         @include flex-direction(column);
         @include justify-content(center);
     }
@@ -49,7 +46,10 @@
         margin-top: 50px;
         @include order(2);
     }
-    .signup-form, .signup-image, .signin-form, .signin-image {
+    .signup-form,
+    .signup-image,
+    .signin-form,
+    .signin-image {
         width: auto;
     }
 
@@ -68,21 +68,17 @@
     .form-title {
         text-align: center;
     }
-
 }
 
-@media screen and (max-width: 620px)  {
-
+@media screen and (max-width: 620px) {
 }
 
 //end 767px
 @media screen and (max-width: 575px) {
-
 }
 
 //end 575px
 @media screen and (max-width: 480px) {
-
 }
 
 //end 480px
@@ -98,4 +94,5 @@
 
 //end 400px
 
-@media screen and (max-width: 320px) {}
+@media screen and (max-width: 320px) {
+}

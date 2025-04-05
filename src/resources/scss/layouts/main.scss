@@ -6,7 +6,10 @@
     padding: 75px 0;
     // flex-flow: wrap;
 }
-.signup-form, .signup-image, .signin-form, .signin-image{
+.signup-form,
+.signup-image,
+.signin-form,
+.signin-image {
     width: 50%;
     overflow: hidden;
 }
@@ -84,51 +87,75 @@ input {
     }
 }
 
-input[type=checkbox]:not(old){
-  width     : 2em;
-  margin    : 0;
-  padding   : 0;
-  font-size : 1em;
-  display: none;
+input[type='checkbox']:not(old) {
+    width: 2em;
+    margin: 0;
+    padding: 0;
+    font-size: 1em;
+    display: none;
 }
-input[type=checkbox]:not(old) + label{
-    display      : inline-block;
-    line-height  : 1.5em;
+input[type='checkbox']:not(old) + label {
+    display: inline-block;
+    line-height: 1.5em;
     margin-top: 6px;
 }
-input[type=checkbox]:not(old) + label > span{
-  display          : inline-block;
-  width            : 13px;
-  height           : 13px;
-  margin-right: 15px;
-  margin-bottom: 3px;
-  border           : 1px solid $grey-light;
-  @include border-radius(2px);
-  background       : rgb(255,255,255);
-  background-image :    -moz-linear-gradient(rgb(255,255,255),rgb(255,255,255));
-  background-image :     -ms-linear-gradient(rgb(255,255,255),rgb(255,255,255));
-  background-image :      -o-linear-gradient(rgb(255,255,255),rgb(255,255,255));
-  background-image : -webkit-linear-gradient(rgb(255,255,255),rgb(255,255,255));
-  background-image :         linear-gradient(rgb(255,255,255),rgb(255,255,255 ));
-  vertical-align   : bottom;
+input[type='checkbox']:not(old) + label > span {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    margin-right: 15px;
+    margin-bottom: 3px;
+    border: 1px solid $grey-light;
+    @include border-radius(2px);
+    background: rgb(255, 255, 255);
+    background-image: -moz-linear-gradient(
+        rgb(255, 255, 255),
+        rgb(255, 255, 255)
+    );
+    background-image: -ms-linear-gradient(
+        rgb(255, 255, 255),
+        rgb(255, 255, 255)
+    );
+    background-image: -o-linear-gradient(
+        rgb(255, 255, 255),
+        rgb(255, 255, 255)
+    );
+    background-image: -webkit-linear-gradient(
+        rgb(255, 255, 255),
+        rgb(255, 255, 255)
+    );
+    background-image: linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255));
+    vertical-align: bottom;
 }
-input[type=checkbox]:not(old):checked + label > span{
-    background-image :    -moz-linear-gradient(rgb(255,255,255),rgb(255,255,255));
-    background-image :     -ms-linear-gradient(rgb(255,255,255),rgb(255,255,255));
-    background-image :      -o-linear-gradient(rgb(255,255,255),rgb(255,255,255));
-    background-image : -webkit-linear-gradient(rgb(255,255,255),rgb(255,255,255));
-    background-image :         linear-gradient(rgb(255,255,255),rgb(255,255,255 ));
+input[type='checkbox']:not(old):checked + label > span {
+    background-image: -moz-linear-gradient(
+        rgb(255, 255, 255),
+        rgb(255, 255, 255)
+    );
+    background-image: -ms-linear-gradient(
+        rgb(255, 255, 255),
+        rgb(255, 255, 255)
+    );
+    background-image: -o-linear-gradient(
+        rgb(255, 255, 255),
+        rgb(255, 255, 255)
+    );
+    background-image: -webkit-linear-gradient(
+        rgb(255, 255, 255),
+        rgb(255, 255, 255)
+    );
+    background-image: linear-gradient(rgb(255, 255, 255), rgb(255, 255, 255));
 }
-input[type=checkbox]:not(old):checked + label > span:before{
-    content     : '\f00c';  /* Dấu tick của FontAwesome */
-    display     : block;
-    color       : $black-color;
-    font-size   : 12px;      /* Điều chỉnh kích thước nếu cần */
-    line-height : 1.1;
-    text-align  : center;
+input[type='checkbox']:not(old):checked + label > span:before {
+    content: '\f00c'; /* Dấu tick của FontAwesome */
+    display: block;
+    color: $black-color;
+    font-size: 12px; /* Điều chỉnh kích thước nếu cần */
+    line-height: 1.1;
+    text-align: center;
     font-family: 'Font Awesome 5 Free', sans-serif; /* FontAwesome 5 Free */
     font-weight: 900; /* Dùng font-weight bold để hiển thị đầy đủ biểu tượng */
-  }
+}
 .agree-term {
     display: inline-block;
     width: auto;
@@ -182,7 +209,6 @@ label.valid {
     font-size: 18px;
 }
 
-
 // Login
 
 .signin-content {
@@ -209,10 +235,10 @@ label.valid {
         &:last-child {
             margin-right: 0px;
         }
-        
+
         a {
             text-decoration: none;
-            
+
             i {
                 width: 30px;
                 height: 30px;
@@ -256,4 +282,3 @@ label.valid {
     margin-right: 20px;
     margin-top: 10px;
 }
-  

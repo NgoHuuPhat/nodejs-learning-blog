@@ -1,6 +1,6 @@
 <div class="mt-4">
     <h3>Sửa tài khoản</h3>
-    <form class="mt-4" method="POST" action="/admin/accountDatas/{{accountData._id}}?_method=PATCH" enctype="multipart/form-data">
+    <form class="mt-4" method="POST" action="/admin/accounts/{{accountData._id}}?_method=PATCH" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="fullName" class="form-label">Họ tên <span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="fullName" name="fullName" value="{{accountData.fullName}}">

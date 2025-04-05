@@ -1,12 +1,13 @@
 const Course = require('../../models/Course')
 
 class CourseController {
-
     //[GET] /courses/:slug
     async details(req, res, next) {
         try {
             //Lấy khóa học trường slug = giá trị req.params.slug
-            const course = await Course.findOne({slug: req.params.slug}).lean() 
+            const course = await Course.findOne({
+                slug: req.params.slug,
+            }).lean()
             res.render('client/courses/details', { course })
         } catch (error) {
             next(error)
@@ -35,7 +36,7 @@ class CourseController {
     async edit(req, res, next) {
         try {
             //Lấy khóa học trường _id = giá trị req.params.id
-            const course = await Course.findById(req.params.id).lean() 
+            const course = await Course.findById(req.params.id).lean()
             res.render('client/courses/edit', { course })
         } catch (error) {
             next(error)
@@ -45,17 +46,17 @@ class CourseController {
     //[PUT] /courses/:id
     async update(req, res, next) {
         try {
-            await Course.updateOne({_id: req.params.id}, req.body)
+            await Course.updateOne({ _id: req.params.id }, req.body)
             res.redirect('/me/stored/courses')
         } catch (error) {
             next(error)
         }
     }
-    
+
     //[DELETE] /courses/:id Xóa giả
     async destroy(req, res, next) {
         try {
-            await Course.delete({_id: req.params.id})
+            await Course.delete({ _id: req.params.id })
             res.redirect('back') //'back' về lại trang trước đó
         } catch (error) {
             next(error)
@@ -65,13 +66,13 @@ class CourseController {
     //[DELETE] /courses/:id/force
     async forceDestroy(req, res, next) {
         try {
-            await Course.deleteOne({_id: req.params.id})
+            await Course.deleteOne({ _id: req.params.id })
             res.redirect('back') //'back' về lại trang trước đó
         } catch (error) {
             next(error)
         }
     }
-    
+
     //[PATCH] /courses/:id/restore
     async restore(req, res, next) {
         try {
@@ -83,21 +84,20 @@ class CourseController {
     }
 
     //[POST] /courses/handle-form-actions
-    async handleFormActions(req, res, next){
-        switch(req.body.action){
+    async handleFormActions(req, res, next) {
+        switch (req.body.action) {
             case 'delete':
                 try {
-                    await Course.delete({_id: req.body.courseIDs})
+                    await Course.delete({ _id: req.body.courseIDs })
                     res.redirect('back') //'back' về lại trang trước đó
                 } catch (error) {
                     next(error)
                 }
                 break
             default:
-                res.json({message: 'Action in valid'})
+                res.json({ message: 'Action in valid' })
         }
     }
-
 }
 
 module.exports = new CourseController()

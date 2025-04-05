@@ -1,8 +1,7 @@
 // Using Node.js `require()`
 const mongoose = require('mongoose')
 
-async function connect(){
-
+async function connect() {
     try {
         await mongoose.connect(process.env.MONGODB_URL)
         console.log('Connect successfully!!!')

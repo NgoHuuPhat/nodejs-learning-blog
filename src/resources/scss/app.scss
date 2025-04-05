@@ -1,11 +1,11 @@
 @import 'variables';
 
 a {
-    text-decoration: none !important; 
+    text-decoration: none !important;
 }
 
 .card-link {
-    color: black; 
+    color: black;
 }
 
 .user-avatar {
@@ -27,7 +27,6 @@ a {
         outline: none;
         font-size: 15px;
         box-shadow: none;
-        
     }
 
     .fa-search {
@@ -54,7 +53,7 @@ a {
 
 .app > header {
     width: 100%;
-    background-color: #f8f9fa; 
+    background-color: #f8f9fa;
     padding: 15px;
     border-bottom: 1px solid #ddd;
 }
@@ -71,7 +70,7 @@ a {
 
 .no-border td {
     border: none !important;
-  }
+}
 
 /* Căn chỉnh thông báo ở góc phải và làm thông báo dài hơn */
 .alert {
@@ -79,15 +78,15 @@ a {
     top: 20px;
     right: 20px;
     z-index: 9999;
-    max-width: 400px; 
+    max-width: 400px;
     height: 50px;
     padding: 15px;
     margin: 40px;
     opacity: 1;
     transition: opacity 1s ease-out;
-    font-size: 16px; 
+    font-size: 16px;
     display: flex;
-    justify-content: space-between; 
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -97,37 +96,37 @@ a {
 }
 
 .close {
-    border: none; 
-    background: transparent; 
-    padding: 0; 
-    color: #fff; 
+    border: none;
+    background: transparent;
+    padding: 0;
+    color: #fff;
     font-size: 20px;
     display: flex;
     align-items: center;
-    justify-content: center; 
-    margin-left: 10px; 
+    justify-content: center;
+    margin-left: 10px;
 }
 
 .close:hover {
-    color: #fff; 
+    color: #fff;
     cursor: pointer;
 }
-  
+
 // SCSS cho Dropdown Menu
 .dropdown {
     .dropdown-menu {
         .dropdown-item {
-            padding: 0px 40px; 
-            line-height: 2; 
+            padding: 0px 40px;
+            line-height: 2;
 
             i {
-                font-size: 15px;  
-                margin-right: 20px; 
+                font-size: 15px;
+                margin-right: 20px;
             }
 
             &:hover {
                 background-color: #f8f9fa;
-                color: #333;  
+                color: #333;
             }
         }
     }
@@ -137,94 +136,93 @@ a {
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .profile-sidebar {
+}
+
+.profile-sidebar {
     background: $primary-gradient;
     color: white;
     padding: 40px 20px;
-  }
-  
-  .profile-avatar {
+}
+
+.profile-avatar {
     width: 120px;
     height: 120px;
     object-fit: cover;
     border: 2px solid white;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-  }
-  
-  // Thông tin cá nhân
-  .profile-info {
+}
+
+// Thông tin cá nhân
+.profile-info {
     h6 {
-      font-weight: 600;
-      color: $text-muted; // Màu chữ nhạt
+        font-weight: 600;
+        color: $text-muted; // Màu chữ nhạt
     }
-  
+
     p {
-      font-weight: 500;
-      color: $text-dark;
+        font-weight: 500;
+        color: $text-dark;
     }
-  }
-  
-  // 🎭 Button Styling
-  .btn-edit {
+}
+
+// 🎭 Button Styling
+.btn-edit {
     border-color: white;
     color: white;
     transition: 0.3s;
-  
+
     &:hover {
-      background-color: white;
-      color: #08AEEA;
+        background-color: white;
+        color: #08aeea;
     }
-  }
-  
-  .btn-back {
+}
+
+.btn-back {
     background-color: $btn-secondary;
     color: white;
-  
+
     &:hover {
-      background-color: $btn-secondary-hover;
+        background-color: $btn-secondary-hover;
     }
-  }
+}
 
-  .text-primary-custom{
-    color: #08AEEA !important;
-  }
+.text-primary-custom {
+    color: #08aeea !important;
+}
 
-  
-  .btn-grad {background-image: linear-gradient(to right, #02AAB0 0%, #00CDAC  51%, #02AAB0  100%)}
-  .btn-grad {
-     margin: 10px;
-     padding: 15px 45px;
-     text-align: center;
-     text-transform: uppercase;
-     transition: 0.5s;
-     background-size: 200% auto;
-     color: white;            
-     box-shadow: 0 0 20px #eee;
-     border-radius: 10px;
-     display: block;
-   }
+.btn-grad {
+    background-image: linear-gradient(
+        to right,
+        #02aab0 0%,
+        #00cdac 51%,
+        #02aab0 100%
+    );
+}
+.btn-grad {
+    margin: 10px;
+    padding: 15px 45px;
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;
+    box-shadow: 0 0 20px #eee;
+    border-radius: 10px;
+    display: block;
+}
 
-   .btn-grad:hover {
-     background-position: right center; /* change the direction of the change here */
-     color: #fff;
-     text-decoration: none;
-   }
+.btn-grad:hover {
+    background-position: right center; /* change the direction of the change here */
+    color: #fff;
+    text-decoration: none;
+}
 
 .custom-dropdown {
-.dropdown-item {
-  transition: all 0.3s ease;
-  
-  &:hover {
-    color: #28a745 !important;
-  }
+    .dropdown-item {
+        transition: all 0.3s ease;
+
+        &:hover {
+            color: #28a745 !important;
+        }
+    }
 }
-}
-
-
-
-
-
-
-   

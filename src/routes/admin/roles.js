@@ -11,5 +11,4 @@ router.patch('/:id', RoleController.update) //Cập nhật 1 phần giá trị
 router.delete('/:id', RoleController.delete)
 router.get('/permissions', RoleController.permissions)
 
-
 module.exports = router

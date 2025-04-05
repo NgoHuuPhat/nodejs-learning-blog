@@ -7,14 +7,12 @@ const userRoute = require('./user')
 const authClientMiddleware = require('../../app/middlewares/authClient')
 
 function route(app) {
-
-    //Client 
+    //Client
     app.use('/', userRoute)
     app.use('/news', authClientMiddleware, newsRoute)
     app.use('/me', authClientMiddleware, meRoute)
     app.use('/courses', authClientMiddleware, courseRoute)
     app.use('/home', authClientMiddleware, siteRoute)
-
 }
 
 module.exports = route

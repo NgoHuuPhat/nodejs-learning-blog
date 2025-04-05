@@ -1,13 +1,12 @@
-module.exports = async function authorMiddleware(req, res, next){
+module.exports = async function authorMiddleware(req, res, next) {
     const account = res.locals.account
-    if(account.role_name === 'user'){
-
+    if (account.role_name === 'user') {
         //Xóa cookie accessToken và refreshToken
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
+        res.clearCookie('accessToken')
+        res.clearCookie('refreshToken')
 
-        //Trả về trang 404 nếu không có quyền truy cập 
-        return res.status(404).render('partials/404', { layout: false }); 
+        //Trả về trang 404 nếu không có quyền truy cập
+        return res.status(404).render('partials/404', { layout: false })
     }
     next()
 }

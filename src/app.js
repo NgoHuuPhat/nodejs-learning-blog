@@ -10,28 +10,30 @@ const app = express()
 const db = require('./config/db') //Ghi tắt vì trong db chỉ có 1 thư mục index.js
 const route = require('./routes/client/index')
 const routeAdmin = require('./routes/admin/index')
-const port = process.env.PORT 
+const port = process.env.PORT
 const SortMiddleware = require('./app/middlewares/sortMiddleware')
 const setLayout = require('./app/middlewares/setLayout')
-const flash = require('connect-flash');
-const session = require('express-session');
+const flash = require('connect-flash')
+const session = require('express-session')
 const cookieParser = require('cookie-parser')
 
 // Sử dụng cookie-parse
 app.use(cookieParser())
 
 //Flash thông báo Alert (Middleware)
-app.use(session({
-    secret: 'your-secret-key',
-    resave: false,
-    saveUninitialized: true
-}));
-app.use(flash());
+app.use(
+    session({
+        secret: 'your-secret-key',
+        resave: false,
+        saveUninitialized: true,
+    }),
+)
+app.use(flash())
 app.use((req, res, next) => {
-    res.locals.success = req.flash('success');
-    res.locals.error = req.flash('error');
-    next();
-});
+    res.locals.success = req.flash('success')
+    res.locals.error = req.flash('error')
+    next()
+})
 
 //Connect to DB
 //{connect: function: connect}
@@ -46,16 +48,18 @@ app.use(methodOverride('_method'))
 app.use(SortMiddleware)
 app.use(setLayout)
 
-
 //Template engine
-app.engine('hbs', engine({ 
-    extname: '.hbs',
-    // Sử dụng helpers: Để tạo hàm sum index
-    helpers: require('./helpers/handlebars'),
-    defaultLayout: 'client',
-}))
+app.engine(
+    'hbs',
+    engine({
+        extname: '.hbs',
+        // Sử dụng helpers: Để tạo hàm sum index
+        helpers: require('./helpers/handlebars'),
+        defaultLayout: 'client',
+    }),
+)
 app.set('view engine', 'hbs')
-app.set('views', path.join(__dirname, 'resources','views')) //Hoặc có thể // nhưng nó có thể sai với hệ điều hành khác 
+app.set('views', path.join(__dirname, 'resources', 'views')) //Hoặc có thể // nhưng nó có thể sai với hệ điều hành khác
 
 console.log(path.join(__dirname, 'public'))
 //Static file
