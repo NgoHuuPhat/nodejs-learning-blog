@@ -4,15 +4,15 @@ const siteRoute = require('./site')
 const courseRoute = require('./courses')
 const userRoute = require('./user')
 
-const authClientMiddleware = require('../../app/middlewares/authClient')
+const authMiddleware = require('../../app/middlewares/authMiddleware')
 
 function route(app) {
     //Client
     app.use('/', userRoute)
-    app.use('/news', authClientMiddleware, newsRoute)
-    app.use('/me', authClientMiddleware, meRoute)
-    app.use('/courses', authClientMiddleware, courseRoute)
-    app.use('/home', authClientMiddleware, siteRoute)
+    app.use('/news', authMiddleware, newsRoute)
+    app.use('/me', authMiddleware, meRoute)
+    app.use('/courses', authMiddleware, courseRoute)
+    app.use('/home', authMiddleware, siteRoute)
 }
 
 module.exports = route

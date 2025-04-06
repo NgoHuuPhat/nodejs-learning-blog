@@ -10,7 +10,11 @@ module.exports = async function authMiddleware(req, res, next) {
     let decoded = null
 
     if (!token) {
-        return res.redirect('/login')
+        if(req.originalUrl.startsWith('/admin')) {
+            return res.redirect('/admin/auth/login')
+        } else {
+            return res.redirect('/login')
+        }
     } else {
         try {
             // Xác thực token
@@ -20,7 +24,7 @@ module.exports = async function authMiddleware(req, res, next) {
             try {
                 //Nếu AccessToken hết hạn thì chuyển qua trang RefreshToken API
                 const response = await axios.get(
-                    'http://localhost:3000/refresh-token',
+                    'http://localhost:3000/admin/auth/refresh-token',
                     {
                         headers: {
                             Cookie: `refreshToken=${req.cookies.refreshToken}`,
@@ -41,14 +45,23 @@ module.exports = async function authMiddleware(req, res, next) {
                 )
             } catch (refreshErr) {
                 console.log('Làm mới Access Token thất bại', refreshErr.message)
-                return res.redirect('/login')
+                if(req.originalUrl.startsWith('/admin')) {
+                    return res.redirect('/admin/auth/login')
+                } else {
+                    return res.redirect('/login')
+                }
             }
         }
 
         // Lấy giá trị Account mới nhất từ database
         const account = await Account.findOne({ _id: decoded.id }).lean()
         if (!account) {
-            return res.redirect('/login')
+            
+            if(req.originalUrl.startsWith('/admin')) {
+                return res.redirect('/admin/auth/login')
+            } else {
+                return res.redirect('/login')
+            }
         }
 
         // Lấy giá trị từ Collection Role tương ứng với _id
