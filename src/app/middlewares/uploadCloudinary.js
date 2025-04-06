@@ -5,7 +5,7 @@ module.exports =  function (req, res, next) {
       if(req.file) {
           let streamUpload = (req) => {
               return new Promise((resolve, reject) => {
-                  let stream = cloudinary.uploader.upload_stream((error, result) => {
+                  let stream = cloudinary.uploader.upload_stream({folder: `${req.file.fieldname}s`},(error, result) => {
                       if (result) {
                         resolve(result)
                       } else {
