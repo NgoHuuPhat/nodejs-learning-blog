@@ -1,0 +1,19 @@
+<div class="mt-4">
+  <h3>Đăng bài viết</h3>
+  <form class="mt-4" method="POST" action="/posts/store" enctype="multipart/form-data">
+    <div class="mb-3"><label for="title" class="form-label">Tiêu đề</label>
+      <input type="text" class="form-control" id="title" name="title" placeholder="Nhập tiêu đề bài viết" required>
+    </div>
+    <div class="mb-3"><label for="content" class="form-label">Nội dung</label>
+      <textarea class="form-control" id="content" name="content" rows="6" placeholder="Nhập nội dung chi tiết" required></textarea>
+    </div>
+    <div class="mb-3"><label for="thumbnail" class="form-label">Hình ảnh <span style="color: #ff6d13;">(Ảnh đại diện hấp dẫn giúp bài viết của bạn cuốn hút hơn với độc giả.)</span></label>
+      <input type="file" class="form-control" id="thumbnail" name="thumbnail" accept="image/*">
+    </div>
+    <div class="mb-3"><label for="tags" class="form-label">Tags (phân cách bằng dấu phẩy)</label>
+      <input type="text" class="form-control" id="tags" name="tags" placeholder="ví dụ: công nghệ, javascript, học lập trình">
+    </div>
+    <button type="submit" class="btn btn-primary">Đăng bài</button>
+  </form>
+</div>
+

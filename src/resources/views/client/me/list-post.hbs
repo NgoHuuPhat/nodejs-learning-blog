@@ -1,0 +1,135 @@
+
+<div class="container mt-5">
+  <h4 class="mb-4 title-strong">Bài viết của tôi</h4>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+      <a class="nav-link nav-customm {{#if (eq currentTab 'approved')}}active{{/if}}" href="?status=approved">Đã duyệt</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link nav-customm {{#if (eq currentTab 'pending')}}active{{/if}}" href="?status=pending">Chờ duyệt</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link nav-customm {{#if (eq currentTab 'rejected')}}active{{/if}}" href="?status=rejected">Bị từ chối</a>
+    </li>
+  </ul>
+
+  <!-- Danh sách bài viết -->
+  {{#if posts.length}}
+    {{#each posts}}
+    <div class="card mb-4 shadow-sm border-0">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <!-- Nội dung bên trái -->
+          <div style="max-width: 90%;">
+            <h5 class="fw-semibold mb-2">{{this.title}}</h5>
+
+            <!-- Trạng thái -->
+            {{#if (eq this.status "approved")}}
+              <span class="text-success fw-medium">✅ Đã duyệt</span>
+            {{else if (eq this.status "pending")}}
+              <span class="text-warning fw-medium">⏳ Chờ duyệt</span>
+            {{else if (eq this.status "rejected")}}
+              <span class="text-danger fw-medium">❌ Bị từ chối</span>
+            {{/if}}
+
+            <br />
+            <small class="mt-1 text-muted d-block">Đăng lúc: {{timeAgo this.createdAt}}</small>
+          </div>
+
+          <!-- Dropdown sửa/xóa -->
+          <div class="dropdown">
+            <button class="btn btn-sm text-muted" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fa-solid fa-ellipsis"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 fade">
+              <li><a class="dropdown-item" href="/posts/{{this._id}}/edit">Chỉnh sửa</a></li>
+              <li><a href="" class="btn btn-link dropdown-item text-danger" data-bs-toggle="modal" data-id = "{{this._id}}" data-bs-target="#delete-post-modal">Xóa</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Lý do từ chối -->
+        {{#if (eq this.status "rejected")}}
+        <div class="mt-3 small text-danger">
+          <i class="fa-solid fa-circle-exclamation me-1"></i> Lý do: {{this.rejectionReason}}
+        </div>
+        {{/if}}
+      </div>
+    </div>
+    {{/each}}
+  {{else}}
+    <div class="text-center mt-5">
+      <p class="mb-2">Chưa có bài viết nào.</p>
+      <p>Bạn có thể <a class="text-success" href="/posts/create">viết bài mới</a> hoặc <a class="text-success" href="/posts">đọc bài viết khác</a> trên SURU.</p>
+    </div>
+  {{/if}}
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="delete-post-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa bài viết?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Bạn chắn chắn muốn xóa bài viết này?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button id="btn-delete-post" type="button" class="btn btn-danger">Xóa bỏ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Delete hidden form --}}
+{{!-- Không có action tại vì đây nó nhận 1 list nên không dùng course._id được --}}
+<form id="delete-post-form" method="POST"></form>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+
+    var deleteForm = document.getElementById('delete-post-form')
+    var btnDeletePost = document.getElementById('btn-delete-post')
+
+    //Khi hộp thoại modal show
+    const deleteModal = document.getElementById('delete-post-modal')
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget
+        postID = button.getAttribute('data-id') //Lấy ra được id
+        })
+    }
+
+    //Khi click vào button xóa bỏ
+    btnDeletePost.onclick = function(event){
+      //Đẩy form xuống và gán action cho nó
+      deleteForm.action = '/posts/' + postID + '?_method=DELETE'
+      deleteForm.submit()
+    }
+
+</script>
+
+<!-- Hiển thị thông báo thành công -->
+{{#if success}}
+  <div class="alert alert-success alert-dismissible mt-5" role="alert">
+    {{success}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<!-- Hiển thị thông báo lỗi -->
+{{#if error}}
+  <div class="alert alert-danger alert-dismissible mt-5" role="alert">
+    {{error}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+

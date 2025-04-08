@@ -1,0 +1,46 @@
+
+<div class="container my-5">
+
+    <!-- Nút quay lại -->
+    <div class="mb-3">
+        <a onclick="history.back()" class="text-muted" style="cursor: pointer;"><i class="fa-solid fa-reply fa-sm me-2"></i>Quay lại</a>
+    </div>
+
+    <!-- Tiêu đề bài viết -->
+    <h1 class="fw-bold fs-2 mb-3 mb-5">{{post.title}}</h1>
+
+    <!-- Thông tin tác giả -->
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <img src="{{author.avatar}}" class="rounded-circle" width="50" height="50">
+        <div>
+            <strong class="d-block">{{author.fullName}}</strong>
+            <small class="text-muted">{{timeAgo post.createdAt}}</small>
+        </div>
+    </div>
+
+    <!-- Nội dung bài viết -->
+    <div class="mb-5">
+        {{{post.content}}}
+    </div>
+
+    <hr class="my-5">
+
+    <!-- Dự án nổi bật -->
+    <h4 class="mb-4 title-strong">🔥Các bài viết nổi bật khác</h4>
+    <div class="row">
+        {{#each relatedPosts}}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0 rounded-4">
+                <a href="/posts/{{this.slug}}">
+                    <img src="{{this.thumbnail}}" class="card-img-top rounded-top-4" alt="{{this.title}}" style="height: 180px; object-fit: cover;">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">{{this.title}}</h5>
+                    <p class="card-text text-muted small">{{this.description}}</p>
+                    <a href="/posts/{{this.slug}}" class="btn btn-warning w-100">>> Xem tiếp</a>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>

@@ -1,10 +1,13 @@
-<div class="mt-4">
+<div class="mt-5">
+
+    <!-- KHÓA HỌC MIỄN PHÍ -->
     <div class="row d-flex align-items-stretch">
+        <h4 class="mb-4 title-strong">Khóa học miễn phí</h4>
         {{#each courses}}
-        <div class="col-sm-6 col-lg-4 mb-4">
-            <div class="card card-course-item h-100 shadow-sm">
+        <div class="col-sm-6 col-lg-4 mb-4 ">
+            <div class="border-0 bg-light card rounded-4 card-course-item h-100 shadow-sm ">
                 <a href="/courses/{{this.slug}}">
-                    <img src="{{this.image}}" class="card-img-top" alt="{{this.name}}" style="height: 200px; object-fit: cover;">
+                    <img src="{{this.image}}" class="card-img-top rounded-top-4 " alt="{{this.name}}" style="height: 200px; object-fit: cover;">
                 </a>
                 <div class="card-body d-flex flex-column">
                     <a href="/courses/{{this.slug}}" class="card-link">
@@ -19,4 +22,58 @@
         </div>
         {{/each}}
     </div>
+
+    <!-- BÀI VIẾT NỔI BẬT -->
+    <div class="mt-5">
+        <h4 class="mb-4 title-strong">Bài viết nổi bật</h4>
+        <div class="row">
+            {{#each posts}}
+            <div class="col-md-6 col-lg-4 mb-4 ">
+                <div class="border-0 bg-light none card rounded-4 h-100 shadow-sm">
+                    <a href="/posts/{{this.slug}}">
+                        <img src="{{this.thumbnail}}" class="card-img-top rounded-top-4" alt="{{this.title}}" style="height: 200px; object-fit: cover;">
+                    </a>
+                    <div class="card-body d-flex flex-column">
+                        <a href="/posts/{{this.slug}}" class="card-link">
+                            <h5 class="card-title text-dark">{{this.title}}</h5>
+                        </a>
+                        <!-- Tác giả và thời gian -->
+                        <div class="d-flex align-items-center gap-2 mt-3 text-muted small">
+                            <img src="{{this.avatarAuthor}}" class="rounded-circle" width="30" height="30">
+                            <strong>{{this.author}}</strong>
+                            <span>•</span>
+                            <span>{{timeAgo this.createdAt}}</span>
+                        </div>
+
+                        <div class="mt-auto pt-3">
+                            <a href="/posts/{{this.slug}}" class="btn btn-warning w-100">Đọc bài viết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+
+
 </div>
+
+<!-- Hiển thị thông báo thành công -->
+{{#if success}}
+  <div class="alert alert-success alert-dismissible mt-5" role="alert">
+    {{success}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<!-- Hiển thị thông báo lỗi -->
+{{#if error}}
+  <div class="alert alert-danger alert-dismissible mt-5" role="alert">
+    {{error}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
