@@ -12,7 +12,9 @@ const CommentSchema = new Schema(
                 user_id: {type: mongoose.Schema.ObjectId, required: true},
                 content: {type: String, required: true},
                 replyToUserId: {type: mongoose.Schema.ObjectId, required: true},
-                createdAt: {type: Date, default: Date.now()}
+                createdAt: {type: Date},
+                deleted: {type: Boolean, default: false},
+                deletedAt: {type: Date, default: null},
             }
         ]
     },

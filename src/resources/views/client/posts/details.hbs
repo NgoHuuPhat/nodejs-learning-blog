@@ -70,7 +70,8 @@
   
   .dropdown-menu {
     position: absolute;
-    right: 0;
+    right: 10px;
+    top: 30px;
     background-color: white;
     min-width: 120px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
@@ -193,7 +194,7 @@
             </button>
           </div>
 
-          <div class="bg-light p-3 ps-5 pe-5 d-flex flex-column bg-white" style="height: 100%;">
+          <div class="bg-light p-3 ps-5 pe-5 pb-5 d-flex flex-column bg-white" style="height: 100%;">
             <!-- Form nhập bình luận -->
             <form action="/comments/{{post._id}}" method="POST">
               <div class="mb-4">
@@ -202,7 +203,7 @@
                   <div id="commentInputTrigger" class="form-control placeholder-text" onclick="showCommentInput()" style="cursor: text; background-color:#eef4fc; border: 0px;">
                     Nhập bình luận mới của bạn
                   </div>
-                  <textarea id="commentInputArea" name="content" class="form-control d-none" rows="3" placeholder="Nhập bình luận..."></textarea>
+                  <textarea id="commentInputArea" style="margin-top: 0px;" name="content" class="form-control d-none" rows="3" placeholder="Nhập bình luận..."></textarea>
                 </div>
                 <div id="commentActions" class="d-none mt-4 d-flex justify-content-end gap-2">
                   <button type="button" class="btn btn-grad-cancel align-self-center" onclick="hideCommentInput()" style="width: 150px; height: 35px;">Hủy</button>
@@ -219,6 +220,11 @@
             <div class="flex-grow-1 overflow-auto">
               <div class="mb-4">
                 {{#each comments}}
+                  {{#if this.isUndo}}
+                    <p class="fst-italic text-muted">
+                      Bạn đã xóa bình luận này. <a href= "" class="btn-undo-cmt fw-semibold" data-id="{{this._id}}">Hoàn tác</a>
+                    </p>
+                  {{else}}
                   {{!-- Hiển thị bình luận --}}
                   <div class="mb-5 comment-item">
                     <div class="d-flex gap-2 mb-3">
@@ -230,38 +236,32 @@
 
                       {{!-- Dropdown menu for actions --}}
                       {{#if (eq (toString this.user_id) (toString @root.account.id))}} 
-                        <div class="comment-actions dropdown">
-                          <i class="fa-solid fa-ellipsis custom-dropdown-toggle" style="color: #ff7e5f;" onclick="toggleDropdown(event, this)"></i>
-                          <div class="dropdown-menu">
+                        <div class="comment-actions dropdown d-flex align-items-center">
+                          <i class="fa-solid fa-ellipsis custom-dropdown-toggle pe-3" style="color: #ff7e5f;" onclick="toggleDropdown(event, this)"></i>
+                          <div class="dropdown-menu dropdown-menu-cmt">
                             <a href="#" class="dropdown-item" onclick="editComment(this)">Chỉnh sửa</a>
                             <a href="#" class="dropdown-item btn-delete-comment" data-id="{{this._id}}">Xóa</a>
                           </div>
                         </div>
                       {{/if}}
-
                     </div>
-                    {{#if this.isUndo}}
-                      <p class="fst-italic text-muted">
-                        Bình luận này đã bị xóa. <a href= "" class="btn-undo-cmt" data-id="{{this._id}}">Hoàn tác</a>
-                      </p>
-                    {{else}}
-                      <p>{{this.content}}</p>
-                    {{/if}}
+                    <p>{{this.content}}</p>
+                    <div class="gap-3 d-flex align-items-center">
+                      <button class="btn btn-link p-0 fw-semibold text-decoration-none" style="color: #ff7e5f;" >Thích</button>
+                      <button class="btn btn-link p-0 fw-semibold text-decoration-none reply-button" data-id="{{this.user._id}}" data-fullName="{{this.user.fullName}}" style="color: #ff7e5f;" onclick="showReplyInput(this)">Trả lời</button>
+                    </div>
+                    
+
                     {{!-- Textarea chỉnh sửa (Ẩn) --}}
                     <form action="/comments/{{this._id}}?_method=PUT" method="POST">
                       <div class="comment-edit-area-{{this._id}}" style="display: none;">
-                        <textarea class="form-control" name="editContent" rows="3">{{this.content}}</textarea>
+                        <textarea class="form-control " name="editContent" rows="3">{{this.content}}</textarea>
                         <div class="d-flex justify-content-end gap-2 mt-2">
                           <button type="button" class="btn btn-grad-cancel btn-sm" onclick="cancelCommentEdit('{{this._id}}')" style="width: 150px; height: 35px;" >Hủy</button>
                           <button type="submit" class="btn btn-grad btn-sm" style="width: 150px; height: 35px;" >Lưu</button>
                         </div>
                       </div>
                     </form>
-
-                    <div class="gap-3 d-flex align-items-center">
-                      <button class="btn btn-link p-0 fw-semibold text-decoration-none" style="color: #ff7e5f;" >Thích</button>
-                      <button class="btn btn-link p-0 fw-semibold text-decoration-none reply-button" data-id="{{this.user._id}}" data-fullName="{{this.user.fullName}}" style="color: #ff7e5f;" onclick="showReplyInput(this)">Trả lời</button>
-                    </div>
 
                     <!-- Reply Textarea -->
                     <form action="/comments/{{this._id}}/reply" method="POST" class="comment-textarea">
@@ -282,27 +282,36 @@
                     <div class="mt-4 ps-5 border-start">
                       {{#each this.replies}}
                         <div class="mb-4 reply-item"> <!-- Thêm class reply-item -->
-                          <div class="d-flex gap-2 mb-3">
-                            <img src="{{this.user.avatar}}" class="rounded-circle" width="35" height="35">
-                            <div class="d-flex gap-2 ">
-                              <strong class="d-block" style="color: #ff7e5f;">{{this.user.fullName}}</strong>
-                              <small class="text-muted" style="margin-top: 1px;">{{timeAgo this.createdAt}}</small>
-                            </div>
-
-                            {{!-- Dropdown menu for actions (Vì HBS không hỗ trợ so sánh ObjectID nên phải toString() --}}
-                            {{#if (eq (toString this.user_id) (toString @root.account.id))}} 
-                              <div class="comment-actions dropdown">
-                                <i class="fa-solid fa-ellipsis custom-dropdown-toggle" style="color: #ff7e5f;" onclick="toggleDropdown(event, this)"></i>
-                                <div class="dropdown-menu">
-                                  <a href="#" class="dropdown-item" onclick="editReply(this)">Chỉnh sửa</a>
-                                  <a href="#" class="dropdown-item" onclick="deleteReply(this)">Xóa</a>
-                                </div>
+                          {{#if this.isUndo}}
+                            <p class="fst-italic text-muted">
+                              Bạn đã xóa bình luận này. <a href= "" class="btn-undo-reply fw-semibold" data-id-cmt="{{../this._id}}" data-id-reply="{{this._id}}">Hoàn tác</a>
+                            </p>
+                          {{else}}
+                            <div class="d-flex gap-2 mb-3 align-items-center">
+                              <img src="{{this.user.avatar}}" class="rounded-circle" width="35" height="35">
+                              <div class="d-flex gap-2 ">
+                                <strong class="d-block" style="color: #ff7e5f;">{{this.user.fullName}}</strong>
+                                <small class="text-muted" style="margin-top: 1px;">{{timeAgo this.createdAt}}</small>
                               </div>
-                            {{/if}}
-                      
-                          </div>
-                          <p class="mt-2"><span class="reply-mention">{{this.replyToUser.fullName}}</span> {{this.content}}</p>
 
+                              {{!-- Dropdown menu for actions (Vì HBS không hỗ trợ so sánh ObjectID nên phải toString() --}}
+                              {{#if (eq (toString this.user_id) (toString @root.account.id))}} 
+                                <div class="comment-actions dropdown">
+                                  <i class="fa-solid fa-ellipsis custom-dropdown-toggle pe-3" style="color: #ff7e5f;" onclick="toggleDropdown(event, this)"></i>
+                                  <div class="dropdown-menu dropdown-menu-reply">
+                                    <a href="#" class="dropdown-item" onclick="editReply(this)">Chỉnh sửa</a>
+                                    <a href="#" class="dropdown-item btn-delete-reply" data-id-cmt="{{../this._id}}" data-id-reply="{{this._id}}">Xóa</a>
+                                  </div>
+                                </div>
+                              {{/if}}
+                            </div>
+                            <p class="mt-2"><span class="reply-mention">{{this.replyToUser.fullName}}</span> {{this.content}}</p>
+                            <div class="gap-3 d-flex align-items-center">
+                              <button class="btn btn-link p-0 fw-semibold text-decoration-none" style="color: #ff7e5f;">Thích</button>
+                              <button class="btn btn-link p-0 fw-semibold text-decoration-none reply-button" style="color: #ff7e5f;" onclick="showReplyInput(this)" data-id="{{this.user._id}}" data-fullName="{{this.user.fullName}}">Trả lời</button>
+                            </div>
+                          {{/if}}
+                      
                           {{!-- Editable contenteditable (hidden by default) --}}
                           <form class="form-edit-reply" action="/comments/{{../this._id}}/replies/{{this._id}}?_method=PUT" method="POST">
                             <div class="reply-edit-area-{{this._id}}" style="display: none;">
@@ -320,11 +329,6 @@
                             </div>
                           </form>
                           
-                          <div class="gap-3 d-flex align-items-center">
-                            <button class="btn btn-link p-0 fw-semibold text-decoration-none" style="color: #ff7e5f;">Thích</button>
-                            <button class="btn btn-link p-0 fw-semibold text-decoration-none reply-button" style="color: #ff7e5f;" onclick="showReplyInput(this)" data-id="{{this.user._id}}" data-fullName="{{this.user.fullName}}">Trả lời</button>
-                          </div>
-
                           <!-- Reply Textarea (di chuyển vào trong mỗi reply-item) -->
                           <form action="/comments/{{../_id}}/reply" method="POST" class="comment-textarea">
                             <div class="d-flex align-items-start gap-2 mt-3">
@@ -343,10 +347,9 @@
                       {{/each}}
                     </div>
                   </div>
+                  {{/if}}
                 {{/each}}
               </div>
-
-              <!-- Thêm bình luận khác tại đây -->
             </div>
           </div>
         </div>
@@ -363,6 +366,14 @@
 
 {{!-- Form ẩn để hoàn tác bình luận --}}
 <form id="undoCommentForm" method="POST" style="display: none;"></form>
+</body>
+
+{{!-- Form ẩn để xóa reply --}}
+<form id="deleteReplyForm" method="POST" style="display: none;"></form>
+</body>
+
+{{!-- Form ẩn để hoàn tác reply --}}
+<form id="undoReplyForm" method="POST" style="display: none;"></form>
 </body>
 
 <script>
@@ -392,6 +403,37 @@
 
       undoCommentForms.action = `/comments/${commentId}/restore?_method=PATCH`
       undoCommentForms.submit(); 
+      
+    });
+  });
+
+  // Xử lý xóa reply
+  const deleteReplyForms = document.getElementById('deleteReplyForm')
+  const btnDeleteReply = document.querySelectorAll('.btn-delete-reply')
+
+  btnDeleteReply.forEach(btn => {
+    btn.addEventListener('click', function(event) {
+      event.preventDefault()
+      const commentId = this.getAttribute('data-id-cmt')
+      const replyId = this.getAttribute('data-id-reply')
+
+      deleteReplyForms.action = `/comments/${commentId}/replies/${replyId}?_method=DELETE`
+      deleteReplyForms.submit(); 
+    });
+  });
+
+  // Xử lí hoàn tác reply
+  const undoReplyForms = document.getElementById('undoReplyForm')
+  const btnUndoReply = document.querySelectorAll('.btn-undo-reply')
+
+  btnUndoReply.forEach(btn => {
+    btn.addEventListener('click', function(event) {
+      event.preventDefault()
+      const commentId = this.getAttribute('data-id-cmt')
+      const replyId = this.getAttribute('data-id-reply')
+
+      undoReplyForms.action = `/comments/${commentId}/replies/${replyId}/restore?_method=PATCH`
+      undoReplyForms.submit(); 
     });
   });
 
@@ -546,107 +588,168 @@
     const dropdown = button.nextElementSibling;
     dropdown.classList.toggle('show');
   }
-  
-  // Đóng menu dropdown khi nhấp ra ngoài
-  document.addEventListener('click', function(event) {
-    document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
-      menu.classList.remove('show');
-    });
-  });
 
   function editComment(editButton) {
-    // Tìm phần tử comment-item cha gần nhất của nút "Chỉnh sửa"
-    const commentItem = editButton.closest('.comment-item');
-    if (commentItem) {
-      // Tìm phần tử hiển thị nội dung bình luận và textarea chỉnh sửa trong comment-item
-      const commentContent = commentItem.querySelector('p');
-      const editArea = commentItem.querySelector('[class^="comment-edit-area-"]');
+  // Tìm phần tử comment-item cha gần nhất của nút "Chỉnh sửa"
+  const currentCommentItem = editButton.closest('.comment-item');
 
-      // Ẩn nội dung bình luận và hiển thị textarea chỉnh sửa
-      if (commentContent && editArea) {
-        commentContent.style.display = 'none';
-        editArea.style.display = 'block';
-
-        // Focus vào textarea để người dùng có thể bắt đầu chỉnh sửa ngay
-        const textarea = editArea.querySelector('textarea');
-        if (textarea) {
-          // Đặt con trỏ vào cuối nội dung
-          textarea.selectionStart = textarea.value.length;
-          textarea.selectionEnd = textarea.value.length; 
-          textarea.focus();
+  // Đóng tất cả các khu vực chỉnh sửa bình luận ĐANG HIỂN THỊ mà không phải của bình luận hiện tại
+  document.querySelectorAll('.comment-item').forEach(item => {
+    if (item !== currentCommentItem) {
+      const editArea = item.querySelector('[class^="comment-edit-area-"]');
+      const commentContent = item.querySelector('p');
+      const replyButton = item.querySelector('.reply-button');
+      if (editArea && editArea.style.display === 'block') {
+        editArea.style.display = 'none';
+        if (commentContent) {
+          commentContent.style.display = 'block';
+        }
+        if (replyButton) {
+          replyButton.disabled = false; // Kích hoạt lại nút trả lời
         }
       }
     }
+  });
+
+  // Đóng tất cả các khu vực chỉnh sửa trả lời ĐANG HIỂN THỊ
+  document.querySelectorAll('.reply-item').forEach(item => {
+    const editArea = item.querySelector('[class^="reply-edit-area-"]');
+    const replyContent = item.querySelector('p.mt-2');
+    const replyButton = item.querySelector('.reply-button');
+    if (editArea && editArea.style.display === 'flex') {
+      editArea.style.display = 'none';
+      if (replyContent) {
+        replyContent.style.display = 'block';
+      }
+      if (replyButton) {
+        replyButton.disabled = false; // Kích hoạt lại nút trả lời
+      }
+    }
+  });
+
+  if (currentCommentItem) {
+    const commentContent = currentCommentItem.querySelector('p');
+    const editArea = currentCommentItem.querySelector('[class^="comment-edit-area-"]');
+    const replyButton = currentCommentItem.querySelector('.reply-button');
+
+    if (commentContent && editArea) {
+      commentContent.style.display = 'none';
+      editArea.style.display = 'block';
+      if (replyButton) {
+        replyButton.disabled = true;
+      }
+      const textarea = editArea.querySelector('textarea');
+      if (textarea) {
+        textarea.focus();
+        textarea.selectionStart = textarea.value.length;
+        textarea.selectionEnd = textarea.value.length;
+      }
+    }
   }
+}
+
 
   function cancelCommentEdit(commentId) {
-    // Tìm phần tử comment-edit-area tương ứng bằng commentId
     const editArea = document.querySelector(`.comment-edit-area-${commentId}`);
     if (editArea) {
-      // Tìm thẻ form cha của editArea
-      const formElement = editArea.parentNode;
-      if (formElement) {
-        // Tìm phần tử <p> liền kề trước thẻ form
-        const commentContent = formElement.previousElementSibling;
-        if (commentContent && commentContent.tagName === 'P') {
-
+      const commentItem = editArea.closest('.comment-item');
+      if (commentItem) {
+        const commentContent = commentItem.querySelector('p');
+        const replyButton = commentItem.querySelector('.reply-button');
+        if (commentContent) {
           commentContent.style.display = 'block';
-          editArea.style.display = 'none';
-        } else {
-          console.log('Không tìm thấy phần tử <p> trước form.');
         }
-      } else {
-        console.log('Không tìm thấy thẻ form cha của editArea.');
+        if (replyButton) {
+          replyButton.disabled = false; // Kích hoạt lại nút trả lời
+        }
+        editArea.style.display = 'none';
       }
     }
   }
 
   function editReply(editButton) {
-    // Tìm phần tử reply-item cha gần nhất
-    const replyItem = editButton.closest('.reply-item');
-    if (replyItem) {
-      // Tìm phần tử hiển thị nội dung trả lời và div contenteditable chỉnh sửa
-      const replyContent = replyItem.querySelector('p.mt-2');
-      const editArea = replyItem.querySelector('[class^="reply-edit-area-"]');
+  // Tìm phần tử reply-item cha gần nhất
+  const currentReplyItem = editButton.closest('.reply-item');
+  const parentCommentItem = currentReplyItem.closest('.comment-item');
 
-      if (replyContent && editArea) {
-        replyContent.style.display = 'none';
-        editArea.style.display = 'flex'; // Hiển thị flex để các phần tử con xếp hàng ngang
-        editArea.style.flexDirection = 'column'; // Đảm bảo các nút ở dưới
-        // Focus vào div contenteditable
-        const editableDiv = editArea.querySelector('[contenteditable="true"]');
-        if (editableDiv) {
-          editableDiv.focus();
-          // Đặt con trỏ vào cuối nội dung (tùy chọn)
-          const range = document.createRange();
-          range.selectNodeContents(editableDiv);
-          range.collapse(false);
-          const selection = window.getSelection();
-          selection.removeAllRanges();
-          selection.addRange(range);
+  // Đóng tất cả các khu vực chỉnh sửa bình luận ĐANG HIỂN THỊ
+  document.querySelectorAll('.comment-item').forEach(item => {
+    if (item !== parentCommentItem) { // Không đóng khu vực chỉnh sửa của bình luận cha
+      const editArea = item.querySelector('[class^="comment-edit-area-"]');
+      const commentContent = item.querySelector('p');
+      const replyButton = item.querySelector('.reply-button');
+      if (editArea && editArea.style.display === 'block') {
+        editArea.style.display = 'none';
+        if (commentContent) {
+          commentContent.style.display = 'block';
+        }
+        if (replyButton) {
+          replyButton.disabled = false;
         }
       }
     }
+  });
+
+  // Đóng tất cả các khu vực chỉnh sửa trả lời ĐANG HIỂN THỊ mà không phải của trả lời hiện tại
+  document.querySelectorAll('.reply-item').forEach(item => {
+    if (item !== currentReplyItem) {
+      const editArea = item.querySelector('[class^="reply-edit-area-"]');
+      const replyContent = item.querySelector('p.mt-2');
+      const replyButton = item.querySelector('.reply-button');
+      if (editArea && editArea.style.display === 'flex') {
+        editArea.style.display = 'none';
+        if (replyContent) {
+          replyContent.style.display = 'block';
+        }
+        if (replyButton) {
+          replyButton.disabled = false;
+        }
+      }
+    }
+  });
+
+  if (currentReplyItem) {
+    const replyContent = currentReplyItem.querySelector('p.mt-2');
+    const editArea = currentReplyItem.querySelector('[class^="reply-edit-area-"]');
+    const replyButton = currentReplyItem.querySelector('.reply-button');
+
+    if (replyContent && editArea) {
+      replyContent.style.display = 'none';
+      editArea.style.display = 'flex';
+      editArea.style.flexDirection = 'column';
+      const editableDiv = editArea.querySelector('[contenteditable="true"]');
+
+      if (replyButton) {
+        replyButton.disabled = true;
+      }
+
+      if (editableDiv) {
+        editableDiv.focus();
+        const range = document.createRange();
+        range.selectNodeContents(editableDiv);
+        range.collapse(false);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    }
   }
+}
 
   function cancelReplyEdit(replyId) {
-    // Tìm phần tử reply-edit-area tương ứng
     const editArea = document.querySelector(`.reply-edit-area-${replyId}`);
     if (editArea) {
-      // Tìm thẻ form cha của editArea
-      const formElement = editArea.parentNode;
-      if (formElement) {
-        // Tìm phần tử <p> liền kề trước thẻ form
-        const replyContent = formElement.previousElementSibling;
-        if (replyContent && replyContent.matches('p.mt-2')) {
-          // Hiển thị lại nội dung trả lời và ẩn khu vực chỉnh sửa
+      const replyItem = editArea.closest('.reply-item');
+      const replyButton = replyItem.querySelector('.reply-button');
+      if (replyItem) {
+        const replyContent = replyItem.querySelector('p.mt-2');
+        if (replyContent) {
           replyContent.style.display = 'block';
-          editArea.style.display = 'none';
-        } else {
-          console.log('Không tìm thấy phần tử <p.mt-2> trước form.');
         }
-      } else {
-        console.log('Không tìm thấy thẻ form cha của editArea.');
+        if (replyButton) {
+          replyButton.disabled = false; // Kích hoạt lại nút trả lời
+        }
+        editArea.style.display = 'none';
       }
     }
   }
@@ -673,6 +776,22 @@
       form.submit(); // Gửi form
     
     });
+  });
+
+  // Đóng dropdown khi click ra ngoài
+  document.addEventListener('click', function(event) {
+      const dropdowns = document.querySelectorAll('.dropdown-menu-cmt, .dropdown-menu-reply');
+      dropdowns.forEach(dropdown => {
+          if (dropdown.classList.contains('show')) {
+              const dropdownToggle = dropdown.previousElementSibling;
+              const commentActions = dropdown.closest('.comment-actions');
+              
+              // Kiểm tra xem phần tử được click có phải là nút toggle hoặc nằm trong menu không
+              if (!commentActions.contains(event.target) && !dropdown.contains(event.target)) {
+                  dropdown.classList.remove('show');
+              }
+          }
+      });
   });
 
 

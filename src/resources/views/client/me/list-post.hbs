@@ -47,7 +47,7 @@
 
               {{!-- Chỉ hiển thị sửa/xóa nếu không phải đã duyệt --}}
               {{#unless (eq this.status "approved")}} 
-                <li><a href="" class="dropdown-item" href="/posts/{{this._id}}/edit">Chỉnh sửa</a></li>
+                <li><a class="dropdown-item" href="/posts/{{this._id}}/edit">Chỉnh sửa</a></li>
                 <li><a href="" class="btn btn-link dropdown-item text-danger" data-bs-toggle="modal" data-id = "{{this._id}}" data-bs-target="#delete-post-modal">Xóa</a></li>
               {{/unless}}
 

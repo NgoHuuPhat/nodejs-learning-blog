@@ -358,6 +358,7 @@ img {
 
 textarea.form-control {
     padding: 15px;
+    margin-top: 20px;
     border: 1px solid #ff7e5f; // Viền màu #ff7e5f
     border-radius: 10px;
     height: 80px;
@@ -372,6 +373,7 @@ textarea.form-control {
 
 div[contenteditable] {
     padding: 15px;
+    margin-top: 20px;
     border: 1px solid #ff7e5f; // Viền màu #ff7e5f
     border-radius: 10px;
     min-height: 80px;

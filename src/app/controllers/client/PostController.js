@@ -18,7 +18,7 @@ class PostController {
             await Post.updateOne({ slug: req.params.slug }, { $inc: { views: 1 } })
 
             // Lấy ra các dự án nổi bật khác
-            const relatedPosts = await Post.find({slug: {$ne: req.params.slug}}).sort({views: -1}).limit(6).lean()
+            const relatedPosts = await Post.find({slug: {$ne: req.params.slug}, status:'approved'}).sort({views: -1}).limit(6).lean()
             
             //Lấy thông tin người đăng
             const author = await Account.findById(post.author).lean()
@@ -40,20 +40,56 @@ class PostController {
                 }
             }
 
-            // Kiểm tra xem bình luận nào đã bị xóa và cần hoàn tác
-            if (req.session.deletedComment) {
-                for (const comment of allComments) {
-                    console.log(comment._id.toString(), req.session.deletedComment.toString())
-                    if (comment._id.toString() === req.session.deletedComment.toString()) {
-                        comment.isUndo = true;  // Đánh dấu hoàn tác
-                        break;
+            // Xử lí hoàn tác comment
+            if(req.session.deletedComment && req.session.deletedComment.length > 0) {
+
+                // Check thơi gian xóa comment
+                const currentTime = new Date()
+                const timeLimit = 60 * 1000 // 1 phút
+
+                // Lọc ra những comment còn trong thời gian hoàn tác
+                req.session.deletedComment = req.session.deletedComment.filter(comment => {
+                    return currentTime - comment.deletedAt < timeLimit
+                })
+
+                for(const comment of allComments) {
+                    if(req.session.deletedComment.some(item => item.id.toString() === comment._id.toString())) {
+                        comment.isUndo = true
                     }
                 }
-                req.session.deletedComment = null 
+                
             }
+            
+            // Xử lí hoàn tác reply
+            if(req.session.deletedReply && req.session.deletedReply.length > 0) {
 
+                // Check thời gian xóa reply
+                const currentTime = new Date()
+                const timeLimit = 60 * 1000 // 1 phút
+
+                // Lọc ra những reply còn trong thời gian hoàn tác
+                req.session.deletedReply = req.session.deletedReply.filter(reply => {
+                    return currentTime - reply.deletedAt < timeLimit
+                })
+
+                for(const comment of allComments) {
+                    for(const reply of comment.replies) {
+                        if(req.session.deletedReply.some(item => item.id.toString() === reply._id.toString())) {
+                            reply.isUndo = true
+                        }
+                    }
+                }
+                
+            }
+            
             // Lấy ra bình luận không bị xóa hoặc đã được hoàn tác
             const comments = allComments.filter(comment => !comment.deleted || comment.isUndo);
+
+            // Lấy ra reply không bị xóa hoặc đã được hoàn tác
+            for (const comment of comments) {
+                comment.replies = comment.replies.filter(reply => !reply.deleted || reply.isUndo);
+            }
+
             
             res.render('client/posts/details', { post, comments, author, relatedPosts })
         } catch (error) {

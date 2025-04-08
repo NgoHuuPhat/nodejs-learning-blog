@@ -9,7 +9,7 @@ class CommentController {
     //[POST] /comments/:id
     async create(req, res, next) {
         try {
-            if(req.params.id && res.locals.account.id){
+            if(req.params.id && res.locals.account.id && req.body) {
                 const newComment = {
                     post_id: req.params.id,
                     user_id: res.locals.account.id,
@@ -30,10 +30,10 @@ class CommentController {
     async replyComment(req, res, next) {
         try {
 
-            if(req.body && req.params.id){
+            if(req.body && req.params.id && res.locals.account.id) {
                 await Comment.updateOne(
                     { _id: req.params.id },
-                    { $push: { replies: {user_id: res.locals.account.id, content: req.body.replies, replyToUserId: req.body.replyToUserId} } }
+                    { $push: { replies: {user_id: res.locals.account.id, content: req.body.replies, replyToUserId: req.body.replyToUserId, createdAt: new Date()} } }
                 )
             }
 
@@ -94,8 +94,13 @@ class CommentController {
                 if(comment) {
                     await Post.updateOne({ _id: comment.post_id }, { $inc: { commentCount: -1 } })
 
-                    // Gán giá trị vào req.session
-                    req.session.deletedComment = comment._id
+                    // Lưu giá trị session để khôi phục lại bình luận
+                    req.session.deletedComment = req.session.deletedComment || []
+                    req.session.deletedComment.push({
+                        id: comment._id,
+                        deletedAt: Date.now(),
+                    })
+                    
                 }
 
                 await Comment.delete({ _id: req.params.id })
@@ -120,12 +125,83 @@ class CommentController {
                     await Post.updateOne({ _id: comment.post_id }, { $inc: { commentCount: 1 } })
                 }
 
+                // Xóa giá trị session đã lưu khi khôi phục bình luận
+                if(req.session.deletedComment && req.session.deletedComment.length > 0) {
+                    req.session.deletedComment = req.session.deletedComment.filter(item => item.id !== req.params.id)
+                }
+
             }
             res.redirect(req.get('referer') + '?showComments=true')
         } catch (error) {
             next(error)
         }
     }
+
+    //[DELETE] /comments/:commentId/replies/:replyId
+    async destroyReplies(req, res, next) {
+        try {
+            if(req.params.replyId && req.params.commentId) {
+                await Comment.updateOne(
+                    { _id: req.params.commentId, 'replies._id': req.params.replyId },
+                    { $set:
+                        { 
+                            'replies.$.deleted': true,
+                            'replies.$.deletedAt': new Date(),
+                        } 
+                    } //.$. là toán tử để cập nhật trường con trong mảng
+                )
+
+                // Lưu giá trị session để khôi phục lại reply
+                req.session.deletedReply = req.session.deletedReply || []
+                req.session.deletedReply.push({
+                    id: req.params.replyId,
+                    deletedAt: Date.now(),
+                })
+
+                // Giảm số lượng bình luận của bài viết
+                const comment = await Comment.findOne({ _id: req.params.commentId, deleted: true})
+                if(comment) {
+                    await Post.updateOne({ _id: comment.post_id }, { $inc: { commentCount: -1 } })
+                }
+            }
+
+            res.redirect(req.get('referer') + '?showComments=true')
+            } catch (error) {
+                next(error)
+            }
+    }
+
+    //[PATCH] /:commentId/replies/:replyId/restore
+    async restoreReplies(req, res, next) {
+        try {
+            if(req.params.replyId && req.params.commentId) {
+                await Comment.updateOne(
+                    { _id: req.params.commentId, 'replies._id': req.params.replyId },
+                    { $set:
+                        { 
+                            'replies.$.deleted': false,
+                            'replies.$.deletedAt': null,
+                        } 
+                    } //.$. là toán tử để cập nhật trường con trong mảng
+                )
+
+                // Xóa giá trị session đã lưu khi khôi phục bình luận
+                if(req.session.deletedReply && req.session.deletedReply.length > 0) {
+                    req.session.deletedReply = req.session.deletedReply.filter(item => item.id !== req.params.replyId)
+                }
+
+                // Tăng số lượng bình luận của bài viết
+                const comment = await Comment.findOne({ _id: req.params.commentId, deleted: false})
+                if(comment) {
+                    await Post.updateOne({ _id: comment.post_id }, { $inc: { commentCount: 1 } })
+                }
+            }
+            res.redirect(req.get('referer') + '?showComments=true')
+        } catch (error) {
+            next(error)
+        }
+    }
+    
 
 }
 
