@@ -1,4 +1,10 @@
 const Handlebars = require('handlebars')
+const dayjs = require('dayjs') // Thư viện xử lý thời gian
+const relativeTime = require('dayjs/plugin/relativeTime')
+const vi = require('dayjs/locale/vi') // Ngôn ngữ tiếng Việt
+
+dayjs.extend(relativeTime)
+dayjs.locale('vi')
 
 module.exports = {
     sum: (a, b) => a + b,
@@ -64,4 +70,8 @@ module.exports = {
 
         return exists
     },
+
+    timeAgo: (date) => {
+        return dayjs(date).fromNow() // So sánh thời gian với thời gian hiện tại
+    }
 }
