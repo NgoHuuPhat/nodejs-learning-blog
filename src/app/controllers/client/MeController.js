@@ -1,5 +1,6 @@
 const Course = require('../../models/Course')
 const Account = require('../../models/Account')
+const Post = require('../../models/Post')
 const paginatitonHelper = require('../../../helpers/pagination')
 
 class MeController {
@@ -57,6 +58,20 @@ class MeController {
             next(error)
         }
     }
+
+    //[GET] /me/list-post
+    async myPostsRoute(req, res, next) {
+        try {
+            //Lấy danh sách bài viết theo trạng thái
+            const statusPage = req.query.status || 'pending'
+            
+            const posts = await Post.find({status: statusPage}).lean()
+            res.render('client/me/list-post', { posts, currentTab: statusPage }) //currentTab để xác định tab nào đang được chọn
+        } catch (error) {
+            next(error)
+        }
+    }
+    
 }
 
 module.exports = new MeController()

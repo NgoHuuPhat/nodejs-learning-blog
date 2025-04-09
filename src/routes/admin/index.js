@@ -4,6 +4,7 @@ const accountRoute = require('./accounts')
 const authRoute = require('./auth')
 const courseRoute = require('./courses')
 const myAccountRoute = require('./my-account')
+const postRoute = require('./posts')
 
 const authMiddleware = require('../../app/middlewares/authMiddleware')
 const authorMiddleware = require('../../app/middlewares/authorMiddleware')
@@ -15,6 +16,7 @@ function routeAdmin(app) {
     app.use('/admin/roles', authMiddleware, authorMiddleware, roleRoute)
     app.use('/admin/accounts', authMiddleware, authorMiddleware, accountRoute)
     app.use('/admin/courses', authMiddleware, authorMiddleware, courseRoute)
+    app.use('/admin/posts', authMiddleware, authorMiddleware, postRoute)
     app.use('/admin/my-account', authMiddleware, authorMiddleware, myAccountRoute)
 }
 

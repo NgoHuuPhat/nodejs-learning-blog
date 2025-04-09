@@ -1,0 +1,105 @@
+
+<div>
+  <h3>Khóa học đã xóa</h3>
+  <a href="/admin/courses">Quay lại</a>
+</div>
+
+  <table class="table mt-4">
+      <thead>
+          <tr>
+              <th scope="col">STT</th>
+              <th scope="col">Tên khóa học</th>
+              <th scope="col">Trình độ</th>
+              <th scope="col">Thời gian tạo</th>
+              <th scope="col"></th>
+          </tr>
+      </thead>
+      <tbody>
+          {{#each courses}}
+          <tr>
+              {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
+              <th scope="row"> {{sum @index 1}}</th>  
+              <td>{{this.name}}</td>
+              <td>{{this.level}}</td>
+              <td>{{this.createdAt}}</td>
+              <td>
+                  <a href="" class="btn btn-link btn-restore" data-id="{{this._id}}">Khôi phục</a>
+                  <!-- Button trigger modal 
+                        Trước tiên phải lấy được ID-->
+                  <a href="" class="btn btn-link" data-bs-toggle="modal" data-id = "{{this._id}}" data-bs-target="#delete-course-modal">Xóa vĩnh viễn</a> 
+              </td>
+          </tr>
+          {{else}}
+          <tr>
+            <td class="text-center" colspan="5">Thùng rác trống.
+            </td>   
+          </tr>
+          {{/each}}
+      </tbody>
+  </table>
+</div>
+
+
+{{!-- Confirm delete course --}}
+
+<!-- Modal -->
+<div class="modal fade" id="delete-course-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa khóa học?</h1>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      Bạn chắn chắn muốn xóa khóa học này?
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+      <button id="btn-delete-course" type="button" class="btn btn-danger">Xóa vĩnh viễn</button>
+    </div>
+  </div>
+</div>
+
+
+{{!-- Delete form --}}
+{{!-- Không có action tại vì đây nó nhận 1 list nên không dùng course._id được --}}
+<form id="delete-course-form" method="POST"></form>
+
+{{!-- Restore form --}}
+<form id="restore-course-form" method="POST"></form>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+
+    var courseID
+    var deleteForm = document.getElementById('delete-course-form')
+    var btnDeleteCourse = document.getElementById('btn-delete-course')
+    var restoreBtn = $('.btn-restore') //Có thể sử dụng JS thuần (ForEach)
+    var restoreForm = document.getElementById('restore-course-form')
+
+    //Xử lí sự kiện khi hộp thoại model show (JS thuần)
+    var deleteModal = document.getElementById('delete-course-modal')
+    deleteModal.addEventListener('show.bs.modal', event => {
+      var button = event.relatedTarget
+      courseID = button.getAttribute('data-id') //Lấy ra được id
+    })
+
+    //Xử lí sự kiện khi click vào button xóa bỏ
+    btnDeleteCourse.onclick = function(event){
+
+      //Đẩy form xuống và gán action cho nó
+      deleteForm.action = '/admin' + '/courses/' + courseID + '/force?_method=DELETE'
+      deleteForm.submit()
+
+    }
+
+    //Restore button Click (Jquery)
+    restoreBtn.click(function(e){
+      e.preventDefault()
+
+      var courseID = $(this).data('id')
+      //Đẩy form xuống và gán action cho nó
+      restoreForm.action = '/admin' + '/courses/' + courseID + '/restore?_method=PATCH'
+      restoreForm.submit()
+    })
+</script>

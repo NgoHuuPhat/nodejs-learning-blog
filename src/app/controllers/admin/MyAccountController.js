@@ -5,6 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
+const dateTime = require('../../../helpers/dateTime')
 
 class MyAccountController {
     //[GET] /admin/my-account
@@ -19,13 +20,7 @@ class MyAccountController {
             const myRole = await Role.findOne({ _id: myAccount.role_id }).lean()
 
             // Chuyển đổi createdAt sang định dạng DD/MM/YYYY
-            myAccount.createdAt = new Date(
-                myAccount.createdAt,
-            ).toLocaleDateString('vi-VN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-            })
+            myAccount.createdAt =  dateTime(myAccount.createdAt)
 
             res.render('admin/my-account/details', { myAccount, myRole })
         } catch (error) {

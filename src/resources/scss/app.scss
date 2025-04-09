@@ -227,3 +227,48 @@ a {
         }
     }
 }
+
+.title-strong {
+    font-family: 'Segoe UI';
+    font-weight: 900;
+}
+
+img {
+    object-fit: cover;
+}
+.dropdown-menu.fade {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    display: block;
+    visibility: hidden;
+  }
+  
+  .dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .dropdown-menu.dropdown-menu-end {
+    right: 0;
+  }
+
+  .nav-tabs .nav-customm {
+    font-weight: normal;
+    border: none;
+    transition: border-bottom 0.3s ease, color 0.3s ease;
+    transition: all 0.2s ease;
+    color: rgb(62, 62, 62); 
+  
+    &.active {
+      font-weight: bold; 
+      border-bottom: 2px solid rgb(0, 0, 0); 
+      color: rgb(0, 0, 0); 
+      font-style: bold;
+    }
+  
+    &:hover {
+      color: black;
+    }
+  }
+  
+  

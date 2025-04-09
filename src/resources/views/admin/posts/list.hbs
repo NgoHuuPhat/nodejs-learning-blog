@@ -1,0 +1,282 @@
+
+{{!-- Kiểm tra quyền truy cập --}}
+{{#if (includes account.role_permissions 'posts_view')}}
+<form method="POST" action="/admin/posts/handle-form-actions">
+  <div>
+    <h3>Danh sách bài viết</h3>
+    <a href="/admin/posts/trash">Thùng rác ({{countDeleted}})</a>
+  </div>
+
+  <div class="d-flex justify-content-end mt-3">
+    <div class="d-flex gap-3">
+      <select class="form-select-sm" name="action" required>
+        <option value="">-- Hành động --</option>
+        <option value="delete">Xóa</option>
+      </select>
+      <button class="btn btn-primary btn-submit btn-sm disabled">Thực hiện</button>
+    </div>
+  </div>
+
+  <table class="table mt-4">
+      <thead>
+          <tr>
+              {{!-- Nếu có giá trị truthy thì nó sẽ hiển thị --}}
+              {{#if posts.length}}
+              <th scope="col">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="checkbox-all" >
+                </div>
+              </th>
+              {{/if}}
+              <th scope="col">STT</th>
+              <th scope="col">
+                Tiêu đề
+                {{{sortTable 'title' _sort query}}}
+              </th>
+              <th scope="col">
+                Từ khóa
+              </th>
+              <th scope="col">
+                Thời gian đăng bài
+                {{{sortTable 'createdAt' _sort query}}}
+              </th>
+              <th scope="col">
+                Tác giả
+              </th>
+              <th scope="col">
+                Trạng thái
+              </th>
+              <th scope="col">Thao tác</th>
+          </tr>
+      </thead>
+      <tbody>
+          {{#each posts}}
+          <tr>
+              {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
+              <td>
+                <div class="form-check">
+                  {{!-- name="postIDs[]" Luôn luôn trả về mảng --}}
+                  <input class="form-check-input" type="checkbox" name="postIDs[]" value="{{this._id}}">
+                </div>
+              </td>
+              {{!-- STT=(currentPage−1)×itemsPerPage+index+1 --}}
+              <th scope="row"> {{ sum (sum (multiply (sub @root.objectPagination.currentPage 1) @root.objectPagination.limitItems) @index) 1 }}</th>  
+              <td>{{this.title}}</td>
+              <td>{{this.tags}}</td>
+              <td>{{this.createdAt}}</td>
+              <div class="dropdown">
+
+              <td>{{this.author}}</td>
+              <td>
+                {{#if (eq this.status 'pending')}}
+                    <a class="badge bg-warning dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                      Chờ duyệt
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item update-status-post text-success" href="#" data-id="{{this._id}}" data-newstatus="approved">Duyệt</a></li>
+                      <li><a class="dropdown-item update-status-post text-danger" href="#" data-id="{{this._id}}" data-newstatus="rejected">Từ chối</a></li>
+                    </ul>
+                  </div>
+                {{/if}}
+                {{#if (eq this.status 'approved')}}
+                  <span class="badge bg-success">Đã duyệt</span>
+                {{/if}}
+                {{#if (eq this.status 'rejected')}}
+                    <a class="badge bg-danger dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                      Từ chối
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item update-status-post text-success" href="#" data-id="{{this._id}}" data-newstatus="approved">Duyệt lại</a></li>
+                    </ul>
+                  </div>
+                {{/if}}
+              </td>
+              <td>
+                  <a href="/admin/posts/{{this.slug}}" class="btn btn-link">Xem chi tiết</a>
+                  <!-- Button trigger modal 
+                        Trước tiên phải lấy được ID-->
+                  <a href="" class="btn btn-link" data-bs-toggle="modal" data-id = "{{this._id}}" data-bs-target="#delete-post-modal">Xóa</a> 
+              </td>
+          </tr>
+          {{else}}
+          <tr>
+            <td class="text-center" colspan="5">Bạn chưa đăng khóa học nào
+              <a href="/admin/posts/create">Đăng khóa học</a>
+            </td>   
+          </tr>
+          {{/each}}
+      </tbody>
+  </table>
+</form>
+
+{{else}}
+  {{> 404}}
+{{/if}}
+
+
+{{!-- Confirm delete post --}}
+
+<!-- Modal -->
+<div class="modal fade" id="delete-post-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa khóa học?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Bạn chắn chắn muốn xóa khóa học này?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button id="btn-delete-post" type="button" class="btn btn-danger">Xóa bỏ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-4">
+  {{!-- Page number --}}
+    <div class="">
+      <span class="pagination-text small">{{objectPagination.startIndex}} to {{objectPagination.endIndex}} of {{objectPagination.count}}</span>
+    </div>
+  {{!-- End Page number --}}
+  {{!-- 1 to 10 of 100 posts --}}
+
+  {{!-- Pagination --}}
+  <nav aria-label="...">
+    <ul class="pagination pagination-sm d-flex mb-0 justify-content-end">
+      <li class="page-item">
+        <a class="page-link{{#if (eq objectPagination.currentPage 1)}} disabled {{/if}}" href="?page={{sub objectPagination.currentPage 1}}">Previous</a>
+      </li>
+      {{#for 1 objectPagination.totalPage}}
+        <li class="page-item {{#if (eq @root.objectPagination.currentPage this)}}active{{/if}}">
+        {{!-- C1: Dùng thẻ a để tạo link --}}
+          <a class="page-link" href="?page={{this}}">{{this}}</a> 
+        {{!-- C2: Dùng thẻ button để tạo page-id thay đổi link href
+          <button class="page-link" page-pagination={{this}}>{{this}}</button> 
+        </li> --}}
+      {{/for}}
+      <li class="page-item">
+        <a class="page-link{{#if (eq objectPagination.currentPage objectPagination.totalPage)}} disabled {{/if}}" href="?page={{sum objectPagination.currentPage 1}}">Next</a>
+      </li>
+    </ul>
+  </nav>  
+  {{!-- End Pagination --}}
+</div>
+
+{{!-- Delete hidden form --}}
+{{!-- Không có action tại vì đây nó nhận 1 list nên không dùng post._id được --}}
+<form id="delete-post-form" method="POST"></form>
+
+{{!-- form giả dùng để thay đổi trạng thái --}}
+<form id="update-status-form" method="POST"></form>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+
+    var postID
+    var deleteForm = document.getElementById('delete-post-form')
+    var btnDeleteCourse = document.getElementById('btn-delete-post')
+    var checkboxAll = $('#checkbox-all') //Jquery
+    var postItemCheckbox = $('input[name="postIDs[]"]')
+    var checkAllSubmitBtn = $('.btn-submit')
+
+    var updateStatusPost = document.querySelectorAll('.update-status-post')
+    var updateStatusForm = document.getElementById('update-status-form')
+
+    //Khi click vào update-status-post
+    if (updateStatusPost) {
+      updateStatusPost.forEach(item => {
+        item.onclick = function(event){
+          event.preventDefault()
+          const postID = this.getAttribute('data-id')
+          const newStatus = this.getAttribute('data-newstatus')
+          console.log(postID)
+          console.log(newStatus)
+          
+          //Gán lại giá trị cho postStatus
+          updateStatusForm.action = '/admin/posts/' + postID + `?newstatus=${newStatus}` + '&_method=PATCH'
+          updateStatusForm.submit()
+        }
+      })
+    }
+
+    //Khi hộp thoại modal show
+    const deleteModal = document.getElementById('delete-post-modal')
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget
+        postID = button.getAttribute('data-id') //Lấy ra được id
+    })
+
+    //Khi click vào button xóa bỏ
+    btnDeleteCourse.onclick = function(event){
+      //Đẩy form xuống và gán action cho nó
+      deleteForm.action = '/admin' + '/posts/' + postID + '?_method=DELETE'
+      deleteForm.submit()
+    }
+
+    //Khi click checkboxAll
+    checkboxAll.change(function(){
+      var isCheckedAll = $(this).prop('checked')
+      postItemCheckbox.prop('checked', isCheckedAll)
+      renderCheckAllSubmitBtn()
+    })
+
+    //Khi click checkboxItem (Phải biết được tổng số lượng đang check = Tổng số lượng checkbox đang có hay không ?)
+    postItemCheckbox.change(function(){ 
+      var isCheckedAll = postItemCheckbox.length === $('input[name="postIDs[]"]:checked').length
+      checkboxAll.prop('checked', isCheckedAll )
+      renderCheckAllSubmitBtn()
+    })
+
+    //Xử lí với disable khi change checkBox
+    function renderCheckAllSubmitBtn(){
+      var checkedCound = $('input[name="postIDs[]"]:checked').length
+      if(checkedCound > 0) {
+        checkAllSubmitBtn.removeClass('disabled')
+      } 
+      else {
+        checkAllSubmitBtn.addClass('disabled')
+      }
+    }
+
+    /* //Pagination
+    const buttonPagination = document.querySelectorAll('[page-pagination]').forEach(item => {
+      item.onclick = function(event){
+        event.preventDefault()
+        var url = this.getAttribute('page-pagination')
+        window.location.href = '/me/stored/posts?page=' + url
+
+        //Hoặc
+        var url = new URL(window.location.href)
+        url.searchParams.set('page', this.getAttribute('page-pagination'))
+        window.location.href = url
+      }
+    })
+    //End Pagination */
+    
+}
+
+</script>
+
+<!-- Hiển thị thông báo thành công -->
+{{#if success}}
+  <div class="alert alert-success alert-dismissible mt-5" role="alert">
+    {{success}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<!-- Hiển thị thông báo lỗi -->
+{{#if error}}
+  <div class="alert alert-danger alert-dismissible mt-5" role="alert">
+    {{error}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
