@@ -66,7 +66,7 @@
               <th scope="row"> {{ sum (sum (multiply (sub @root.objectPagination.currentPage 1) @root.objectPagination.limitItems) @index) 1 }}</th>  
               <td>{{this.name}}</td>
               <td>{{this.level}}</td>
-              <td>{{this.createdAt}}</td>
+              <td>{{this.createdBy.createdAt}}</td>
               <td>{{this.createdBy.name}}</td>
               <td>
                   <a href="/admin/courses/{{this._id}}/edit" class="btn btn-link">Sửa</a>

@@ -43,7 +43,7 @@ const CourseSchema = new Schema(
     },
     {
         _id: false,
-        timestamps: true,
+        timestamps: false,
     },
 )
 
@@ -52,7 +52,7 @@ CourseSchema.plugin(AutoIncrement)
 
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
 CourseSchema.plugin(mongooseDelete, {
-    deletedAt: true,
+    deletedAt: false,
     overrideMethods: 'all',
 })
 
