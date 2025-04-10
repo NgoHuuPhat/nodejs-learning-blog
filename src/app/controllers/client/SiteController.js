@@ -10,7 +10,7 @@ class SiteController {
             C2: toObject() (thay const = let)
             */
             const courses = await Course.find({}).lean() // Đợi Promise return kết quả (find() return Array)
-            const posts = await Post.find({}).lean() 
+            const posts = await Post.find({status: 'approved'}).lean() 
             
             // Lấy ra tên người viết bài viết
             for(const post of posts) {

@@ -44,8 +44,18 @@
               <i class="fa-solid fa-ellipsis"></i>
             </button>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0 fade">
-              <li><a class="dropdown-item" href="/posts/{{this._id}}/edit">Chỉnh sửa</a></li>
-              <li><a href="" class="btn btn-link dropdown-item text-danger" data-bs-toggle="modal" data-id = "{{this._id}}" data-bs-target="#delete-post-modal">Xóa</a></li>
+
+              {{!-- Chỉ hiển thị sửa/xóa nếu không phải đã duyệt --}}
+              {{#unless (eq this.status "approved")}} 
+                <li><a href="" class="dropdown-item" href="/posts/{{this._id}}/edit">Chỉnh sửa</a></li>
+                <li><a href="" class="btn btn-link dropdown-item text-danger" data-bs-toggle="modal" data-id = "{{this._id}}" data-bs-target="#delete-post-modal">Xóa</a></li>
+              {{/unless}}
+
+              {{!-- Chỉ hiển thị gửi yêu cầu xóa nếu đã duyệt --}}
+              {{#if (eq this.status "approved")}}
+                <li><a href="" class="btn btn-link dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#request-delete-modal"  data-id="{{this._id}}" >Gửi yêu cầu xóa bài viết</a></li>
+              {{/if}}
+  
             </ul>
           </div>
         </div>
@@ -67,7 +77,7 @@
   {{/if}}
 </div>
 
-<!-- Modal -->
+<!-- Modal xóa bài viết -->
 <div class="modal fade" id="delete-post-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -85,17 +95,43 @@
     </div>
   </div>
 </div>
-
 {{!-- Delete hidden form --}}
-{{!-- Không có action tại vì đây nó nhận 1 list nên không dùng course._id được --}}
 <form id="delete-post-form" method="POST"></form>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<form id="request-delete-form" method="POST">
+  <!-- Modal gửi yêu cầu xóa -->
+  <div class="modal fade modal-lg" id="request-delete-modal" tabindex="-1" aria-labelledby="requestDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="requestDeleteLabel">Gửi yêu cầu xóa bài viết?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="delete-reason" class="form-label">Lý do xóa:</label>
+              <textarea class="form-control" name="reason" id="delete-reason" rows="3" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button id="btn-request-delete-post" type="button" class="btn btn-danger">Gửi yêu cầu</button>
+          </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+
 <script>
 
     var deleteForm = document.getElementById('delete-post-form')
     var btnDeletePost = document.getElementById('btn-delete-post')
 
-    //Khi hộp thoại modal show
+    var requestDeleteForm = document.getElementById('request-delete-form')
+    var btnrequestDeletePost = document.getElementById('btn-request-delete-post')
+
+    //Khi hộp thoại modal xóa bài viết show
     const deleteModal = document.getElementById('delete-post-modal')
     if (deleteModal) {
         deleteModal.addEventListener('show.bs.modal', event => {
@@ -109,6 +145,22 @@
       //Đẩy form xuống và gán action cho nó
       deleteForm.action = '/posts/' + postID + '?_method=DELETE'
       deleteForm.submit()
+    }
+
+    //Khi hộp thoại modal gửi yêu cầu xóa bài viết show
+    const requestDeleteModal = document.getElementById('request-delete-modal')
+    if (requestDeleteModal) {
+        requestDeleteModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget
+        postID = button.getAttribute('data-id') //Lấy ra được id
+        })
+    }
+
+    //Khi click vào button gửi yêu cầu xóa bài viết
+    btnrequestDeletePost.onclick = function(event){
+      //Đẩy form xuống và gán action cho nó
+      requestDeleteForm.action = '/posts/' + postID +'/request-delete'
+      requestDeleteForm.submit()
     }
 
 </script>

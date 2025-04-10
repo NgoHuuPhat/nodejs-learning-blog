@@ -1,0 +1,140 @@
+<!-- Hiển thị thông báo thành công -->
+{{#if success}}
+  <div class="alert alert-success alert-dismissible mt-5" role="alert">
+    {{success}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<!-- Hiển thị thông báo lỗi -->
+{{#if error}}
+  <div class="alert alert-danger alert-dismissible mt-5" role="alert">
+    {{error}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<div>
+  <h3>Danh sách yêu cầu xóa</h3>
+  <a href="/admin/posts">Quay lại</a>
+</div>
+
+  <table class="table mt-4">
+      <thead>
+          <tr>
+              <th scope="col">STT</th>
+              <th scope="col">Tiêu đề</th>
+              <th scope="col">Từ khóa</th>
+              <th scope="col">Thời gian đăng bài</th>
+              <th scope="col">Tác giả</th>
+              <th scope="col">Trạng thái</th>
+              <th scope="col">Thao tác</th>
+          </tr>
+      </thead>
+      <tbody>
+          {{#each posts}}
+          <tr>
+              {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
+              <th scope="row"> {{sum @index 1}}</th>  
+              <td>{{this.title}}</td>
+              <td>{{this.tags}}</td>
+              <td>{{this.createdAt}}</td>
+              <td>{{this.author}}</td>
+              <td>
+                {{#if (eq this.status 'pending')}}
+                  <span class="badge bg-warning">Chờ duyệt</span>
+                {{/if}}
+                
+                {{#if (eq this.status 'approved')}}
+                  <span class="badge bg-success">Đã duyệt</span>
+                {{/if}}
+                {{#if (eq this.status 'rejected')}}
+                  <span class="badge bg-danger">Từ chối</span>
+                {{/if}}
+              </td>
+              <td>
+                  <a href="" class="btn btn-link btn-restore" data-id="{{this._id}}">Khôi phục</a>
+                  <!-- Button trigger modal 
+                        Trước tiên phải lấy được ID-->
+                  <a href="" class="btn btn-link" data-bs-toggle="modal" data-id = "{{this._id}}" data-bs-target="#delete-post-modal">Xóa vĩnh viễn</a> 
+              </td>
+          </tr>
+          {{else}}
+          <tr>
+            <td class="text-center" colspan="5">Thùng rác trống.
+            </td>   
+          </tr>
+          {{/each}}
+      </tbody>
+  </table>
+</div>
+
+
+{{!-- Confirm delete post --}}
+
+<!-- Modal -->
+<div class="modal fade" id="delete-post-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa khóa học?</h1>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      Bạn chắn chắn muốn xóa khóa học này?
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+      <button id="btn-delete-post" type="button" class="btn btn-danger">Xóa vĩnh viễn</button>
+    </div>
+  </div>
+</div>
+
+
+{{!-- Delete form --}}
+{{!-- Không có action tại vì đây nó nhận 1 list nên không dùng post._id được --}}
+<form id="delete-post-form" method="POST"></form>
+
+{{!-- Restore form --}}
+<form id="restore-post-form" method="POST"></form>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+
+    var postID
+    var deleteForm = document.getElementById('delete-post-form')
+    var btnDeleteCourse = document.getElementById('btn-delete-post')
+    var restoreBtn = $('.btn-restore') //Có thể sử dụng JS thuần (ForEach)
+    var restoreForm = document.getElementById('restore-post-form')
+
+    //Xử lí sự kiện khi hộp thoại model show (JS thuần)
+    var deleteModal = document.getElementById('delete-post-modal')
+    deleteModal.addEventListener('show.bs.modal', event => {
+      var button = event.relatedTarget
+      postID = button.getAttribute('data-id') //Lấy ra được id
+    })
+
+    //Xử lí sự kiện khi click vào button xóa bỏ
+    btnDeleteCourse.onclick = function(event){
+
+      //Đẩy form xuống và gán action cho nó
+      deleteForm.action = '/admin' + '/posts/' + postID + '/force?_method=DELETE'
+      deleteForm.submit()
+
+    }
+
+    //Restore button Click (Jquery)
+    restoreBtn.click(function(e){
+      e.preventDefault()
+
+      var postID = $(this).data('id')
+      //Đẩy form xuống và gán action cho nó
+      restoreForm.action = '/admin' + '/posts/' + postID + '/restore?_method=PATCH'
+      restoreForm.submit()
+    })
+</script>
+

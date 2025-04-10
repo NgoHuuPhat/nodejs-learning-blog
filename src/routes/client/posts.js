@@ -9,6 +9,7 @@ router.post('/store', upload.single('thumbnail'), uploadCloudinary, postControll
 router.get('/:id/edit', postController.edit)
 router.patch('/:id', upload.single('thumbnail'), uploadCloudinary, postController.update)
 router.delete('/:id', postController.destroy)
+router.post('/:id/request-delete', postController.requestDelete) 
 router.get('/:slug', postController.details)
 
 module.exports = router

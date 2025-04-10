@@ -1,5 +1,6 @@
 const Post = require('../../models/Post')
 const Account = require('../../models/Account')
+const PostDeleteRequest = require('../../models/PostDeleteRequest')
 const paginatitonHelper = require('../../../helpers/pagination')
 const dateTime = require('../../../helpers/dateTime')
 
@@ -53,55 +54,43 @@ class PostController {
         }
     }
 
-    //[GET] /posts/create
-    create(req, res, next) {
-        res.render('admin/posts/create')
-    }
-
-    //[POST] /posts/store
-    async store(req, res, next) {
-        try {
-            //Lưu người tạo khóa học
-            req.body.createdBy = {
-                account_id: res.locals.account.id,
-            }
-
-            //Gán giá trị image (Tương tự như default ở bên Schema)
-            req.body.image = `https://i.ytimg.com/vi/${req.body.videoID}/hqdefault.jpg?s%E2%80%A6EIYAXABwAEG&rs=AOn4CLBwYwrOaKarfa87-f5y6U_UtM0Cfg`
-            await Post.create(req.body) //Lưu vào database (có thể dùng .save())
-
-            //Điều hướng về trang home
-            res.redirect('/admin/posts')
-        } catch (error) {
-            next(error)
-        }
-    }
-
     //[GET] /admin/posts/trash
     async trashPosts(req, res, next) {
         try {
             const posts = await Post.findWithDeleted({
                 deleted: true,
             }).lean()
+
+            //Lây ra tên người tạo
+            for (let post of posts) {
+                const user = await Account.findOne({
+                    _id: post.author,
+                }).lean()
+
+                if (user) {
+                    post.author = user.fullName
+                }
+
+            // Lấy ra người xóa
+                const deletedUser = await Account.findOne({
+                    _id: post.deletedBy.account_id,
+                }).lean()
+                if (deletedUser) {
+                    post.deletedBy = deletedUser.fullName
+                }
+
+                // Chuyển đổi createdAt sang định dạng DD/MM/YYYY
+                post.createdAt = dateTime(post.createdAt)
+            }
+
             res.render('admin/posts/trash-posts', { posts })
         } catch (error) {
             next(error)
         }
     }
 
-    //[GET] /admin/posts/:id/edit
-    async edit(req, res, next) {
-        try {
-            //Lấy khóa học trường _id = giá trị req.params.id
-            const course = await Post.findById(req.params.id).lean()
-            res.render('admin/posts/edit', { course })
-        } catch (error) {
-            next(error)
-        }
-    }
-
     //[PATCH] /admin/posts/:id
-    async update(req, res, next) {
+    async updateStatus(req, res, next) {
         try {
 
             //Nếu tồn tại trạng thái mới thì cập nhật trạng thái
@@ -109,12 +98,10 @@ class PostController {
                 await Post.updateOne(
                     { _id: req.params.id },
                     {
-                        status: req.query.newstatus,
+                        status: req.query.newstatus
                     },
                 )
             }
-            
-            req.flash('success', 'Cập nhật thành công')
             res.redirect('back')
         } catch (error) {
             next(error)
@@ -137,7 +124,8 @@ class PostController {
 
             //Chính thức xóa mềm
             await Post.delete({ _id: req.params.id })
-            res.redirect(req.get('Referrer') || '/') //'back' về lại trang trước đó
+            req.flash('success', 'Đã chuyển bài viết vào thùng rác')
+            res.redirect('back')
         } catch (error) {
             next(error)
         }
@@ -147,7 +135,8 @@ class PostController {
     async restore(req, res, next) {
         try {
             await Post.restore({ _id: req.params.id })
-            res.redirect(req.get('Referrer') || '/') //'back' về lại trang trước đó
+            req.flash('success', 'Khôi phục thành công')
+            res.redirect('back')
         } catch (error) {
             next(error)
         }
@@ -159,8 +148,34 @@ class PostController {
         switch (req.body.action) {
             case 'delete':
                 try {
-                    await Post.delete({ _id: req.body.courseIDs })
-                    res.redirect(req.get('Referrer') || '/') //'back' về lại trang trước đó
+                    await Post.delete({ _id: req.body.postIDs })
+                    res.redirect('back')
+                } catch (error) {
+                    next(error)
+                }
+                break
+            case 'approved':
+                try {
+                    await Post.updateMany(
+                        { _id: req.body.postIDs },
+                        {
+                            status: req.body.action,
+                        },
+                    )
+                    res.redirect('back')
+                } catch (error) {
+                    next(error)
+                }
+                break
+            case 'rejected':
+                try {
+                    await Post.updateMany(
+                        { _id: req.body.postIDs },
+                        {
+                            status: req.body.action,
+                        },
+                    )
+                    res.redirect('back')
                 } catch (error) {
                     next(error)
                 }
@@ -174,7 +189,7 @@ class PostController {
     async forceDestroy(req, res, next) {
         try {
             await Post.deleteOne({ _id: req.params.id })
-            res.redirect(req.get('Referrer') || '/') //'back' về lại trang trước đó
+            res.redirect('back')
         } catch (error) {
             next(error)
         }
@@ -189,6 +204,16 @@ class PostController {
             }).lean()
             console.log(post)
             res.render('admin/posts/details', { post })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    
+    //[GET] /admin/posts/request-delete
+    async requestDeletePosts(req, res, next) {
+        try {
+
         } catch (error) {
             next(error)
         }

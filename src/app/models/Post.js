@@ -15,7 +15,11 @@ const PostSchema = new Schema(
         slug: { type: String, slug: 'title', unique: true },
         tags: [{ type: String }],
         views: { type: Number, default: 0 },
-        commentCount: { type: Number, default: 0 }
+        commentCount: { type: Number, default: 0 },
+        deletedBy: {
+            account_id: String,
+            deletedAt: Date
+        }
     },
     { timestamps: true }
 );
@@ -24,7 +28,7 @@ mongoose.plugin(slug)
 
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
 PostSchema.plugin(mongooseDelete, {
-    deletedAt: true,
+    deletedAt: false,
     overrideMethods: 'all',
 })
 

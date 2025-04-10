@@ -5,6 +5,7 @@
   <div>
     <h3>Danh sách bài viết</h3>
     <a href="/admin/posts/trash">Thùng rác ({{countDeleted}})</a>
+    <a class="ms-3" href="/admin/posts/request-delete">Yêu cầu xóa ({{countDeleteRequests}})</a>
   </div>
 
   <div class="d-flex justify-content-end mt-3">
@@ -12,6 +13,8 @@
       <select class="form-select-sm" name="action" required>
         <option value="">-- Hành động --</option>
         <option value="delete">Xóa</option>
+        <option value="approved">Duyệt</option>
+        <option value="rejected">Từ chối</option>
       </select>
       <button class="btn btn-primary btn-submit btn-sm disabled">Thực hiện</button>
     </div>
@@ -100,9 +103,7 @@
           </tr>
           {{else}}
           <tr>
-            <td class="text-center" colspan="5">Bạn chưa đăng khóa học nào
-              <a href="/admin/posts/create">Đăng khóa học</a>
-            </td>   
+            <td class="text-center" colspan="5">Không tồn tại bài viết nào</td>   
           </tr>
           {{/each}}
       </tbody>
@@ -165,8 +166,8 @@
   {{!-- End Pagination --}}
 </div>
 
+
 {{!-- Delete hidden form --}}
-{{!-- Không có action tại vì đây nó nhận 1 list nên không dùng post._id được --}}
 <form id="delete-post-form" method="POST"></form>
 
 {{!-- form giả dùng để thay đổi trạng thái --}}

@@ -1,6 +1,7 @@
 const Course = require('../../models/Course')
 const Account = require('../../models/Account')
 const Post = require('../../models/Post')
+const PostDeleteRequest = require('../../models/PostDeleteRequest')
 
 class PostController {
 
@@ -57,7 +58,7 @@ class PostController {
             
             req.flash('success', 'Tạo bài viết thành công!')
             await Post.create(newPost)
-            res.redirect('/home')
+            res.redirect('/me/list-post')
         } catch (error) {
             next(error)
         }
@@ -83,9 +84,19 @@ class PostController {
             if(req.file) {
                 updateData.thumbnail = req.file.cloudinary_url
             }
-            console.log('updateData', updateData)
 
-             
+            // Kiểm tra xem bài viết có bị từ chối không
+            const post = await Post.findById(req.params.id)
+            if (post.status === 'rejected') {
+                updateData.status = 'pending'
+            }
+
+            // Kiểm tra xem bài viết đã được duyệt chưa
+            if (post.status === 'approved') {
+                req.flash('error', 'Bài viết đã được duyệt không thể chỉnh sửa!')
+                return res.redirect('/me/list-post?status=approved')
+            }
+
             // Kiểm tra xem có tags không
             if (req.body.tags) {
                 updateData.tags = req.body.tags.split(',').map(tag => tag.trim())
@@ -103,6 +114,36 @@ class PostController {
     async destroy(req, res, next) {
         try {
             await Post.deleteOne({ _id: req.params.id })
+            res.redirect('back') //'back' về lại trang trước đó
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    
+    //[POST] /posts/:id/request-delete
+    async requestDelete(req, res, next) {
+        try {
+
+            // Kiểm tra xem trước đó đã gửi yêu cầu chưa
+            const existingRequest = await PostDeleteRequest.findOne({
+                post_id: req.params.id,
+                user_id: res.locals.account.id,
+            })
+            if (existingRequest) {
+                req.flash('error', 'Bạn đã gửi yêu cầu xóa bài viết này trước đó. Hãy chờ admin duyệt yêu cầu của bạn!')
+                return res.redirect('back') //'back' về lại trang trước đó
+            }
+
+            // Tạo yêu cầu xóa bài viết
+            const newRequest = {
+                post_id: req.params.id,
+                user_id: res.locals.account.id,
+                reason: req.body.reason,
+            }
+        
+            await PostDeleteRequest.create(newRequest)
+            req.flash('success', 'Yêu cầu xóa bài viết thành công. Hãy chờ admin duyệt yêu cầu của bạn!')
             res.redirect('back') //'back' về lại trang trước đó
         } catch (error) {
             next(error)
