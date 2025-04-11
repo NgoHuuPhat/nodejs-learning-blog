@@ -10,6 +10,8 @@ class PostController {
         try {
             //Đếm số lượng khóa học
             const countPosts = await Post.countDocuments({ deleted: false })
+            const countDeleteRequests = await PostDeleteRequest.countDocuments()
+
             let objectPagination = paginatitonHelper(
                 {
                     limitItems: 5,
@@ -48,6 +50,7 @@ class PostController {
                 countDeleted,
                 objectPagination,
                 query: req.query,
+                countDeleteRequests,
             })
         } catch (error) {
             next(error)
@@ -122,6 +125,16 @@ class PostController {
                 },
             )
 
+            // Xóa yêu cầu xóa bài viết
+            const postDeleteRequest = await PostDeleteRequest.findOne({
+                post_id: req.params.id,
+            }).lean()
+            if (postDeleteRequest) {
+                await PostDeleteRequest.deleteOne({
+                    post_id: req.params.id,
+                })
+            }
+
             //Chính thức xóa mềm
             await Post.delete({ _id: req.params.id })
             req.flash('success', 'Đã chuyển bài viết vào thùng rác')
@@ -195,7 +208,7 @@ class PostController {
         }
     }
 
-    //[GET] /courses/:slug
+    //[GET] /posts/:slug
     async details(req, res, next) {
         try {
             //Lấy khóa học trường slug = giá trị req.params.slug
@@ -214,6 +227,32 @@ class PostController {
     async requestDeletePosts(req, res, next) {
         try {
 
+            const posts = await PostDeleteRequest.find({}).lean()
+            
+            // Lấy ra chi tiết bài viết
+            for(const post of posts) {
+                const postDetails = await Post.findOne({ _id: post.post_id }).lean()
+                const accountDetails = await Account.findOne({ _id: post.user_id }).lean()
+                if (postDetails) {
+                    post.postDetails = postDetails
+                    post.accountDetails = accountDetails
+                    post.postDetails.createdAt = dateTime(post.postDetails.createdAt)
+                }
+            }
+
+            res.render('admin/posts/request-delete', { posts })
+
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    //[DELETE] /admin/posts/:id/deny
+    async denyDeleteRequest(req, res, next) {
+        try {
+            await PostDeleteRequest.deleteOne({ _id: req.params.id })
+            req.flash('success', 'Đã từ chối yêu cầu xóa bài viết')
+            res.redirect('back')
         } catch (error) {
             next(error)
         }
