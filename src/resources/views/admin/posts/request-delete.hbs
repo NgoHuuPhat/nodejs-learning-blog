@@ -59,7 +59,7 @@
               <td>
                   <a href="/admin/posts/{{this.postDetails.slug}}" class="btn btn-link">Xem chi tiết</a>
                   <a href="" class="btn btn-link" data-bs-toggle="modal" data-id = "{{this.postDetails._id}}" data-bs-target="#delete-post-modal">Đồng ý xóa</a> 
-                  <a href="" class="btn btn-link btn-deny" data-id="{{this._id}}">Từ chối</a>
+                  <a href="" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#deny-delete-modal"  data-id="{{this._id}}" >Từ chối xóa</a>
                   <!-- Button trigger modal 
                         Trước tiên phải lấy được ID-->
               </td>
@@ -74,45 +74,62 @@
   </table>
 </div>
 
-
-{{!-- Confirm delete post --}}
-
-<!-- Modal -->
+<!-- Modal xóa bài viết -->
 <div class="modal fade" id="delete-post-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-<div class="modal-dialog">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa khóa học?</h1>
-      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    <div class="modal-body">
-      Bạn chắn chắn muốn xóa khóa học này?
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-      <button id="btn-delete-post" type="button" class="btn btn-danger">Xóa vĩnh viễn</button>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa bài viết?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Bạn chắn chắn muốn xóa bài viết này?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button id="btn-delete-post" type="button" class="btn btn-danger">Xóa bỏ</button>
+      </div>
     </div>
   </div>
 </div>
-
-
-{{!-- Delete form --}}
-{{!-- Không có action tại vì đây nó nhận 1 list nên không dùng post._id được --}}
+{{!-- Delete hidden form --}}
 <form id="delete-post-form" method="POST"></form>
 
 {{!-- deny form --}}
-<form id="deny-post-form" method="POST"></form>
+<form id="deny-delete-form" method="POST">
+  <!-- Modal gửi yêu cầu xóa -->
+  <div class="modal fade modal-lg" id="deny-delete-modal" tabindex="-1" aria-labelledby="denyDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="denyDeleteLabel">Gửi yêu cầu xóa bài viết?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="delete-reasonDeny" class="form-label">Lý do từ chối:</label>
+              <textarea class="form-control" name="reasonDeny" id="delete-reasonDeny" rows="3" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button id="btn-deny-delete-post" type="button" class="btn btn-danger">Gửi yêu cầu</button>
+          </div>
+      </div>
+    </div>
+  </div>
+</form>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
 
     var postID
     var deleteForm = document.getElementById('delete-post-form')
     var btnDeleteCourse = document.getElementById('btn-delete-post')
-    var denyBtn = $('.btn-deny') //Có thể sử dụng JS thuần (ForEach)
-    var denyForm = document.getElementById('deny-post-form')
 
-    //Xử lí sự kiện khi hộp thoại model show (JS thuần)
+    var denyDeleteForm = document.getElementById('deny-delete-form')
+    var btndenyDeletePost = document.getElementById('btn-deny-delete-post')
+
+    //Xử lí sự kiện khi hộp thoại model đồng ý xóa show (JS thuần)
     var deleteModal = document.getElementById('delete-post-modal')
     deleteModal.addEventListener('show.bs.modal', event => {
       var button = event.relatedTarget
@@ -128,14 +145,22 @@
 
     }
 
-    //deny button Click (Jquery)
-    denyBtn.click(function(e){
-      e.preventDefault()
+    //Khi hộp thoại modal gửi yêu cầu xóa bài viết show
+    const denyDeleteModal = document.getElementById('deny-delete-modal')
+    if (denyDeleteModal) {
+        denyDeleteModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget
+        postID = button.getAttribute('data-id') //Lấy ra được id
+        console.log(postID)
+        })
+    }
 
-      var postID = $(this).data('id')
+    //Khi click vào button gửi yêu cầu xóa bài viết
+    btndenyDeletePost.onclick = function(event){
       //Đẩy form xuống và gán action cho nó
-      denyForm.action = '/admin' + '/posts/' + postID + '/deny' + '?_method=DELETE'
-      denyForm.submit()
-    })
+      denyDeleteForm.action = '/admin' + '/posts/' + postID + '/deny'
+      denyDeleteForm.submit()
+    }
+
 </script>
 

@@ -1,5 +1,6 @@
 const Post = require('../../models/Post')
 const Account = require('../../models/Account')
+const Notification = require('../../models/Notification')
 const PostDeleteRequest = require('../../models/PostDeleteRequest')
 const paginatitonHelper = require('../../../helpers/pagination')
 const dateTime = require('../../../helpers/dateTime')
@@ -247,10 +248,37 @@ class PostController {
         }
     }
 
-    //[DELETE] /admin/posts/:id/deny
+    //[POST] /admin/posts/:id/deny
     async denyDeleteRequest(req, res, next) {
         try {
-            await PostDeleteRequest.deleteOne({ _id: req.params.id })
+            //Tạo thông báo cho người dùng
+            if(req.params.id){
+                const postDeleteRequest = await PostDeleteRequest.findOne({
+                    _id: req.params.id,
+                }).lean()
+                if (postDeleteRequest) {
+                    const post = await Post.findOne({
+                        _id: postDeleteRequest.post_id,
+                    }).lean()
+                    
+                    const notification = {
+                        type: 'delete_post_request_denied',
+                        meta:{
+                            post_id: post._id,
+                            post_title: post.title,
+                            reasonDeny: req.body.reasonDeny,
+                        },
+                        user_id: postDeleteRequest.user_id,
+                    }
+                    console.log(notification)
+                    await Notification.create(notification)
+                }
+            }
+
+            //Xóa yêu cầu xóa bài viết
+            await PostDeleteRequest.deleteOne({
+                _id: req.params.id,
+            })
             req.flash('success', 'Đã từ chối yêu cầu xóa bài viết')
             res.redirect('back')
         } catch (error) {

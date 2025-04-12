@@ -10,7 +10,7 @@ router.patch('/:id/restore', postController.restore) //Khôi phục
 router.delete('/:id', postController.destroy) //Xóa mềm
 router.delete('/:id/force', postController.forceDestroy) //Xóa vĩnh viễn
 router.get('/request-delete', postController.requestDeletePosts)
-router.delete('/:id/deny', postController.denyDeleteRequest) 
+router.post('/:id/deny', postController.denyDeleteRequest) 
 router.get('/:slug', postController.details)
 
 
