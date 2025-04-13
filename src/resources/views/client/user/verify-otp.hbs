@@ -64,7 +64,7 @@
                     <div class="col-md-6">
                         <div class="verify-otp-content">
                             <div class="text-center mb-4">
-                                <a class="navbar-brand" href="/home">
+                                <a class="navbar-brand" href="/">
                                     <img src="/img/LOGO FINAL.png" alt="logo" style="width: 130px; height: auto;">
                                 </a>
                             </div>
@@ -72,7 +72,7 @@
                                 <h2 class="form-title text-center text-custom">Verify OTP</h2>
                                 <p class="text-center">Please enter the OTP sent to email: <span style="color: #4292dc; font-weight: 700;">{{email}}</span><br>to verify your identity.</p>
                                 <!-- Form nhập OTP -->
-                                <form method="POST" action="/verify-otp" class="verify-otp-form" id="verify-otp-form">
+                                <form method="POST" action="/user/verify-otp" class="verify-otp-form" id="verify-otp-form">
                                     <div class="form-group mb-3">
                                         <label for="otp" class="mb-2"><b>OTP</b></label>
                                         <input type="text" name="email" id="email" class="form-control" placeholder="Enter OTP" value="{{email}}" hidden/>
@@ -84,7 +84,7 @@
                                 </form>
                             </div>
                             <div class="verify-otp-image text-center mt-3">
-                                <a href="/login" class="verify-otp-image-link">Back to Login</a>
+                                <a href="/user/login" class="verify-otp-image-link">Back to Login</a>
                             </div>
                         </div>
                     </div>

@@ -10,12 +10,12 @@ const notificationsMiddleware = require('../../app/middlewares/notifications')
 
 function route(app) {
     //Client
-    app.use('/', userRoute)
+    app.use('/user', userRoute)
+    app.use('/', authMiddleware, notificationsMiddleware, siteRoute)
     app.use('/news', authMiddleware, notificationsMiddleware, newsRoute)
     app.use('/me', authMiddleware, notificationsMiddleware, meRoute)
     app.use('/courses', authMiddleware, notificationsMiddleware, courseRoute)
     app.use('/posts', authMiddleware, notificationsMiddleware, postRoute)
-    app.use('/home', authMiddleware, notificationsMiddleware, siteRoute)
 }
 
 module.exports = route

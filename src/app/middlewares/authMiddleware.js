@@ -13,7 +13,7 @@ module.exports = async function authMiddleware(req, res, next) {
         if(req.originalUrl.startsWith('/admin')) {
             return res.redirect('/admin/auth/login')
         } else {
-            return res.redirect('/login')
+            return res.redirect('/user/login')
         }
     } else {
         try {
@@ -22,9 +22,12 @@ module.exports = async function authMiddleware(req, res, next) {
         } catch (err) {
             console.log('AccessToken hết hạn, thử làm mới')
             try {
+                // Kiểm tra xem đường dẫn là admin hay user
+                let refreshTokenUrl = req.originalUrl.startsWith('/admin') ? 'admin/auth/refresh-token' : 'user/refresh-token'
+
                 //Nếu AccessToken hết hạn thì chuyển qua trang RefreshToken API
                 const response = await axios.get(
-                    'http://localhost:3000/admin/auth/refresh-token',
+                    `http://localhost:3000/${refreshTokenUrl}`,
                     {
                         headers: {
                             Cookie: `refreshToken=${req.cookies.refreshToken}`,
@@ -48,7 +51,7 @@ module.exports = async function authMiddleware(req, res, next) {
                 if(req.originalUrl.startsWith('/admin')) {
                     return res.redirect('/admin/auth/login')
                 } else {
-                    return res.redirect('/login')
+                    return res.redirect('/user/login')
                 }
             }
         }
@@ -60,7 +63,7 @@ module.exports = async function authMiddleware(req, res, next) {
             if(req.originalUrl.startsWith('/admin')) {
                 return res.redirect('/admin/auth/login')
             } else {
-                return res.redirect('/login')
+                return res.redirect('/user/login')
             }
         }
 

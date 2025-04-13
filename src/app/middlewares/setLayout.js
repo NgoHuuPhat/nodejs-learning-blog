@@ -1,11 +1,11 @@
 module.exports = (req, res, next) => {
     const authRoutes = [
-        '/login',
-        '/register',
-        '/logout',
-        '/refresh-token',
-        '/forgot-password',
-        '/verify-otp',
+        '/user/login',
+        '/user/register',
+        '/user/logout',
+        '/user/refresh-token',
+        '/user/forgot-password',
+        '/user/verify-otp',
     ]
 
     if (authRoutes.includes(req.url) || req.url.startsWith('/admin/auth')) {

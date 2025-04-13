@@ -42,7 +42,7 @@ class UserController {
             //Lưu vào database (có thể dùng .save())
             await Account.create(newAccount)
             req.flash('success', 'Đăng ký thành công!')
-            res.redirect('/login')
+            res.redirect('/user/login')
         } catch (error) {
             next(error)
         }
@@ -52,7 +52,7 @@ class UserController {
     showLoginForm(req, res) {
         //Kiểm tra đã có Token thì không đăng nhập lại
         if (req.cookies.accessToken) {
-            res.redirect('/home')
+            res.redirect('/')
         } else {
             res.render('client/user/login')
         }
@@ -116,7 +116,7 @@ class UserController {
             res.cookie('accessToken', accessToken, { httpOnly: true })
             res.cookie('refreshToken', refreshToken, { httpOnly: true })
 
-            res.redirect('/home')
+            res.redirect('/')
         } catch (error) {
             next(error)
         }
@@ -127,14 +127,14 @@ class UserController {
         res.clearCookie('accessToken')
         res.clearCookie('refreshToken')
 
-        res.redirect('/login')
+        res.redirect('/user/login')
     }
 
     //[GET] /refresh-token
     async refreshToken(req, res, next) {
         const token = req.cookies.refreshToken
         if (!token) {
-            return res.redirect('/login')
+            return res.redirect('/user/login')
         }
         try {
             // Kiểm tra refreshToken
@@ -158,7 +158,7 @@ class UserController {
             res.json({ accessToken: newAccessToken })
         } catch (error) {
             console.log('refreshToken không hợp lệ')
-            res.redirect('/login')
+            res.redirect('/user/login')
             next(error)
         }
     }
@@ -195,7 +195,7 @@ class UserController {
             sendMailHelper.sendMail(email, subject, html)
 
             // Chuyển hướng đến trang xác thực OTP
-            res.redirect(`/verify-otp?email=${email}`)
+            res.redirect(`/user/verify-otp?email=${email}`)
         } catch (error) {
             next(error)
         }
@@ -227,7 +227,7 @@ class UserController {
             res.cookie('resetToken', resetToken, { httpOnly: true })
 
             // Chuyển hướng đến trang đặt lại mật khẩu
-            res.redirect('/reset-password')
+            res.redirect('/user/reset-password')
         } catch (error) {
             next(error)
         }
@@ -267,7 +267,7 @@ class UserController {
             await Account.updateOne({ email }, { password: req.body.password })
 
             res.clearCookie('resetToken')
-            res.redirect('/login')
+            res.redirect('/user/login')
         } catch (error) {
             next(error)
         }

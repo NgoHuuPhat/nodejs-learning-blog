@@ -158,7 +158,6 @@ class PostController {
 
     //[POST] /admin/posts/handle-form-actions
     async handleFormActions(req, res, next) {
-        console.log(req.body)
         switch (req.body.action) {
             case 'delete':
                 try {
@@ -216,7 +215,6 @@ class PostController {
             const post = await Post.findOne({
                 slug: req.params.slug,
             }).lean()
-            console.log(post)
             res.render('admin/posts/details', { post })
         } catch (error) {
             next(error)
@@ -270,7 +268,6 @@ class PostController {
                         },
                         user_id: postDeleteRequest.user_id,
                     }
-                    console.log(notification)
                     await Notification.create(notification)
                 }
             }
