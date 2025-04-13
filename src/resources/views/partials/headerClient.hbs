@@ -1,9 +1,9 @@
 <nav class="navbar navbar-expand-lg bg-danger-subtle shadow-sm">
   <div class="container">
-    <a class="navbar-brand" href="/home">
+    <a class="navbar-brand" href="/">
       <img src="/img/LOGO FINAL.png" alt="logo" style="width: 100px; height: auto;">
     </a>  
-    <form class="search-container" method="GET" action="/home/search">
+    <form class="search-container" method="GET" action="/search">
       <i class="fa fa-search"></i>
       <input type="text" placeholder="Tìm kiếm khóa học, bài viết, ..." name="keyword" id="searchInput" value="{{keyWord}}">{{!-- Hiển thị lại giá trị vừa nhập --}}
     </form>
@@ -15,27 +15,32 @@
         <li class="nav-item dropdown me-3">
           <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa fa-bell fs-5 mt-1 {{#if notifications.length}}text-danger{{/if}}"></i>
-            {{#if notifications.length}}
+            {{#if unreadNotifications.length}}
               <span class="position-absolute bg-danger text-white rounded-circle d-flex justify-content-center align-items-center"
                     style="top: -4px; right: 0px; width: 16px; height: 16px; font-size: 10px;">
-                {{notifications.length}}
+                {{unreadNotifications.length}}
                 <span class="visually-hidden">thông báo chưa đọc</span>
               </span>
             {{/if}}
           </a>
           {{!-- Dropdown menu for notifications --}}
-          <ul class="dropdown-menu dropdown-menu-end p-2 pe-4 shadow border-0" style="width: 400px; max-height: 400px; overflow-y: auto;">
-            <h4 class="dropdown-header mb-2 fw-bold text-dark fs-5">Thông báo</h4>
+          <ul class="dropdown-menu dropdown-menu-end rounded-3 shadow border-0" style="width: 400px; max-height: 400px; overflow-y: auto;">
+            <div class="d-flex justify-content-between align-items-center">
+              <h4 class="dropdown-header mb-2 ms-3 mt-2 fw-bold text-dark fs-5">Thông báo</h4>
+              <a href="" id="realAll" class="dropdown-header mb-2 ms-3 mt-2 " style="color: rgb(255, 94, 0);">Đánh dấu đã đọc</a>
+            </div>
             {{#if notifications.length}}
               {{#each notifications}}
                 <li class="mb-2 px-3">
-                  <div class="small">
-                    Yêu cầu xóa bài viết 
-                    <strong class="font-weight-bold">{{this.meta.post_title}}</strong> 
-                    của bạn bị từ chối vì lý do: 
-                    <span style="color: rgb(255, 94, 0);">{{this.meta.reasonDeny}}</span>
+                  <a href="" data-id="{{this._id}}" class="text-decoration-none text-dark isRead">
+                    <div class="small p-3 pe-3 rounded-3 {{#unless this.isRead}}bg-warning-subtle{{/unless}}">
+                      Yêu cầu xóa bài viết 
+                      <strong >"{{this.meta.post_title}}"</strong> 
+                      của bạn bị từ chối vì lý do: 
+                      <strong style="color: rgb(255, 94, 0);">"{{this.meta.reasonDeny}}"</strong>
+                      <div class="fw-semibold mt-2 small" style="color: rgb(255, 94, 0);">{{timeAgo this.createdAt}}</div>
                   </div>
-                  <div class="fw-semibold mt-2 small" style="color: rgb(255, 94, 0);">{{timeAgo this.createdAt}}</div>
+                  </a>
                 </li>
               {{/each}}
             {{else}}
@@ -66,12 +71,40 @@
   </div>
 </nav>
 
+{{!-- Thêm các thẻ form ẩn để gửi yêu cầu PATCH --}}
+<form id="realAllForm" method="POST"></form>
+<form id="isRead" method="POST"></form>
+
 <script>
+
   // Ngăn sự kiện nổi bọt
   document.querySelectorAll('.dropdown-menu').forEach(dropdown => {
     dropdown.addEventListener('click', (e) => {
       e.stopPropagation(); 
     });
   });
+
+  //Xử lí form giả lập
+  const realAll = document.getElementById('realAll');
+  const realAllForm = document.getElementById('realAllForm');
+
+  const isRead = document.querySelectorAll('.isRead');
+  const isReadForm = document.getElementById('isRead');
+
+  isRead.forEach((item) => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault(); 
+      const notificationId = item.getAttribute('data-id'); 
+      isReadForm.action = `/notifications/${notificationId}/read?_method=PATCH`; 
+      isReadForm.submit(); 
+    });
+  });
+
+  realAll.addEventListener('click', (e) => {
+    e.preventDefault(); 
+    realAllForm.action = '/notifications/readAll?_method=PATCH';
+    realAllForm.submit(); 
+  });
+
 </script>
 
