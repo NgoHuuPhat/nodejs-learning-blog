@@ -35,6 +35,9 @@ app.use((req, res, next) => {
     next()
 })
 
+//TinyMCE
+app.use('/tinymce', express.static(path.join(__dirname, '..', 'node_modules', 'tinymce')))
+
 //Connect to DB
 //{connect: function: connect}
 db.connect()
