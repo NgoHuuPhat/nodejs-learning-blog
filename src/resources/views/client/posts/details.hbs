@@ -1,46 +1,179 @@
+<style>
+  body {
+    overflow-x: hidden;
+  }
+  .full-width-page {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  }
 
-<div class="container my-5">
+  .sidebar-trigger {
+      transition: all 0.3s;
+      border-right: 1px solid #dee2e6;
+  }   
 
-    <!-- Nút quay lại -->
-    <div class="mb-3">
-        <a onclick="history.back()" class="text-muted" style="cursor: pointer;"><i class="fa-solid fa-reply fa-sm me-2"></i>Quay lại</a>
+  .comments-sidebar {
+      position: fixed;
+      top: 0;
+      right: -750px;
+      width: 750px;
+      height: 100vh;
+      background-color: #f8f9fa;
+      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 1050;
+      overflow-y: auto;
+      transition: right 0.3s ease-in-out;
+  }
+
+  .comments-sidebar.show {
+      right: 0;
+  }
+
+  .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1040;
+      display: none;
+  }
+
+  .overlay.show {
+      display: block;
+  }   
+
+</style>
+
+<div class="container-fluid px-0 full-width-page">
+  <div class="row g-0">
+    <!-- Sidebar trái (col-2) -->
+    <div class="col-3">
+      <div class="bg-white p-5 mt-5 h-100 d-flex flex-column rounded-1">
+          <a href="/@son-son-16" class="text-decoration-none text-dark">
+          <h6 class="fw-semibold text-start">Sơn Sơn</h6>
+          </a>
+
+          <hr class="w-200 m-0 mb-4 mt-2">
+
+          <div class="d-flex gap-5">
+          <button class="btn btn-sm d-flex align-items-center gap-2 p-0 text-secondary bg-transparent" style="border: none; font-size: 17px;" title="Nhấn để thích bài này">
+              <i class="fa-regular fa-heart"></i>
+              <span>568</span>
+          </button>
+
+          <button class="btn btn-sm d-flex align-items-center gap-2 p-0 text-secondary bg-transparent" style="border: none; font-size: 17px;" onclick="toggleComments()" title="Bình luận">
+              <i class="fa-regular fa-comment"></i>
+              <span>26</span>
+          </button>
+          </div>
+      </div>
     </div>
 
-    <!-- Tiêu đề bài viết -->
-    <h1 class="fw-bold fs-2 mb-3 mb-5">{{post.title}}</h1>
 
-    <!-- Thông tin tác giả -->
-    <div class="d-flex align-items-center gap-3 mb-4">
-        <img src="{{author.avatar}}" class="rounded-circle" width="50" height="50">
-        <div>
+
+    <!-- Nội dung chính (col-8) -->
+    <div class="col-6">
+      <div class="container my-5">
+        <div class="mb-3">
+          <a onclick="history.back()" class="text-muted" style="cursor: pointer;">
+            <i class="fa-solid fa-reply fa-sm me-2"></i>Quay lại
+          </a>
+        </div>
+
+        <h1 class="fw-bold fs-2 mb-5">{{post.title}}</h1>
+
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <img src="{{author.avatar}}" class="rounded-circle" width="50" height="50">
+          <div>
             <strong class="d-block">{{author.fullName}}</strong>
             <small class="text-muted">{{timeAgo post.createdAt}}</small>
+          </div>
         </div>
-    </div>
 
-    <!-- Nội dung bài viết -->
-    <div class="mb-5">
-        {{{post.content}}}
-    </div>
+        <div class="mb-5">
+          {{{post.content}}}
+        </div>
 
-    <hr class="my-5">
+        <hr class="my-5">
 
-    <!-- Dự án nổi bật -->
-    <h4 class="mb-4 title-strong">🔥Các bài viết nổi bật khác</h4>
-    <div class="row">
-        {{#each relatedPosts}}
-        <div class="col-md-4 mb-4">
+        <h4 class="mb-4 title-strong">🔥Các bài viết nổi bật khác</h4>
+        <div class="row">
+          {{#each relatedPosts}}
+          <div class="col-md-4 mb-4">
             <div class="card h-100 shadow-sm border-0 rounded-4">
-                <a href="/posts/{{this.slug}}">
-                    <img src="{{this.thumbnail}}" class="card-img-top rounded-top-4" alt="{{this.title}}" style="height: 180px; object-fit: cover;">
-                </a>
-                <div class="card-body">
-                    <h5 class="card-title">{{this.title}}</h5>
-                    <p class="card-text text-muted small">{{this.description}}</p>
-                    <a href="/posts/{{this.slug}}" class="btn btn-warning w-100">>> Xem tiếp</a>
-                </div>
+              <a href="/posts/{{this.slug}}">
+                <img src="{{this.thumbnail}}" class="card-img-top rounded-top-4" style="height: 180px; object-fit: cover;">
+              </a>
+              <div class="card-body">
+                <h5 class="card-title">{{this.title}}</h5>
+                <p class="card-text text-muted small">{{this.description}}</p>
+                <a href="/posts/{{this.slug}}" class="btn-grad"> Xem tiếp</a>
+              </div>
             </div>
+          </div>
+          {{/each}}
         </div>
-        {{/each}}
+      </div>
     </div>
+
+    <!-- col-2 (khoảng trống hoặc sidebar bình luận nếu hiển thị) -->
+    <div class="col-2">
+      <!-- Right Sidebar (Comments) -->
+      <div class="comments-sidebar" id="commentsSidebar">
+        <div class="bg-light p-3">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Bình luận (2)</h5>
+            <button class="btn btn-sm btn-outline-secondary" onclick="toggleComments()">
+              <i class="fa-solid fa-times"></i>
+            </button>
+          </div>
+
+          <!-- Comment list -->
+          <div class="mb-3">
+            <div class="d-flex gap-2 mb-2">
+              <img src="https://via.placeholder.com/40" class="rounded-circle" width="40" height="40">
+              <div>
+                <strong class="d-block">Bình Duồng</strong>
+                <small class="text-muted">5 tháng trước</small>
+              </div>
+            </div>
+            <div class="ps-5">
+              <p>As a seasoned problem solver...</p>
+            </div>
+          </div>
+
+          <!-- Comment form -->
+          <div class="mt-4 pt-3 border-top">
+            <textarea class="form-control mb-2" placeholder="Viết bình luận..." rows="3"></textarea>
+            <button class="btn btn-primary w-100">Gửi bình luận</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div class="overlay" onclick="toggleComments()"></div>
 </div>
+
+<script>
+  function toggleComments(forceClose = false) {
+    const sidebar = document.getElementById('commentsSidebar')
+    const overlay = document.querySelector('.overlay')
+
+    if(forceClose) {
+      sidebar.classList.remove('show')
+      overlay.classList.remove('show')
+      return
+    }
+
+    sidebar.classList.toggle('show')
+    overlay.classList.toggle('show')
+  }
+
+  // Thêm sự kiện click cho overlay để đóng sidebar khi người dùng nhấn vào overlay
+  document.querySelector('.overlay').addEventListener('click', toggleComments(true))
+</script
