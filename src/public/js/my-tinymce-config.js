@@ -1,3 +1,4 @@
+
 tinymce.init({
   selector: 'textarea.tinymce',
   plugins: 'lists link image table code preview fullscreen wordcount align',
@@ -14,34 +15,50 @@ tinymce.init({
     file_picker_types: 'image',
     /* and here's our custom image picker*/
     file_picker_callback: (cb, value, meta) => {
-      const input = document.createElement('input');
-      input.setAttribute('type', 'file');
-      input.setAttribute('accept', 'image/*');
+      const input = document.createElement('input')
+      input.setAttribute('type', 'file')
+      input.setAttribute('accept', 'image/*')
 
       input.addEventListener('change', (e) => {
-        const file = e.target.files[0];
+        const file = e.target.files[0]
 
-        const reader = new FileReader();
-        reader.addEventListener('load', () => {
-          /*
-            Note: Now we need to register the blob in TinyMCEs image blob
-            registry. In the next release this part hopefully won't be
-            necessary, as we are looking to handle it internally.
-          */
-          const id = 'blobid' + (new Date()).getTime();
-          const blobCache =  tinymce.activeEditor.editorUpload.blobCache;
-          const base64 = reader.result.split(',')[1];
-          const blobInfo = blobCache.create(id, file, base64);
-          blobCache.add(blobInfo);
+        // Thêm file vào FormData
+        const formData = new FormData()
+        formData.append('tinyMCE', file)
 
-          /* call the callback and populate the Title field with the file name */
-          cb(blobInfo.blobUri(), { title: file.name });
-        });
-        reader.readAsDataURL(file);
-      });
+        // Hiển thị spinner (loading)
+        const loadingIndicator = document.createElement('div')
+        loadingIndicator.classList.add('loading-indicator')
+        loadingIndicator.innerHTML = 'Đang tải ảnh...'
+        document.body.appendChild(loadingIndicator) 
 
-      input.click();
+        // Gửi file đến server
+        axios.post('/posts/upload/tinymce', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        })
+        .then((response) => {
+          const result = response.data
+          if(result){
+
+            // Nếu upload thành công, trả về URL của ảnh
+            cb(result.url, { alt: file.name })
+
+             // Ẩn spinner (loading) sau khi tải thành công
+             document.body.removeChild(loadingIndicator);
+             
+          }
+        })
+        .catch((error) => {
+          console.error('Error uploading image:', error)
+          alert('Có lỗi xảy ra khi tải lên ảnh. Vui lòng thử lại.')
+        })
+      })
+
+      input.click()
+
     },
-    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
-  });
+    content_style: 'body { font-family:Helvetica,Arial,sans-serif font-size:16px }'
+  })
 
