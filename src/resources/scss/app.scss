@@ -220,9 +220,7 @@ a {
 
 .btn-grad {
     background-image: linear-gradient(to right, #DD5E89 0%, #F7BB97  51%, #DD5E89  100%);
-    margin: 10px;
     height: 40px;
-    text-transform: uppercase;
     transition: 0.5s;
     background-size: 200% auto;
     color: white;            
@@ -307,4 +305,72 @@ img {
     z-index: 9999;
 }
 
-  
+.navbar .fa-bell {
+    color: inherit;
+}
+
+.navbar .navbar-brand {
+    color: inherit;
+}
+
+.navbar .navbar-nav .nav-link {
+    color: inherit; 
+}
+
+.btn-grad-cancel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff7e5f;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        z-index: -1;
+        background: linear-gradient(to right, #ff7e5f, #feb47b);
+        border-radius: 10px;
+        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        mask-composite: exclude;
+        -webkit-mask-composite: xor;
+        padding: 1px;
+    }
+
+    &:hover {
+        color: #feb47b;
+        &::before {
+            background: linear-gradient(to right, #feb47b, #ff7e5f);
+        }
+    }
+}
+
+textarea.form-control {
+    padding: 15px;
+    border: 1px solid #ff7e5f; // Viền màu #ff7e5f
+    border-radius: 10px;
+    height: 80px;
+    transition: border-color 0.3s ease;
+
+    &:focus {
+        border-color: #feb47b; // Đổi màu viền khi focus
+        outline: none;
+        box-shadow: 0 0 5px rgba(255, 126, 95, 0.5); // Hiệu ứng ánh sáng
+    }
+}
+
+.d-flex.justify-content-between.align-items-center {
+    gap: 10px; // Khoảng cách giữa các phần tử
+}
+

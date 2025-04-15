@@ -72,9 +72,9 @@ app.use(express.static(path.join(__dirname, 'public'))) //Hoặc không dùng _d
 app.use(express.urlencoded({ extended: true })) //Sử dụng form để submit
 app.use(express.json()) //Sử dụng code JS để submit
 
-//Định nghĩa router xử lí yêu cầu HTTP
-route(app)
+//Định nghĩa router xử lí yêu cầu HTTP (Ưu tiên đặt những router có link cụ thể ở trên)
 routeAdmin(app)
+route(app)
 
 app.listen(port, () => {
     console.log(`🚀 App listening on http://localhost:${port}`)

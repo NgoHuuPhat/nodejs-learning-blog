@@ -2,153 +2,206 @@
   body {
     overflow-x: hidden;
   }
+  body.no-scroll {
+    overflow: hidden;
+    padding-right: 15px;
+  }
   .full-width-page {
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
-  margin-right: calc(-50vw + 50%);
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
   }
 
-  .sidebar-trigger {
-      transition: all 0.3s;
-      border-right: 1px solid #dee2e6;
-  }   
-
   .comments-sidebar {
-      position: fixed;
-      top: 0;
-      right: -750px;
-      width: 750px;
-      height: 100vh;
-      background-color: #f8f9fa;
-      box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-      z-index: 1050;
-      overflow-y: auto;
-      transition: right 0.3s ease-in-out;
+    position: fixed;
+    top: 0;
+    right: -750px;
+    width: 750px;
+    height: 100vh;
+    background-color: #f8f9fa;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1050;
+    overflow-y: auto;
+    transition: right 0.5s ease-in-out;
   }
 
   .comments-sidebar.show {
-      right: 0;
+    right: 0;
   }
 
   .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1040;
-      display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    display: none;
   }
 
   .overlay.show {
-      display: block;
-  }   
+    display: block;
+  }
 
+  .placeholder-text {
+    color: #6c757d;
+  }
+
+  .comment-textarea {
+    display: none;
+    margin-top: 15px;
+    margin-left: 40px;
+  }
+
+  .reply-button {
+    cursor: pointer;
+  }
+
+  .comment-textarea.show {
+    display: block;
+  }
 </style>
 
-<div class="container-fluid px-0 full-width-page">
-  <div class="row g-0">
-    <!-- Sidebar trái (col-2) -->
-    <div class="col-3">
-      <div class="bg-white p-5 mt-5 h-100 d-flex flex-column rounded-1">
+<body>
+  <div class="container-fluid px-0 full-width-page">
+    <div class="row g-0">
+      <!-- Sidebar trái (col-3) -->
+      <div class="col-3">
+        <div class="bg-white p-5 mt-5 h-100 d-flex flex-column rounded-1">
           <a href="/@son-son-16" class="text-decoration-none text-dark">
-          <h6 class="fw-semibold text-start">Sơn Sơn</h6>
+            <h6 class="fw-semibold text-start">{{author.fullName}}</h6>
           </a>
 
           <hr class="w-200 m-0 mb-4 mt-2">
 
           <div class="d-flex gap-5">
-          <button class="btn btn-sm d-flex align-items-center gap-2 p-0 text-secondary bg-transparent" style="border: none; font-size: 17px;" title="Nhấn để thích bài này">
+            <button class="btn btn-sm d-flex align-items-center gap-2 p-0 text-secondary bg-transparent" style="border: none; font-size: 17px;" title="Nhấn để thích bài này">
               <i class="fa-regular fa-heart"></i>
               <span>568</span>
-          </button>
+            </button>
 
-          <button class="btn btn-sm d-flex align-items-center gap-2 p-0 text-secondary bg-transparent" style="border: none; font-size: 17px;" onclick="toggleComments()" title="Bình luận">
+            <button class="btn btn-sm d-flex align-items-center gap-2 p-0 text-secondary bg-transparent" style="border: none; font-size: 17px;" onclick="toggleComments()" title="Bình luận">
               <i class="fa-regular fa-comment"></i>
-              <span>26</span>
-          </button>
+              <span>{{post.commentCount}}</span>
+            </button>
           </div>
+        </div>
       </div>
-    </div>
 
-
-
-    <!-- Nội dung chính (col-8) -->
-    <div class="col-6">
-      <div class="container my-5">
-        <div class="mb-3">
-          <a onclick="history.back()" class="text-muted" style="cursor: pointer;">
-            <i class="fa-solid fa-reply fa-sm me-2"></i>Quay lại
-          </a>
-        </div>
-
-        <h1 class="fw-bold fs-2 mb-5">{{post.title}}</h1>
-
-        <div class="d-flex align-items-center gap-3 mb-4">
-          <img src="{{author.avatar}}" class="rounded-circle" width="50" height="50">
-          <div>
-            <strong class="d-block">{{author.fullName}}</strong>
-            <small class="text-muted">{{timeAgo post.createdAt}}</small>
+      <!-- Nội dung chính (col-8) -->
+      <div class="col-6">
+        <div class="container my-5">
+          <div class="mb-3">
+            <a onclick="history.back()" class="text-muted" style="cursor: pointer;">
+              <i class="fa-solid fa-reply fa-sm me-2"></i>Quay lại
+            </a>
           </div>
-        </div>
 
-        <div class="mb-5">
-          {{{post.content}}}
-        </div>
+          <h1 class="fw-bold fs-2 mb-5">{{post.title}}</h1>
 
-        <hr class="my-5">
-
-        <h4 class="mb-4 title-strong">🔥Các bài viết nổi bật khác</h4>
-        <div class="row">
-          {{#each relatedPosts}}
-          <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm border-0 rounded-4">
-              <a href="/posts/{{this.slug}}">
-                <img src="{{this.thumbnail}}" class="card-img-top rounded-top-4" style="height: 180px; object-fit: cover;">
-              </a>
-              <div class="card-body">
-                <h5 class="card-title">{{this.title}}</h5>
-                <p class="card-text text-muted small">{{this.description}}</p>
-                <a href="/posts/{{this.slug}}" class="btn-grad"> Xem tiếp</a>
-              </div>
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <img src="{{author.avatar}}" class="rounded-circle" width="50" height="50">
+            <div>
+              <strong class="d-block">{{author.fullName}}</strong>
+              <small class="text-muted">{{timeAgo post.createdAt}}</small>
             </div>
           </div>
-          {{/each}}
+
+          <div class="mb-5">
+            {{{post.content}}}
+          </div>
+
+          <hr class="my-5">
+
+          <h4 class="mb-4 title-strong">🔥Các bài viết nổi bật khác</h4>
+          <div class="row">
+            {{#each relatedPosts}}
+            <div class="col-md-4 mb-4">
+              <div class="card h-100 shadow-sm border-0 rounded-4">
+                <a href="/posts/{{this.slug}}">
+                  <img src="{{this.thumbnail}}" class="card-img-top rounded-top-4" style="height: 180px; object-fit: cover;">
+                </a>
+                <div class="card-body">
+                  <h5 class="card-title">{{this.title}}</h5>
+                  <p class="card-text text-muted small">{{this.description}}</p>
+                  <a href="/posts/{{this.slug}}" class="btn-grad"> Xem tiếp</a>
+                </div>
+              </div>
+            </div>
+            {{/each}}
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- col-2 (khoảng trống hoặc sidebar bình luận nếu hiển thị) -->
-    <div class="col-2">
-      <!-- Right Sidebar (Comments) -->
-      <div class="comments-sidebar" id="commentsSidebar">
-        <div class="bg-light p-3">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Bình luận (2)</h5>
-            <button class="btn btn-sm btn-outline-secondary" onclick="toggleComments()">
-              <i class="fa-solid fa-times"></i>
+      <!-- col-2 (sidebar bình luận) -->
+      <div class="col-2">
+        <div class="comments-sidebar bg-white" id="commentsSidebar">
+          <!-- Nút đóng -->
+          <div class="d-flex justify-content-end">
+            <button class="btn btn-link text-dark fs-5" onclick="toggleComments(true)" style="text-decoration: none;">
+              <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
 
-          <!-- Comment list -->
-          <div class="mb-3">
-            <div class="d-flex gap-2 mb-2">
-              <img src="https://via.placeholder.com/40" class="rounded-circle" width="40" height="40">
-              <div>
-                <strong class="d-block">Bình Duồng</strong>
-                <small class="text-muted">5 tháng trước</small>
+          <div class="bg-light p-3 ps-5 pe-5 d-flex flex-column bg-white" style="height: 100%;">
+            <!-- Form nhập bình luận -->
+            <form action="/comments/{{post._id}}" method="POST">
+              <div class="mb-4">
+                <div class="d-flex align-items-start gap-2">
+                  <img src="{{account.avatar}}" class="rounded-circle" width="40" height="40">
+                  <div id="commentInputTrigger" class="form-control placeholder-text" onclick="showCommentInput()" style="cursor: text; background-color:#eef4fc; border: 0px;">
+                    Nhập bình luận mới của bạn
+                  </div>
+                  <textarea id="commentInputArea" name="content" class="form-control d-none" rows="3" placeholder="Nhập bình luận..."></textarea>
+                </div>
+                <div id="commentActions" class="d-none mt-4 d-flex justify-content-end gap-2">
+                  <button type="button" class="btn btn-grad-cancel align-self-center" onclick="hideCommentInput()" style="width: 150px; height: 35px;">Hủy</button>
+                  <button type="submit" class="btn btn-grad btn-sm" style="width: 150px; height: 35px;">Bình luận</button>
+                </div>
               </div>
-            </div>
-            <div class="ps-5">
-              <p>As a seasoned problem solver...</p>
-            </div>
-          </div>
+            </form>
 
-          <!-- Comment form -->
-          <div class="mt-4 pt-3 border-top">
-            <textarea class="form-control mb-2" placeholder="Viết bình luận..." rows="3"></textarea>
-            <button class="btn btn-primary w-100">Gửi bình luận</button>
+            <!-- Danh sách bình luận -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h5 class="mb-0">Bình luận ({{post.commentCount}})</h5>
+            </div>
+
+            <div class="flex-grow-1 overflow-auto">
+              <div class="mb-4">
+                {{#each comments}}
+                  <div class="mb-5 comment-item">
+                    <div class="d-flex gap-2 mb-3">
+                      <img src="{{this.user.avatar}}" class="rounded-circle" width="40" height="40">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <strong class="d-block" style="color: #ff7e5f;">{{this.user.fullName}}</strong>
+                        <small class="text-muted" style="margin-top: 3px;">{{timeAgo this.createdAt}}</small>
+                      </div>
+                    </div>
+                    <p>{{this.content}}</p>
+                    <div class="gap-3 d-flex align-items-center">
+                      <button class="btn btn-link p-0 fw-semibold text-decoration-none" style="color: #ff7e5f;" >Thích</button>
+                      <button class="btn btn-link p-0 fw-semibold text-decoration-none reply-button" style="color: #ff7e5f;" onclick="showReplyInput(this)">Trả lời</button>
+                    </div>
+                  </div>
+                {{/each}}
+                <div class="mt-1">
+                  <!-- Reply Textarea -->
+                  <div class="comment-textarea ">
+                    <div class="d-flex align-items-start gap-2">
+                      <img src="{{account.avatar}}" class="rounded-circle" width="40" height="40">
+                      <textarea class="form-control" rows="3" placeholder="Nhập câu trả lời..."></textarea>
+                    </div>
+                    <div class="mt-4 d-flex justify-content-end gap-2">
+                      <button type="button" class="btn btn-grad-cancel btn-sm align-self-center" onclick="hideReplyInput(this)" style="width: 150px; height: 35px; border-radius: 10px;" >Hủy</button>
+                      <button type="submit" class="btn btn-grad btn-sm" style="width: 150px; height: 35px;">Trả lời</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Thêm bình luận khác tại đây -->
+            </div>
           </div>
         </div>
       </div>
@@ -156,24 +209,63 @@
   </div>
 
   <!-- Overlay -->
-  <div class="overlay" onclick="toggleComments()"></div>
-</div>
+  <div class="overlay" onclick="toggleComments(true)"></div>
 
-<script>
-  function toggleComments(forceClose = false) {
-    const sidebar = document.getElementById('commentsSidebar')
-    const overlay = document.querySelector('.overlay')
+  <script>
 
-    if(forceClose) {
-      sidebar.classList.remove('show')
-      overlay.classList.remove('show')
-      return
+    function toggleComments(forceClose = false) {
+    const sidebar = document.getElementById('commentsSidebar');
+    const overlay = document.querySelector('.overlay');
+    const body = document.body;
+
+    if (forceClose) {
+      sidebar.classList.remove('show');
+      overlay.classList.remove('show');
+
+      setTimeout(() => {
+        body.classList.remove('no-scroll'); 
+        body.style.paddingRight = '';
+      }, 300);
+
+      hideCommentInput();
+      return;
     }
 
-    sidebar.classList.toggle('show')
-    overlay.classList.toggle('show')
+    sidebar.classList.add('show');
+    overlay.classList.add('show');
+    body.classList.add('no-scroll');
+
+    // Chống "nhảy" giao diện do scrollbar mất
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollBarWidth > 0) {
+      body.style.paddingRight = scrollBarWidth + 'px';
+    }
   }
 
-  // Thêm sự kiện click cho overlay để đóng sidebar khi người dùng nhấn vào overlay
-  document.querySelector('.overlay').addEventListener('click', toggleComments(true))
-</script
+    function showCommentInput() {
+      document.getElementById('commentInputTrigger').classList.add('d-none')
+      document.getElementById('commentInputArea').classList.remove('d-none')
+      document.getElementById('commentActions').classList.remove('d-none')
+      document.getElementById('commentInputArea').focus();
+    }
+
+    function hideCommentInput() {
+      document.getElementById('commentInputTrigger').classList.remove('d-none')
+      document.getElementById('commentInputArea').classList.add('d-none')
+      document.getElementById('commentActions').classList.add('d-none')
+    }
+
+    function showReplyInput(button) {
+      const replyTextarea = button.closest('.ps-5').querySelector('.comment-textarea')
+      replyTextarea.classList.add('show')
+    }
+
+    function hideReplyInput(button) {
+    const replyTextarea = button.closest('.ps-5').querySelector('.comment-textarea');
+    replyTextarea.classList.remove('show');
+  }
+
+    document.querySelector('.overlay').addEventListener('click', () => toggleComments(true))
+
+  </script>
+</body>

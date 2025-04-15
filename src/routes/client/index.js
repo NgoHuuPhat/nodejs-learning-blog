@@ -5,6 +5,7 @@ const courseRoute = require('./courses')
 const userRoute = require('./user')
 const postRoute = require('./posts')
 const notificationRoute = require('./notifications')
+const commentRoute = require('./comments')
 
 const authMiddleware = require('../../app/middlewares/authMiddleware')
 const notificationsMiddleware = require('../../app/middlewares/notifications')
@@ -18,6 +19,7 @@ function route(app) {
     app.use('/courses', authMiddleware, notificationsMiddleware, courseRoute)
     app.use('/posts', authMiddleware, notificationsMiddleware, postRoute)
     app.use('/notifications', authMiddleware, notificationsMiddleware, notificationRoute)
+    app.use('/comments', authMiddleware, notificationsMiddleware, commentRoute)
 }
 
 module.exports = route

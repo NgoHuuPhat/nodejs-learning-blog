@@ -4,17 +4,15 @@ const Post = require('../../models/Post')
 const Comment = require('../../models/Comment')
 const PostDeleteRequest = require('../../models/PostDeleteRequest')
 
-class PostController {
+class CommentController {
 
-    //[GET] /posts/:slug
+    //[GET] /comments/:slug
     async details(req, res, next) {
         try {
             //Lấy khóa học trường slug = giá trị req.params.slug
             const post = await Post.findOne({
                 slug: req.params.slug,
             }).lean()
-
-            console.log(post)
 
             // Tăng view
             await Post.updateOne({ slug: req.params.slug }, { $inc: { views: 1 } })
@@ -25,67 +23,44 @@ class PostController {
             //Lấy thông tin người đăng
             const author = await Account.findById(post.author).lean()
 
-            // Lấy ra các bình luận của bài viết
-            const comments = await Comment.find({ post_id: post._id }).lean()
-            for (const comment of comments) {
-                const user = await Account.findById(comment.user_id).lean()
-                comment.user = user
-            }
-            console.log(comments)
-            res.render('client/posts/details', { post, comments, author, relatedPosts })
+            res.render('client/comments/details', { post, author, relatedPosts })
         } catch (error) {
             next(error)
         }
     }
 
-    //[GET] /posts/create
-    create(req, res, next) {
-        res.render('client/posts/create')
-    }
-
-    //[POST] /posts/store
-    async store(req, res, next) {
+    //[POST] /comments/:id
+    async create(req, res, next) {
         try {
+            if(req.params.id && res.locals.account.id){
+                const newComment = {
+                    post_id: req.params.id,
+                    user_id: res.locals.account.id,
+                    content: req.body.content,
+                }
+                await Comment.create(newComment)
+            }
 
-            let avatarPath = ''
-
-            // Kiểm tra xem có file ảnh mới không
-            if(req.file) {
-                avatarPath = req.file.cloudinary_url
-            } 
-
-            // Lấy thông tin người đăng
-            const authorID = res.locals.account.id
-
-            const newPost = {
-                title: req.body.title,
-                content: req.body.content,
-                thumbnail: avatarPath,
-                author: authorID, 
-                tags: req.body.tags?.split(',').map(tag => tag.trim()), //? kiểm tra xem có tồn tại không => chuyển chuỗi sang mảng
-    
-            };
-            
-            req.flash('success', 'Tạo bài viết thành công!')
-            await Post.create(newPost)
-            res.redirect('/me/list-post')
+            // Tăng số lượng bình luận của bài viết
+            await Post.updateOne({ _id: req.params.id }, { $inc: { commentCount: 1 } })
+            res.redirect('back')
         } catch (error) {
             next(error)
         }
     }
 
-    //[GET] /posts/:id/edit
+    //[GET] /comments/:id/edit
     async edit(req, res, next) {
         try {
             //Lấy khóa học trường _id = giá trị req.params.id
             const postData = await Post.findById(req.params.id).lean()
-            res.render('client/posts/edit', { postData })
+            res.render('client/comments/edit', { postData })
         } catch (error) {
             next(error)
         }
     }
 
-    //[PATCH] /posts/:id
+    //[PATCH] /comments/:id
     async update(req, res, next) {
         try {
             let updateData = {...req.body}
@@ -120,7 +95,7 @@ class PostController {
         }
     }
 
-    //[DELETE] /posts/:id 
+    //[DELETE] /comments/:id 
     async destroy(req, res, next) {
         try {
             await Post.deleteOne({ _id: req.params.id })
@@ -131,7 +106,7 @@ class PostController {
     }
 
     
-    //[POST] /posts/:id/request-delete
+    //[POST] /comments/:id/request-delete
     async requestDelete(req, res, next) {
         try {
 
@@ -161,4 +136,4 @@ class PostController {
     }
 }
 
-module.exports = new PostController()
+module.exports = new CommentController()
