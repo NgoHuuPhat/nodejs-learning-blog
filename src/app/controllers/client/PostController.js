@@ -33,9 +33,13 @@ class PostController {
                 for(const reply of comment.replies) {
                     const replyUser = await Account.findById(reply.user_id).lean()
                     reply.user = replyUser
+                    
+                    // Lấy ra thông tin người được trả lời
+                    const replyToUser = await Account.findById(reply.replyToUserId).lean()
+                    reply.replyToUser = replyToUser
+                    console.log("Reply: ", reply);
                 }
             }
-
             
             res.render('client/posts/details', { post, comments, author, relatedPosts })
         } catch (error) {

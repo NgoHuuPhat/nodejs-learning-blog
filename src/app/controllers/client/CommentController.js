@@ -52,11 +52,11 @@ class CommentController {
     //[POST] /comments/:id/reply
     async replyComment(req, res, next) {
         try {
-
+            console.log("Req.body: ", req.body);
             if(req.body && req.params.id){
                 await Comment.updateOne(
                     { _id: req.params.id },
-                    { $push: { replies: {user_id: res.locals.account.id, content: req.body.replies} } }
+                    { $push: { replies: {user_id: res.locals.account.id, content: req.body.replies, replyToUserId: req.body.replyToUserId} } }
                 )
             }
 
