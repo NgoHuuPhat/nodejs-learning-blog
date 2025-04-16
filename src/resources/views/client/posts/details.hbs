@@ -21,7 +21,7 @@
     background-color: #f8f9fa;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1050;
-    overflow-y: auto;
+    overflow-y: hidden;
     transition: right 0.5s ease-in-out;
   }
 
@@ -139,7 +139,7 @@
         <div class="comments-sidebar bg-white" id="commentsSidebar">
           <!-- Nút đóng -->
           <div class="d-flex justify-content-end">
-            <button class="btn btn-link text-dark fs-5" onclick="toggleComments(true)" style="text-decoration: none;">
+            <button class="btn btn-link text-secondary fs-5" onclick="toggleComments(true)" style="text-decoration: none;">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
@@ -175,7 +175,7 @@
                       <img src="{{this.user.avatar}}" class="rounded-circle" width="40" height="40">
                       <div class="d-flex justify-content-between align-items-center">
                         <strong class="d-block" style="color: #ff7e5f;">{{this.user.fullName}}</strong>
-                        <small class="text-muted" style="margin-top: 3px;">{{timeAgo this.createdAt}}</small>
+                        <small class="text-muted" style="margin-top: 1px;">{{timeAgo this.createdAt}}</small>
                       </div>
                     </div>
                     <p>{{this.content}}</p>
@@ -183,21 +183,50 @@
                       <button class="btn btn-link p-0 fw-semibold text-decoration-none" style="color: #ff7e5f;" >Thích</button>
                       <button class="btn btn-link p-0 fw-semibold text-decoration-none reply-button" style="color: #ff7e5f;" onclick="showReplyInput(this)">Trả lời</button>
                     </div>
+                    <!-- Reply Textarea -->
+                    <form action="/comments/{{this._id}}/reply" method="POST" class="comment-textarea">
+                      <div class="d-flex align-items-start gap-2">
+                        <img src="{{@root.account.avatar}}" class="rounded-circle" width="40" height="40">
+                        <textarea class="form-control" name="replies" rows="3" placeholder="Nhập câu trả lời..."></textarea>
+                      </div>
+                      <div class="mt-4 d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-grad-cancel btn-sm align-self-center" onclick="hideReplyInput(this)" style="width: 150px; height: 35px; border-radius: 10px;" >Hủy</button>
+                        <button type="submit" class="btn btn-grad btn-sm" data-fullName="{{this.user.fullName}}" style="width: 150px; height: 35px;">Trả lời</button>
+                      </div>
+                    </form>
+                    <!-- Replies Section -->
+                    <div class="mt-4 ps-5 border-start">
+                      {{#each this.replies}}
+                        <div class="mb-4 reply-item"> <!-- Thêm class reply-item -->
+                          <div class="d-flex gap-2 mb-3">
+                            <img src="{{this.user.avatar}}" class="rounded-circle" width="35" height="35">
+                            <div class="d-flex gap-2">
+                              <strong class="d-block" style="color: #ff7e5f;">{{this.user.fullName}}</strong>
+                              <small class="text-muted" style="margin-top: 1px;">{{timeAgo this.createdAt}}</small>
+                            </div>
+                          </div>
+                          <p class="mt-2">{{this.content}}</p>
+                          <div class="gap-3 d-flex align-items-center">
+                            <button class="btn btn-link p-0 fw-semibold text-decoration-none" style="color: #ff7e5f;">Thích</button>
+                            <button class="btn btn-link p-0 fw-semibold text-decoration-none reply-button" style="color: #ff7e5f;" onclick="showReplyInput(this)">Trả lời</button>
+                          </div>
+
+                          <!-- Reply Textarea (di chuyển vào trong mỗi reply-item) -->
+                          <form action="/comments/{{../_id}}/reply" method="POST" class="comment-textarea">
+                            <div class="d-flex align-items-start gap-2 mt-3">
+                              <img src="{{@root.account.avatar}}" class="rounded-circle" width="40" height="40">
+                              <textarea class="form-control" name="replies" rows="3" placeholder="Nhập câu trả lời..."></textarea>
+                            </div>
+                            <div class="mt-4 d-flex justify-content-end gap-2">
+                              <button type="button" class="btn btn-grad-cancel btn-sm align-self-center" onclick="hideReplyInput(this)" style="width: 150px; height: 35px; border-radius: 10px;">Hủy</button>
+                              <button type="submit" class="btn btn-grad btn-sm" style="width: 150px; height: 35px;">Trả lời</button>
+                            </div>
+                          </form>
+                        </div>
+                      {{/each}}
+                    </div>
                   </div>
                 {{/each}}
-                <div class="mt-1">
-                  <!-- Reply Textarea -->
-                  <div class="comment-textarea ">
-                    <div class="d-flex align-items-start gap-2">
-                      <img src="{{account.avatar}}" class="rounded-circle" width="40" height="40">
-                      <textarea class="form-control" rows="3" placeholder="Nhập câu trả lời..."></textarea>
-                    </div>
-                    <div class="mt-4 d-flex justify-content-end gap-2">
-                      <button type="button" class="btn btn-grad-cancel btn-sm align-self-center" onclick="hideReplyInput(this)" style="width: 150px; height: 35px; border-radius: 10px;" >Hủy</button>
-                      <button type="submit" class="btn btn-grad btn-sm" style="width: 150px; height: 35px;">Trả lời</button>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               <!-- Thêm bình luận khác tại đây -->
@@ -256,16 +285,46 @@
     }
 
     function showReplyInput(button) {
-      const replyTextarea = button.closest('.ps-5').querySelector('.comment-textarea')
-      replyTextarea.classList.add('show')
+      // Ẩn tất cả các textarea trả lời đang hiển thị trước đó
+      document.querySelectorAll('.comment-textarea').forEach(textarea => {
+        textarea.classList.remove('show');
+      });
+      
+      // Tìm phần tử cha gần nhất là comment-item hoặc reply-item
+      const commentContainer = button.closest('.comment-item, .reply-item');
+      
+      // Tìm textarea trong container đó
+      const replyTextarea = commentContainer.querySelector('.comment-textarea');
+      
+      if (replyTextarea) {
+        replyTextarea.classList.add('show');
+        replyTextarea.querySelector('textarea').focus();
+
+        // Cuộn đến vị trí của textarea nếu cần
+        replyTextarea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
 
     function hideReplyInput(button) {
-    const replyTextarea = button.closest('.ps-5').querySelector('.comment-textarea');
-    replyTextarea.classList.remove('show');
-  }
+      // Tìm form cha chứa nút hủy
+      const form = button.closest('form');
+      if (form) {
+        form.classList.remove('show');
+      }
+    }
 
     document.querySelector('.overlay').addEventListener('click', () => toggleComments(true))
+
+    // Kiểm tra URL để xác định xem có cần mở sidebar bình luận không
+    const urlParams = new URLSearchParams(window.location.search);
+    const showComments = urlParams.get('showComments');
+
+    if (showComments === 'true') {
+      toggleComments(); // Mở sidebar
+    }
+    const url = new URL(window.location);
+    url.searchParams.delete('showComments');
+    window.history.replaceState({}, document.title, url.toString());
 
   </script>
 </body>

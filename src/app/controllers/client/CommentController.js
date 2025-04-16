@@ -43,7 +43,32 @@ class CommentController {
 
             // Tăng số lượng bình luận của bài viết
             await Post.updateOne({ _id: req.params.id }, { $inc: { commentCount: 1 } })
-            res.redirect('back')
+            res.redirect(req.get('referer') + '?showComments=true')
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    //[POST] /comments/:id/reply
+    async replyComment(req, res, next) {
+        try {
+
+            if(req.body && req.params.id){
+                await Comment.updateOne(
+                    { _id: req.params.id },
+                    { $push: { replies: {user_id: res.locals.account.id, content: req.body.replies} } }
+                )
+            }
+
+            // Lấy ra bài viết
+            const comment = await Comment.findById(req.params.id)
+
+            // Tăng số lượng bình luận của bài viết
+            if(comment) {
+                await Post.updateOne({ _id: comment.post_id }, { $inc: { commentCount: 1 } })
+            }
+
+            res.redirect(req.get('referer') + '?showComments=true')
         } catch (error) {
             next(error)
         }

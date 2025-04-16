@@ -14,8 +14,6 @@ class PostController {
                 slug: req.params.slug,
             }).lean()
 
-            console.log(post)
-
             // Tăng view
             await Post.updateOne({ slug: req.params.slug }, { $inc: { views: 1 } })
 
@@ -30,8 +28,15 @@ class PostController {
             for (const comment of comments) {
                 const user = await Account.findById(comment.user_id).lean()
                 comment.user = user
+
+                // Lấy ra thông tin người trả lời bình luận
+                for(const reply of comment.replies) {
+                    const replyUser = await Account.findById(reply.user_id).lean()
+                    reply.user = replyUser
+                }
             }
-            console.log(comments)
+
+            
             res.render('client/posts/details', { post, comments, author, relatedPosts })
         } catch (error) {
             next(error)

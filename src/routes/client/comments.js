@@ -3,6 +3,7 @@ var router = express.Router()
 const commentController = require('../../app/controllers/client/CommentController')
 
 router.post('/:id', commentController.create)
+router.post('/:id/reply', commentController.replyComment)
 // router.get('/:id/edit', courseController.edit)
 // router.post('/handle-form-actions', courseController.handleFormActions)
 // router.put('/:id', courseController.update)
