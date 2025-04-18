@@ -4,12 +4,7 @@ const commentController = require('../../app/controllers/client/CommentControlle
 
 router.post('/:id', commentController.create)
 router.post('/:id/reply', commentController.replyComment)
-// router.get('/:id/edit', courseController.edit)
-// router.post('/handle-form-actions', courseController.handleFormActions)
-// router.put('/:id', courseController.update)
-// router.patch('/:id/restore', courseController.restore)
-// router.delete('/:id', courseController.destroy)
-// router.delete('/:id/force', courseController.forceDestroy)
-// router.get('/:slug', courseController.details)
+router.put('/:id', commentController.update)
+router.delete('/:id', commentController.destroy)
 
 module.exports = router
