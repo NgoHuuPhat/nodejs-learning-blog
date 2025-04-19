@@ -20,7 +20,7 @@ const CourseSchema = new Schema(
 
         //Thêm người tạo
         createdBy: {
-            account_id: String,
+            account_id: mongoose.Schema.ObjectId,
             createdAt: {
                 type: Date,
                 default: Date.now,
@@ -29,14 +29,14 @@ const CourseSchema = new Schema(
 
         //Thêm người xóa
         deletedBy: {
-            account_id: String,
+            account_id: mongoose.Schema.ObjectId,
             deletedAt: Date,
         },
 
         //Thêm người cập nhật
         updatedBy: [
             {
-                account_id: String,
+                account_id: mongoose.Schema.ObjectId,
                 updatedAt: Date,
             },
         ],
@@ -48,7 +48,14 @@ const CourseSchema = new Schema(
 )
 
 mongoose.plugin(slug)
-CourseSchema.plugin(AutoIncrement)
+CourseSchema.plugin(AutoIncrement) 
+
+//Tránh trùng lặp ID nếu có nhiều collection dùng tăng tự động
+// CourseSchema.plugin(AutoIncrement, {
+//     inc_field: '_id', // Tên trường tự động tăng
+//     id: 'course_seq', // Tên ID cho bộ đếm
+// }) 
+
 
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
 CourseSchema.plugin(mongooseDelete, {

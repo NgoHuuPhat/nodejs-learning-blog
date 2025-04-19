@@ -10,14 +10,14 @@ const PostSchema = new Schema(
         title: { type: String, required: true, unique: true },
         content: { type: String, required: true },
         thumbnail: { type: String },
-        author: { type: String, required: true },
+        author: { type: mongoose.Schema.ObjectId, required: true },
         status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
         slug: { type: String, slug: 'title', unique: true },
         tags: [{ type: String }],
         views: { type: Number, default: 0 },
         commentCount: { type: Number, default: 0 },
         deletedBy: {
-            account_id: String,
+            account_id: mongoose.Schema.ObjectId,
             deletedAt: Date
         }
     },

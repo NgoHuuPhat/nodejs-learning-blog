@@ -19,7 +19,7 @@ const NotificationSchema = new Schema(
             required: true
         }, 
         meta: { type: Object, required: true }, // Dữ liệu thông báo
-        user_id: { type: String, required: true }, // Người nhận thông báo
+        user_id: { type: mongoose.Schema.ObjectId, required: true }, // Người nhận thông báo
         isRead: { type: Boolean, default: false }, // Trạng thái đã đọc hay chưa
     },
     { timestamps: true }

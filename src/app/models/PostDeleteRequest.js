@@ -3,8 +3,8 @@ const Schema = mongoose.Schema
 
 const PostDeleteRequestSchema = new Schema(
     {
-        post_id: { type: String, required: true },
-        user_id: { type: String, required: true }, 
+        post_id: { type: mongoose.Schema.ObjectId, required: true },
+        user_id: { type: mongoose.Schema.ObjectId, required: true }, 
         reason: { type: String, required: true }, 
     },
     { timestamps: true },

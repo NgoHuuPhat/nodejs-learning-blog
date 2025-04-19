@@ -9,7 +9,7 @@ const AccountSchema = new Schema(
         password: { type: String, required: true },
         phone: { type: String },
         avatar: { type: String },
-        role_id: { type: String, required: true },
+        role_id: { type: mongoose.Schema.ObjectId, required: true },
         status: { type: String, required: true },
     },
     { timestamps: true },
