@@ -29,7 +29,7 @@ class CommentController {
     //[POST] /comments/:id/reply
     async replyComment(req, res, next) {
         try {
-            console.log("Req.body: ", req.body);
+
             if(req.body && req.params.id){
                 await Comment.updateOne(
                     { _id: req.params.id },
@@ -53,18 +53,32 @@ class CommentController {
 
 
     //[PUT] /comments/:id
-    async update(req, res, next) {
+    async updateComment(req, res, next) {
         try {
-            if (req.params.id && res.locals.account.id) {
+            if (req.params.id && req.body) {
                 await Comment.updateOne(
-                    { _id: req.params.id, user_id: res.locals.account.id },
-                    { content: req.body.content }
+                    { _id: req.params.id },
+                    { content: req.body.editContent }
                 )
-                req.flash('success', 'Cập nhật bình luận thành công!')
-            } else {
-                req.flash('error', 'Không thể cập nhật bình luận!')
+            } 
+
+            res.redirect(req.get('referer') + '?showComments=true')
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    //[PUT] /comments/:commentId/replies/:replyId
+    async updateCommentReply(req, res, next) {
+        try {
+            if(req.params.replyId && req.params.commentId && req.body) {
+                await Comment.updateOne(
+                    { _id: req.params.commentId, 'replies._id': req.params.replyId },
+                    { $set: { 'replies.$.content': req.body.editReplies } } //.$. là toán tử để cập nhật trường con trong mảng
+                )
             }
-            res.redirect('back')
+
+            res.redirect(req.get('referer') + '?showComments=true')
         } catch (error) {
             next(error)
         }
@@ -73,19 +87,17 @@ class CommentController {
     //[DELETE] /comments/:id
     async destroy(req, res, next) {
         try {
-            const comment = await Comment.findOneAndDelete({
-                _id: req.params.id,
-                user_id: res.locals.account.id,
-            })
+            if (req.params.id) {
 
-            if (comment) {
                 // Giảm số lượng bình luận của bài viết
-                await Post.updateOne({ _id: comment.post_id }, { $inc: { commentCount: -1 } })
-                req.flash('success', 'Xóa bình luận thành công!')
-            } else {
-                req.flash('error', 'Không thể xóa bình luận!')
-            }
+                const comment = await Comment.findOne({ _id: req.params.id, deleted: true })
+                if(comment) {
+                    await Post.updateOne({ _id: comment.post_id }, { $inc: { commentCount: -1 } })
+                }
 
+                await Comment.delete({ _id: req.params.id })
+
+            }
             res.redirect('back')
         } catch (error) {
             next(error)

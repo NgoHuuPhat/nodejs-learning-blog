@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const mongooseDelete = require('mongoose-delete')
 const Schema = mongoose.Schema
 
 const CommentSchema = new Schema(
@@ -17,5 +18,11 @@ const CommentSchema = new Schema(
     },
     { timestamps: true },
 )
+
+// { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
+CommentSchema.plugin(mongooseDelete, {
+    deletedAt: true,
+    overrideMethods: 'all',
+})
 
 module.exports = mongoose.model('Comment', CommentSchema) // Collection - Schema

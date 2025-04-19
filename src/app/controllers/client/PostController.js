@@ -37,7 +37,6 @@ class PostController {
                     // Lấy ra thông tin người được trả lời
                     const replyToUser = await Account.findById(reply.replyToUserId).lean()
                     reply.replyToUser = replyToUser
-                    console.log("Reply: ", reply);
                 }
             }
             
