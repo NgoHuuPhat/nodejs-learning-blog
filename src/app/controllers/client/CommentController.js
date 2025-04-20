@@ -93,12 +93,35 @@ class CommentController {
                 const comment = await Comment.findOne({ _id: req.params.id, deleted: true })
                 if(comment) {
                     await Post.updateOne({ _id: comment.post_id }, { $inc: { commentCount: -1 } })
+
+                    // Gán giá trị vào req.session
+                    req.session.deletedComment = comment._id
                 }
 
                 await Comment.delete({ _id: req.params.id })
 
             }
-            res.redirect('back')
+            res.redirect(req.get('referer') + '?showComments=true')
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    //[PATCH] comments/:id/restore
+    async restore(req, res, next) {
+        try {
+            if(req.params.id){
+
+                await Comment.restore({ _id: req.params.id })
+
+                // Tăng số lượng bình luận của bài viết
+                const comment = await Comment.findOne({ _id: req.params.id, deleted: false })
+                if(comment) {
+                    await Post.updateOne({ _id: comment.post_id }, { $inc: { commentCount: 1 } })
+                }
+
+            }
+            res.redirect(req.get('referer') + '?showComments=true')
         } catch (error) {
             next(error)
         }

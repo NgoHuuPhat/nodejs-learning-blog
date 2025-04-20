@@ -219,6 +219,7 @@
             <div class="flex-grow-1 overflow-auto">
               <div class="mb-4">
                 {{#each comments}}
+                  {{!-- Hiển thị bình luận --}}
                   <div class="mb-5 comment-item">
                     <div class="d-flex gap-2 mb-3">
                       <img src="{{this.user.avatar}}" class="rounded-circle" width="40" height="40">
@@ -239,8 +240,13 @@
                       {{/if}}
 
                     </div>
-                    <p>{{this.content}}</p>
-
+                    {{#if this.isUndo}}
+                      <p class="fst-italic text-muted">
+                        Bình luận này đã bị xóa. <a href= "" class="btn-undo-cmt" data-id="{{this._id}}">Hoàn tác</a>
+                      </p>
+                    {{else}}
+                      <p>{{this.content}}</p>
+                    {{/if}}
                     {{!-- Textarea chỉnh sửa (Ẩn) --}}
                     <form action="/comments/{{this._id}}?_method=PUT" method="POST">
                       <div class="comment-edit-area-{{this._id}}" style="display: none;">
@@ -355,6 +361,10 @@
 <form id="deleteCommentForm" method="POST" style="display: none;"></form>
 </body>
 
+{{!-- Form ẩn để hoàn tác bình luận --}}
+<form id="undoCommentForm" method="POST" style="display: none;"></form>
+</body>
+
 <script>
 
   // Xử lý xóa bình luận
@@ -368,6 +378,20 @@
 
       deleteCommentForms.action = `/comments/${commentId}?_method=DELETE`
       deleteCommentForms.submit(); 
+    });
+  });
+
+  // Xử lí hoàn tác bình luận
+  const undoCommentForms = document.getElementById('undoCommentForm')
+  const btnUndoComment = document.querySelectorAll('.btn-undo-cmt')
+
+  btnUndoComment.forEach(btn => {
+    btn.addEventListener('click', function(event) {
+      event.preventDefault()
+      const commentId = this.getAttribute('data-id')
+
+      undoCommentForms.action = `/comments/${commentId}/restore?_method=PATCH`
+      undoCommentForms.submit(); 
     });
   });
 

@@ -7,5 +7,6 @@ router.post('/:id/reply', commentController.replyComment)
 router.put('/:id', commentController.updateComment)
 router.put('/:commentId/replies/:replyId', commentController.updateCommentReply)
 router.delete('/:id', commentController.destroy) //Xóa mềm
+router.patch('/:id/restore', commentController.restore) //Khôi phục
 
 module.exports = router

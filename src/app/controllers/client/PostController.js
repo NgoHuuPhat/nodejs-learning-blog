@@ -24,8 +24,8 @@ class PostController {
             const author = await Account.findById(post.author).lean()
 
             // Lấy ra các bình luận của bài viết
-            const comments = await Comment.find({ post_id: post._id }).lean()
-            for (const comment of comments) {
+            const allComments = await Comment.findWithDeleted({ post_id: post._id }).lean()
+            for (const comment of allComments) {
                 const user = await Account.findById(comment.user_id).lean()
                 comment.user = user
 
@@ -39,6 +39,21 @@ class PostController {
                     reply.replyToUser = replyToUser
                 }
             }
+
+            // Kiểm tra xem bình luận nào đã bị xóa và cần hoàn tác
+            if (req.session.deletedComment) {
+                for (const comment of allComments) {
+                    console.log(comment._id.toString(), req.session.deletedComment.toString())
+                    if (comment._id.toString() === req.session.deletedComment.toString()) {
+                        comment.isUndo = true;  // Đánh dấu hoàn tác
+                        break;
+                    }
+                }
+                req.session.deletedComment = null 
+            }
+
+            // Lấy ra bình luận không bị xóa hoặc đã được hoàn tác
+            const comments = allComments.filter(comment => !comment.deleted || comment.isUndo);
             
             res.render('client/posts/details', { post, comments, author, relatedPosts })
         } catch (error) {
