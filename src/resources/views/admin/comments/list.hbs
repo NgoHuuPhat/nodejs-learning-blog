@@ -1,0 +1,171 @@
+{{!-- Kiểm tra quyền truy cập --}}
+{{#if (includes account.role_permissions 'comments_view')}}
+<form method="POST" action="/admin/comments/handle-form-actions">
+  <div>
+    <h3>Danh sách bình luận</h3>
+    <a href="/admin/comments/trash">Thùng rác ({{countDeleted}})</a>
+  </div>
+
+  <div class="d-flex justify-content-end mt-3">
+    <div class="d-flex gap-3">
+      <select class="form-select-sm" name="action" required>
+        <option value="">-- Hành động --</option>
+        <option value="delete">Xóa</option>
+      </select>
+      <button class="btn btn-primary btn-submit btn-sm disabled">Thực hiện</button>
+    </div>
+  </div>
+
+  <table class="table mt-4">
+    <thead>
+      <tr>
+        {{#if comments.length}}
+        <th scope="col">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="checkbox-all">
+          </div>
+        </th>
+        {{/if}}
+        <th scope="col">STT</th>
+        <th scope="col">
+          Nội dung
+          {{{sortTable 'content' _sort query}}}
+        </th>
+        <th scope="col">Bài viết</th>
+        <th scope="col">
+          Thời gian
+          {{{sortTable 'createdAt' _sort query}}}
+        </th>
+        <th scope="col">Người bình luận</th>
+        <th scope="col">Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each comments}}
+      <tr>
+        <td>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="commentIDs[]" value="{{this._id}}">
+          </div>
+        </td>
+        <th scope="row">{{ sum (sum (multiply (sub @root.objectPagination.currentPage 1) @root.objectPagination.limitItems) @index) 1 }}</th>
+        <td>{{this.content}}</td>
+        <td>{{this.postTitle}}</td>
+        <td>{{this.createdAt}}</td>
+        <td>{{this.userName}}</td>
+        <td>
+          <a href="/admin/comments/{{this._id}}" class="btn btn-link">Xem chi tiết</a>
+          <a href="#" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa</a>
+        </td>
+      </tr>
+      {{else}}
+      <tr>
+        <td class="text-center" colspan="8">Không tồn tại bình luận nào</td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+</form>
+
+{{else}}
+  {{> 404}}
+{{/if}}
+
+<!-- Modal Xác nhận Xóa -->
+<div class="modal fade" id="delete-comment-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa bình luận?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">Bạn chắc chắn muốn xóa bình luận này?</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button id="btn-delete-post" type="button" class="btn btn-danger">Xóa bỏ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Form giả -->
+<form id="delete-post-form" method="POST"></form>
+<form id="update-status-form" method="POST"></form>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Script xử lý giống phần post -->
+<script>
+  var commentID
+  var deleteForm = document.getElementById('delete-post-form')
+  var btnDeleteComment = document.getElementById('btn-delete-post')
+  var checkboxAll = $('#checkbox-all')
+  var commentItemCheckbox = $('input[name="commentIDs[]"]')
+  var checkAllSubmitBtn = $('.btn-submit')
+  var updateStatusItems = document.querySelectorAll('.update-status-post')
+  var updateStatusForm = document.getElementById('update-status-form')
+
+  if (updateStatusItems) {
+    updateStatusItems.forEach(item => {
+      item.onclick = function (event) {
+        event.preventDefault()
+        const id = this.getAttribute('data-id')
+        const newStatus = this.getAttribute('data-newstatus')
+        updateStatusForm.action = '/admin/comments/' + id + `?newstatus=${newStatus}` + '&_method=PATCH'
+        updateStatusForm.submit()
+      }
+    })
+  }
+
+  const deleteModal = document.getElementById('delete-comment-modal')
+  if (deleteModal) {
+    deleteModal.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget
+      commentID = button.getAttribute('data-id')
+    })
+
+    btnDeleteComment.onclick = function (event) {
+      deleteForm.action = '/admin/comments/' + commentID + '?_method=DELETE'
+      deleteForm.submit()
+    }
+
+    checkboxAll.change(function () {
+      var isCheckedAll = $(this).prop('checked')
+      commentItemCheckbox.prop('checked', isCheckedAll)
+      renderCheckAllSubmitBtn()
+    })
+
+    commentItemCheckbox.change(function () {
+      var isCheckedAll = commentItemCheckbox.length === $('input[name="commentIDs[]"]:checked').length
+      checkboxAll.prop('checked', isCheckedAll)
+      renderCheckAllSubmitBtn()
+    })
+
+    function renderCheckAllSubmitBtn() {
+      var checkedCount = $('input[name="commentIDs[]"]:checked').length
+      if (checkedCount > 0) {
+        checkAllSubmitBtn.removeClass('disabled')
+      } else {
+        checkAllSubmitBtn.addClass('disabled')
+      }
+    }
+  }
+</script>
+
+<!-- Thông báo -->
+{{#if success}}
+  <div class="alert alert-success alert-dismissible mt-5" role="alert">
+    {{success}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+{{#if error}}
+  <div class="alert alert-danger alert-dismissible mt-5" role="alert">
+    {{error}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}

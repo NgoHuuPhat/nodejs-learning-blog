@@ -1,0 +1,109 @@
+<!-- Hiển thị thông báo thành công -->
+{{#if success}}
+  <div class="alert alert-success alert-dismissible mt-5" role="alert">
+    {{success}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<!-- Hiển thị thông báo lỗi -->
+{{#if error}}
+  <div class="alert alert-danger alert-dismissible mt-5" role="alert">
+    {{error}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<div>
+  <h3>Bình luận đã xóa</h3>
+  <a href="/admin/comments">Quay lại</a>
+</div>
+
+<table class="table mt-4">
+  <thead>
+    <tr>
+      <th scope="col">STT</th>
+      <th scope="col">Nội dung</th>
+      <th scope="col">Bài viết</th>
+      <th scope="col">Người bình luận</th>
+      <th scope="col">Thời gian bình luận</th>
+      <th scope="col">Người xóa</th>
+      <th scope="col">Thao tác</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each comments}}
+    <tr>
+      <th scope="row">{{sum @index 1}}</th>
+      <td>{{this.content}}</td>
+      <td>{{this.postTitle}}</td>
+      <td>{{this.userName}}</td>
+      <td>{{this.createdAt}}</td>
+      <td>{{this.deletedBy}}</td>
+      <td>
+        <a href="" class="btn btn-link btn-restore" data-id="{{this._id}}">Khôi phục</a>
+        <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa vĩnh viễn</a>
+      </td>
+    </tr>
+    {{else}}
+    <tr>
+      <td class="text-center" colspan="8">Thùng rác trống.</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="delete-comment-modal" tabindex="-1" aria-labelledby="deleteCommentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5">Xóa bình luận?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Bạn chắn chắn muốn xóa bình luận này?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button id="btn-delete-comment" type="button" class="btn btn-danger">Xóa vĩnh viễn</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Các form ẩn -->
+<form id="delete-comment-form" method="POST"></form>
+<form id="restore-comment-form" method="POST"></form>
+
+<!-- Script xử lý -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+  var commentID
+  var deleteForm = document.getElementById('delete-comment-form')
+  var btnDeleteComment = document.getElementById('btn-delete-comment')
+  var restoreBtn = $('.btn-restore')
+  var restoreForm = document.getElementById('restore-comment-form')
+
+  var deleteModal = document.getElementById('delete-comment-modal')
+  deleteModal.addEventListener('show.bs.modal', event => {
+    var button = event.relatedTarget
+    commentID = button.getAttribute('data-id')
+  })
+
+  btnDeleteComment.onclick = function(event) {
+    deleteForm.action = '/admin/comments/' + commentID + '/force?_method=DELETE'
+    deleteForm.submit()
+  }
+
+  restoreBtn.click(function(e) {
+    e.preventDefault()
+    var commentID = $(this).data('id')
+    restoreForm.action = '/admin/comments/' + commentID + '/restore?_method=PATCH'
+    restoreForm.submit()
+  })
+</script>

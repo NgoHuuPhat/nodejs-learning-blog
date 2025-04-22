@@ -1,0 +1,166 @@
+<!-- Hiển thị thông báo thành công -->
+{{#if success}}
+  <div class="alert alert-success alert-dismissible mt-5" role="alert">
+    {{success}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<!-- Hiển thị thông báo lỗi -->
+{{#if error}}
+  <div class="alert alert-danger alert-dismissible mt-5" role="alert">
+    {{error}}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<div>
+  <h3>Danh sách yêu cầu xóa</h3>
+  <a href="/admin/posts">Quay lại</a>
+</div>
+
+  <table class="table mt-4">
+      <thead>
+          <tr>
+              <th scope="col">STT</th>
+              <th scope="col">Tiêu đề</th>
+              <th scope="col">Thời gian đăng bài</th>
+              <th scope="col">Tác giả</th>
+              <th scope="col">Trạng thái</th>
+              <th scope="col">Lý do muốn xóa</th>
+              <th scope="col">Thao tác</th>
+          </tr>
+      </thead>
+      <tbody>
+          {{#each posts}}
+          <tr>
+              {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
+              <th scope="row"> {{sum @index 1}}</th>  
+              <td>{{this.postDetails.title}}</td>
+              <td>{{this.postDetails.createdAt}}</td>
+              <td>{{this.accountDetails.fullName}}</td>
+              <td>
+                {{#if (eq this.postDetails.status 'pending')}}
+                  <span class="badge bg-warning">Chờ duyệt</span>
+                {{/if}}
+                
+                {{#if (eq this.postDetails.status 'approved')}}
+                  <span class="badge bg-success">Đã duyệt</span>
+                {{/if}}
+                {{#if (eq this.postDetails.status 'rejected')}}
+                  <span class="badge bg-danger">Từ chối</span>
+                {{/if}}
+              </td>
+              <td>{{this.reason}}</td>
+              <td>
+                  <a href="/admin/posts/{{this.postDetails.slug}}" class="btn btn-link">Xem chi tiết</a>
+                  <a href="" class="btn btn-link" data-bs-toggle="modal" data-id = "{{this.postDetails._id}}" data-bs-target="#delete-post-modal">Đồng ý xóa</a> 
+                  <a href="" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#deny-delete-modal"  data-id="{{this._id}}" >Từ chối xóa</a>
+                  <!-- Button trigger modal 
+                        Trước tiên phải lấy được ID-->
+              </td>
+          </tr>
+          {{else}}
+          <tr>
+            <td class="text-center" colspan="10">Danh sách trống.
+            </td>   
+          </tr>
+          {{/each}}
+      </tbody>
+  </table>
+</div>
+
+<!-- Modal xóa bài viết -->
+<div class="modal fade" id="delete-post-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa bài viết?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Bạn chắn chắn muốn xóa bài viết này?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button id="btn-delete-post" type="button" class="btn btn-danger">Xóa bỏ</button>
+      </div>
+    </div>
+  </div>
+</div>
+{{!-- Delete hidden form --}}
+<form id="delete-post-form" method="POST"></form>
+
+{{!-- deny form --}}
+<form id="deny-delete-form" method="POST">
+  <!-- Modal gửi yêu cầu xóa -->
+  <div class="modal fade modal-lg" id="deny-delete-modal" tabindex="-1" aria-labelledby="denyDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="denyDeleteLabel">Gửi yêu cầu xóa bài viết?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="delete-reasonDeny" class="form-label">Lý do từ chối:</label>
+              <textarea class="form-control" name="reasonDeny" id="delete-reasonDeny" rows="3" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+            <button id="btn-deny-delete-post" type="button" class="btn btn-danger">Gửi yêu cầu</button>
+          </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<script>
+
+    var postID
+    var deleteForm = document.getElementById('delete-post-form')
+    var btnDeleteCourse = document.getElementById('btn-delete-post')
+
+    var denyDeleteForm = document.getElementById('deny-delete-form')
+    var btndenyDeletePost = document.getElementById('btn-deny-delete-post')
+
+    //Xử lí sự kiện khi hộp thoại model đồng ý xóa show (JS thuần)
+    var deleteModal = document.getElementById('delete-post-modal')
+    deleteModal.addEventListener('show.bs.modal', event => {
+      var button = event.relatedTarget
+      postID = button.getAttribute('data-id') //Lấy ra được id
+    })
+
+    //Xử lí sự kiện khi click vào button xóa bỏ
+    btnDeleteCourse.onclick = function(event){
+
+      //Đẩy form xuống và gán action cho nó
+      deleteForm.action = '/admin' + '/posts/' + postID + '?_method=DELETE'
+      deleteForm.submit()
+
+    }
+
+    //Khi hộp thoại modal gửi yêu cầu xóa bài viết show
+    const denyDeleteModal = document.getElementById('deny-delete-modal')
+    if (denyDeleteModal) {
+        denyDeleteModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget
+        postID = button.getAttribute('data-id') //Lấy ra được id
+        console.log(postID)
+        })
+    }
+
+    //Khi click vào button gửi yêu cầu xóa bài viết
+    btndenyDeletePost.onclick = function(event){
+      //Đẩy form xuống và gán action cho nó
+      denyDeleteForm.action = '/admin' + '/posts/' + postID + '/deny'
+      denyDeleteForm.submit()
+    }
+
+</script>
+

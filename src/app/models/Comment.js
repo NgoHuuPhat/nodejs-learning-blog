@@ -1,6 +1,9 @@
 const mongoose = require('mongoose')
 const mongooseDelete = require('mongoose-delete')
+const { sortTable } = require('../../helpers/queryHelper')
+
 const Schema = mongoose.Schema
+
 
 const CommentSchema = new Schema(
     {
@@ -26,5 +29,8 @@ CommentSchema.plugin(mongooseDelete, {
     deletedAt: true,
     overrideMethods: 'all',
 })
+
+// Sử dụng query helper chung
+CommentSchema.query.sortTable = sortTable
 
 module.exports = mongoose.model('Comment', CommentSchema) // Collection - Schema
