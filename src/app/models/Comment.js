@@ -16,17 +16,27 @@ const CommentSchema = new Schema(
                 content: {type: String, required: true},
                 replyToUserId: {type: mongoose.Schema.ObjectId, required: true},
                 createdAt: {type: Date},
+                updatedAt: {type: Date},
                 deleted: {type: Boolean, default: false},
-                deletedAt: {type: Date, default: null},
+                deletedBy: {
+                    account_id: mongoose.Schema.ObjectId,
+                    deletedAt: Date,
+                },
             }
-        ]
+        ],
+
+        // Thêm người xóa
+        deletedBy: {
+            account_id: mongoose.Schema.ObjectId,
+            deletedAt: Date,
+        },
     },
     { timestamps: true },
 )
 
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
 CommentSchema.plugin(mongooseDelete, {
-    deletedAt: true,
+    deletedAt: false,
     overrideMethods: 'all',
 })
 

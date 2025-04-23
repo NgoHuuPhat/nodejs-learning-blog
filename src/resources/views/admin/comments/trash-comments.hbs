@@ -37,13 +37,14 @@
   </thead>
   <tbody>
     {{#each comments}}
-    <tr>
+    <tr class="align-middle">
+      {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
       <th scope="row">{{sum @index 1}}</th>
       <td>{{this.content}}</td>
       <td>{{this.postTitle}}</td>
       <td>{{this.userName}}</td>
       <td>{{this.createdAt}}</td>
-      <td>{{this.deletedBy}}</td>
+      <td>{{this.deletedByName}}</td>
       <td>
         <a href="" class="btn btn-link btn-restore" data-id="{{this._id}}">Khôi phục</a>
         <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa vĩnh viễn</a>

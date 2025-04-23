@@ -1,6 +1,7 @@
 const Course = require('../../models/Course')
 const Account = require('../../models/Account')
 const paginatitonHelper = require('../../../helpers/pagination')
+const dateTime = require('../../../helpers/dateTime')
 
 class CourseController {
     //[GET] /admin/courses
@@ -36,6 +37,9 @@ class CourseController {
                 if (user) {
                     course.createdBy.name = user.fullName
                 }
+
+                course.createdAt = dateTime(course.createdBy.createdAt)
+                console.log(course.createdAt)
             }
 
             res.render('admin/courses/list', {

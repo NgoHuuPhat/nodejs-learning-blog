@@ -33,7 +33,7 @@ class CommentController {
                 Comment.countDocumentsWithDeleted({ deleted: true }),
             ])
 
-            //Lấy ra tên người tạo và bài viết
+            //Lấy ra tên người tạo và bài viết 
             for(const comment of comments) {
                 const user = await Account.findOne({
                     _id: comment.user_id,
@@ -46,10 +46,12 @@ class CommentController {
                     comment.userName = user.fullName
                 }
                 if(post) {
+                    comment.slug = post.slug
                     comment.postTitle = post.title
                 }
 
                 comment.createdAt = dateTime(comment.createdAt)
+
             }
 
             res.render('admin/comments/list', {
@@ -86,6 +88,14 @@ class CommentController {
                     comment.postTitle = post.title
                 }
 
+                // Lấy ra tên người xóa
+                const deletedBy = await Account.findOne({
+                    _id: comment.deletedBy.account_id,
+                }).lean()
+                if (deletedBy) {
+                    comment.deletedByName = deletedBy.fullName
+                }
+
                 // Chuyển đổi createdAt sang định dạng DD/MM/YYYY
                 comment.createdAt = dateTime(comment.createdAt)
                 
@@ -97,6 +107,106 @@ class CommentController {
         }
     }
     
+    //[PATCH] /admin/comments/:id/restore
+    async restore(req, res, next) {
+        try {
+
+            // Khôi phục bình luận
+            await Comment.restore({ _id: req.params.id })
+
+            // Tăng số lượng bình luận của bài viết
+            const comment = await Comment.findById(req.params.id).lean()
+            console.log(comment)
+            await Post.updateOne(
+                { _id: comment.post_id },
+                { $inc: { commentCount: 1 } },
+            )
+
+            req.flash('success', 'Khôi phục thành công')
+            res.redirect('back')
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    //[DELETE] /admin/comments/:id //Xóa mềm
+    async destroy(req, res, next) {
+        try {
+            // Xóa mềm lưu thông tin người xóa
+            await Comment.updateOne(
+                { _id: req.params.id },
+                {
+                    deletedBy: {
+                        account_id: res.locals.account.id,
+                        deletedAt: new Date(),
+                    },
+                },
+            )
+
+            // Giảm số lượng bình luận của bài viết
+            const comment = await Comment.findById(req.params.id).lean()
+            if (comment) {
+                await Post.updateOne(
+                    { _id: comment.post_id },
+                    { $inc: { commentCount: -1 } },
+                )
+            }
+
+            //Chính thức xóa mềm
+            await Comment.delete({ _id: req.params.id })
+            req.flash('success', 'Đã chuyển bài viết vào thùng rác')
+            res.redirect('back')
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    //[POST] /admin/posts/handle-form-actions
+    async handleFormActions(req, res, next) {
+        switch (req.body.action) {
+            case 'delete':
+                try {
+                    // Xóa mềm lưu thông tin người xóa
+                    await Comment.updateMany(
+                        { _id: req.body.commentIDs },
+                        {
+                            deletedBy: {
+                                account_id: res.locals.account.id,
+                                deletedAt: new Date(),
+                            },
+                        },
+                    )
+                    // Giảm số lượng bình luận của bài viết
+                    const comments = await Comment.find({
+                        _id: req.body.commentIDs,
+                    }).lean()
+                    for (const comment of comments) {
+                        await Post.updateOne(
+                            { _id: comment.post_id },
+                            { $inc: { commentCount: -1 } },
+                        )
+                    }
+                    // Chính thức xóa mềm
+                    await Comment.delete({ _id: req.body.commentIDs })
+                    res.redirect('back')
+                } catch (error) {
+                    next(error)
+                }
+                break
+            default:
+                res.json({ message: 'Action in valid' })
+        }
+    }
+
+    //[DELETE] /admin/comments/:id/force
+    async forceDestroy(req, res, next) {
+        try {
+            await Comment.deleteOne({ _id: req.params.id })
+            res.redirect('back')
+        } catch (error) {
+            next(error)
+        }
+    }
 
 }
 

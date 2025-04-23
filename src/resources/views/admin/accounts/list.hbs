@@ -48,7 +48,8 @@
       </thead>
       <tbody>
         {{#each accounts}}
-        <tr>
+        <tr class="align-middle">
+          {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
           <td>
             <div class="form-check">
               <input class="form-check-input" type="checkbox" name="accountIDs[]" value="{{this._id}}">

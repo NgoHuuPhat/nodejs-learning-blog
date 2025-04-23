@@ -1,5 +1,6 @@
 const Role = require('../../models/Role')
 const paginatitonHelper = require('../../../helpers/pagination')
+const dateTime = require('../../../helpers/dateTime')
 
 class RoleController {
     //[GET] /admin/roles
@@ -21,6 +22,11 @@ class RoleController {
                 .skip(objectPagination.skip)
                 .limit(objectPagination.limitItems)
                 .lean()
+
+            for(const role of roles) {
+                role.createdAt = dateTime(role.createdAt)
+            }
+
             res.render('admin/roles/list', {
                 roles,
                 objectPagination,

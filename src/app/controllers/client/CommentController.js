@@ -74,7 +74,12 @@ class CommentController {
             if(req.params.replyId && req.params.commentId && req.body) {
                 await Comment.updateOne(
                     { _id: req.params.commentId, 'replies._id': req.params.replyId },
-                    { $set: { 'replies.$.content': req.body.editReplies } } //.$. là toán tử để cập nhật trường con trong mảng
+                    { $set: 
+                        { 
+                            'replies.$.content': req.body.editReplies, 
+                            'replies.$.updatedAt': new Date(),
+                        } 
+                    } //.$. là toán tử để cập nhật trường con trong mảng
                 )
             }
 
@@ -92,6 +97,18 @@ class CommentController {
                 // Giảm số lượng bình luận của bài viết
                 const comment = await Comment.findOne({ _id: req.params.id, deleted: true })
                 if(comment) {
+
+                    // Xóa mềm bình luận
+                    await Comment.updateOne(
+                        { _id: req.params.id },
+                        {
+                            deletedBy: {
+                                account_id: res.locals.account.id,
+                                deletedAt: new Date(),
+                            },
+                        })
+
+                    // Cập nhật số lượng bình luận của bài viết
                     await Post.updateOne({ _id: comment.post_id }, { $inc: { commentCount: -1 } })
 
                     // Lưu giá trị session để khôi phục lại bình luận
@@ -147,6 +164,10 @@ class CommentController {
                         { 
                             'replies.$.deleted': true,
                             'replies.$.deletedAt': new Date(),
+                            'replies.$.deletedBy': {
+                                account_id: res.locals.account.id,
+                                deletedAt: new Date(),
+                            },
                         } 
                     } //.$. là toán tử để cập nhật trường con trong mảng
                 )
@@ -180,7 +201,10 @@ class CommentController {
                     { $set:
                         { 
                             'replies.$.deleted': false,
-                            'replies.$.deletedAt': null,
+                            'replies.$.deletedBy': {
+                                account_id: null,
+                                deletedAt: null,
+                            },
                         } 
                     } //.$. là toán tử để cập nhật trường con trong mảng
                 )
