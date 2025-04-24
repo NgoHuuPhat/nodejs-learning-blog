@@ -37,19 +37,37 @@
   </thead>
   <tbody>
     {{#each comments}}
-    <tr class="align-middle">
-      {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
-      <th scope="row">{{sum @index 1}}</th>
-      <td>{{this.content}}</td>
-      <td>{{this.postTitle}}</td>
-      <td>{{this.userName}}</td>
-      <td>{{this.createdAt}}</td>
-      <td>{{this.deletedByName}}</td>
-      <td>
-        <a href="" class="btn btn-link btn-restore" data-id="{{this._id}}">Khôi phục</a>
-        <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa vĩnh viễn</a>
-      </td>
-    </tr>
+      {{#if this.deleted}}
+        <tr class="align-middle">
+          {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
+          <th scope="row">{{sum @index 1}}</th>
+          <td>{{this.content}}</td>
+          <td>{{this.postTitle}}</td>
+          <td>{{this.userName}}</td>
+          <td>{{this.createdAt}}</td>
+          <td>{{this.deletedByName}}</td>
+          <td>
+            <a href="" class="btn btn-link btn-restore" data-id="{{this._id}}">Khôi phục</a>
+            <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa vĩnh viễn</a>
+          </td>
+        </tr>
+      {{/if}}
+      {{#each this.replies}}
+        {{#if this.deleted}}
+          <tr class="align-middle">
+            <th scope="row">↳</th>
+            <td>{{this.content}}</td>
+            <td>{{../postTitle}}</td>
+            <td>{{this.userName}}</td>
+            <td>{{this.createdAt}}</td>
+            <td>{{this.deletedByName}}</td>
+            <td>
+              <a href="" class="btn btn-link btn-restore-reply" data-id-cmt="{{../this._id}}" data-id-reply="{{this._id}}">Khôi phục</a>
+              <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa vĩnh viễn</a>
+            </td>
+          </tr>
+        {{/if}}
+      {{/each}}
     {{else}}
     <tr>
       <td class="text-center" colspan="8">Thùng rác trống.</td>
@@ -80,6 +98,7 @@
 <!-- Các form ẩn -->
 <form id="delete-comment-form" method="POST"></form>
 <form id="restore-comment-form" method="POST"></form>
+<form id="restore-reply-form" method="POST"></form>
 
 <!-- Script xử lý -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -88,7 +107,9 @@
   var deleteForm = document.getElementById('delete-comment-form')
   var btnDeleteComment = document.getElementById('btn-delete-comment')
   var restoreBtn = $('.btn-restore')
+  var restoreReplyBtn = $('.btn-restore-reply')
   var restoreForm = document.getElementById('restore-comment-form')
+  var restoreReplyForm = document.getElementById('restore-reply-form')
 
   var deleteModal = document.getElementById('delete-comment-modal')
   deleteModal.addEventListener('show.bs.modal', event => {
@@ -106,5 +127,13 @@
     var commentID = $(this).data('id')
     restoreForm.action = '/admin/comments/' + commentID + '/restore?_method=PATCH'
     restoreForm.submit()
+  })
+
+  restoreReplyBtn.click(function(e) {
+    e.preventDefault()
+    const commentID = this.getAttribute('data-id-cmt')
+    const replyID = this.getAttribute('data-id-reply')
+    restoreReplyForm.action = '/admin/comments/' + commentID + '/replies/' + replyID + '/restore?_method=PATCH'
+    restoreReplyForm.submit()
   })
 </script>

@@ -42,26 +42,49 @@
     </thead>
     <tbody>
       {{#each comments}}
-      <tr class="align-middle">
-        <td>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="commentIDs[]" value="{{this._id}}">
-          </div>
-        </td>
-        <th scope="row">{{ sum (sum (multiply (sub @root.objectPagination.currentPage 1) @root.objectPagination.limitItems) @index) 1 }}</th>
-        <td>{{this.content}}</td>
-        <td>{{this.postTitle}}</td>
-        <td>{{this.createdAt}}</td>
-        <td>{{this.userName}}</td>
-        <td>
-          <a href="/posts/{{this.slug}}?showComments=true#comment-{{this._id}}" class="btn btn-link">Xem chi tiết</a>
-          <a href="#" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa</a>
-        </td>
-      </tr>
-      {{else}}
-      <tr>
-        <td class="text-center" colspan="8">Không tồn tại bình luận nào</td>
-      </tr>
+        <tr class="align-middle">
+          <td>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="commentIDs[]" value="{{this._id}}">
+            </div>
+          </td>
+          <th scope="row">{{ sum (sum (multiply (sub @root.objectPagination.currentPage 1) @root.objectPagination.limitItems) @index) 1 }}</th>
+          <td>{{this.content}}</td>
+          <td>{{this.postTitle}}</td>
+          <td>{{this.createdAt}}</td>
+          <td>{{this.userName}}</td>
+          <td>
+            <a href="/posts/{{this.slug}}?showComments=true#comment-{{this._id}}" class="btn btn-link">Xem chi tiết</a>
+            <a href="#" class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#replies-{{this._id}}" aria-expanded="false" aria-controls="replies-{{this._id}}" >Xem phản hồi ({{this.lengthReplies}}) </a>
+            <a href="#" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa</a>
+          </td>
+        </tr>
+        {{#if this.replies.length}}
+          {{#each this.replies}}
+            {{#unless this.deleted}}
+              <tr class="align-middle collapse bg-light-subtle" id="replies-{{../_id}}">
+                <td>
+                  <div class="form-check ps-4">
+                    <input class="form-check-input" type="checkbox" name="commentIDs[]" value="{{this._id}}">
+                  </div>
+                </td>
+                <th scope="row">↳</th>
+                <td>{{this.content}}</td>
+                <td>{{../postTitle}}</td>
+                <td>{{this.createdAt}}</td>
+                <td>{{this.userName}}</td>
+                <td>
+                  <a href="/posts/{{this.slug}}?showComments=true#comment-{{this._id}}" class="btn btn-link">Xem chi tiết</a>
+                  <a href="#" class="btn btn-link" data-bs-toggle="modal" data-id-reply="{{this._id}}" data-id-comment="{{../_id}}" data-bs-target="#delete-comment-modal">Xóa</a>
+                </td>
+              </tr>
+            {{/unless}}
+          {{/each}}
+        {{/if}}
+        {{else}}
+          <tr>
+            <td class="text-center" colspan="8">Không tồn tại bình luận nào</td>
+          </tr>
       {{/each}}
     </tbody>
   </table>
@@ -148,13 +171,25 @@
 
   const deleteModal = document.getElementById('delete-comment-modal')
   if (deleteModal) {
+    let deleteType = 'comment'
+    let commentID = null
+    let replyID = null
+
     deleteModal.addEventListener('show.bs.modal', event => {
-      const button = event.relatedTarget
-      commentID = button.getAttribute('data-id')
+      const button = event.relatedTarget // Lấy được button đã click để mở modal
+      commentID = button.getAttribute('data-id-comment') || button.getAttribute('data-id')
+      replyID = button.getAttribute('data-id-reply')
+
+      deleteType = replyID ? 'reply' : 'comment'
+
     })
 
     btnDeleteComment.onclick = function (event) {
-      deleteForm.action = '/admin/comments/' + commentID + '?_method=DELETE'
+      if(deleteType === 'reply') {
+        deleteForm.action = '/admin/comments/' + commentID + '/replies/' + replyID + '?_method=DELETE'
+      } else if (deleteType === 'comment') {
+        deleteForm.action = '/admin/comments/' + commentID + '?_method=DELETE'
+      }
       deleteForm.submit()
     }
 

@@ -30,7 +30,12 @@ class CommentController {
                     .skip(objectPagination.skip)
                     .limit(objectPagination.limitItems)
                     .lean(),
-                Comment.countDocumentsWithDeleted({ deleted: true }),
+                Comment.countDocumentsWithDeleted({ 
+                    $or: [
+                        { deleted: true },
+                        { 'replies.deleted': true },
+                    ],
+                 }),
             ])
 
             //Lấy ra tên người tạo và bài viết 
@@ -50,7 +55,21 @@ class CommentController {
                     comment.postTitle = post.title
                 }
 
+                comment.lengthReplies = comment.replies.filter((reply)=> reply.deleted === false).length
                 comment.createdAt = dateTime(comment.createdAt)
+
+                // Xử lí phần reply
+                if(comment.replies && comment.replies.length > 0) {
+                    for(const reply of comment.replies) {
+                        const userReply = await Account.findOne({
+                            _id: reply.user_id,
+                        }).lean()
+                        if(userReply) {
+                            reply.userName = userReply.fullName
+                        }
+                        reply.createdAt = dateTime(reply.createdAt)
+                    }
+                }
 
             }
 
@@ -69,7 +88,10 @@ class CommentController {
     async trashComments(req, res, next) {
         try {
             const comments = await Comment.findWithDeleted({
-                deleted: true,
+                $or: [
+                    { deleted: true },
+                    { 'replies.deleted': true },
+                ],
             }).lean()
 
             //Lây ra tên người bình luận và bài viết
@@ -88,16 +110,37 @@ class CommentController {
                     comment.postTitle = post.title
                 }
 
-                // Lấy ra tên người xóa
-                const deletedBy = await Account.findOne({
-                    _id: comment.deletedBy.account_id,
-                }).lean()
-                if (deletedBy) {
-                    comment.deletedByName = deletedBy.fullName
+                if(comment.deleted) {
+                    // Lấy ra tên người xóa
+                    const deletedBy = await Account.findOne({
+                        _id: comment.deletedBy.account_id,
+                    }).lean()
+                    if (deletedBy) {
+                        comment.deletedByName = deletedBy.fullName
+                    }
+                    comment.createdAt = dateTime(comment.createdAt)
                 }
 
-                // Chuyển đổi createdAt sang định dạng DD/MM/YYYY
-                comment.createdAt = dateTime(comment.createdAt)
+                // Xử lí phần reply
+                if (comment.replies) {
+                    for (const reply of comment.replies) {
+                        const userReply = await Account.findOne({
+                            _id: reply.user_id,
+                        }).lean() 
+                        if (userReply) {
+                            reply.userName = userReply.fullName
+                        }
+                        reply.createdAt = dateTime(reply.createdAt)
+                        if(reply.deleted) {
+                            const deletedByReply = await Account.findOne({
+                                _id: reply.deletedBy.account_id,
+                            }).lean()
+                            if (deletedByReply) {
+                                reply.deletedByName = deletedByReply.fullName
+                            }
+                        }
+                    }
+                }
                 
             }
 
@@ -116,7 +159,7 @@ class CommentController {
 
             // Tăng số lượng bình luận của bài viết
             const comment = await Comment.findById(req.params.id).lean()
-            console.log(comment)
+
             await Post.updateOne(
                 { _id: comment.post_id },
                 { $inc: { commentCount: 1 } },
@@ -146,9 +189,18 @@ class CommentController {
             // Giảm số lượng bình luận của bài viết
             const comment = await Comment.findById(req.params.id).lean()
             if (comment) {
+                
+                // Đếm số lượng reply chưa bị xóa trước đó
+                const countDeletedReplies = comment.replies.filter(
+                    (reply) => reply.deleted === false,
+                ).length
+
+                // Cập nhật lại số lượng bình luận của bài viết
+                const totalComment = countDeletedReplies + 1
+
                 await Post.updateOne(
                     { _id: comment.post_id },
-                    { $inc: { commentCount: -1 } },
+                    { $inc: { commentCount: - totalComment } },
                 )
             }
 
@@ -202,6 +254,67 @@ class CommentController {
     async forceDestroy(req, res, next) {
         try {
             await Comment.deleteOne({ _id: req.params.id })
+            res.redirect('back')
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    //[DELETE] /admin/comments/:commentId/replies/:replyId
+    async destroyReplies(req, res, next) {
+        try {
+            if(req.params.replyId && req.params.commentId) {
+                await Comment.updateOne(
+                    { _id: req.params.commentId, 'replies._id': req.params.replyId },
+                    { $set:
+                        { 
+                            'replies.$.deleted': true,
+                            'replies.$.deletedAt': new Date(),
+                            'replies.$.deletedBy': {
+                                account_id: res.locals.account.id,
+                                deletedAt: new Date(),
+                            },
+                        } 
+                    } //.$. là toán tử để cập nhật trường con trong mảng
+                )
+
+                // Giảm số lượng bình luận của bài viết
+                const comment = await Comment.findOne({ _id: req.params.commentId, deleted: true})
+                if(comment) {
+                    await Post.updateOne({ _id: comment.post_id }, { $inc: { commentCount: -1 } })
+                }
+            }
+
+            res.redirect('back')
+            } catch (error) {
+                next(error)
+            }
+    }
+
+    //[PATCH] /:commentId/replies/:replyId/restore
+    async restoreReplies(req, res, next) {
+        try {
+            if(req.params.replyId && req.params.commentId) {
+                await Comment.updateOne(
+                    { _id: req.params.commentId, 'replies._id': req.params.replyId },
+                    { $set:
+                        { 
+                            'replies.$.deleted': false,
+                            'replies.$.deletedBy': {
+                                account_id: null,
+                                deletedAt: null,
+                            },
+                        } 
+                    } //.$. là toán tử để cập nhật trường con trong mảng
+                )
+
+                // Tăng số lượng bình luận của bài viết
+                const comment = await Comment.findOne({ _id: req.params.commentId, deleted: false})
+                if(comment) {
+                    await Post.updateOne({ _id: comment.post_id }, { $inc: { commentCount: 1 } })
+                }
+            }
+            req.flash('success', 'Khôi phục thành công')
             res.redirect('back')
         } catch (error) {
             next(error)
