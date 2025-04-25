@@ -27,11 +27,11 @@
   <thead>
     <tr>
       <th scope="col">STT</th>
-      <th scope="col">Nội dung</th>
+      <th scope="col">Tác giả</th>
+      <th scope="col">Bình luận</th>
       <th scope="col">Bài viết</th>
-      <th scope="col">Người bình luận</th>
-      <th scope="col">Thời gian bình luận</th>
-      <th scope="col">Người xóa</th>
+      <th scope="col">Đã đăng vào</th>
+      <th scope="col">Thông tin xóa</th>
       <th scope="col">Thao tác</th>
     </tr>
   </thead>
@@ -41,11 +41,11 @@
         <tr class="align-middle">
           {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
           <th scope="row">{{sum @index 1}}</th>
+          <td>{{this.userName}}</td>
           <td>{{this.content}}</td>
           <td>{{this.postTitle}}</td>
-          <td>{{this.userName}}</td>
           <td>{{this.createdAt}}</td>
-          <td>{{this.deletedByName}}</td>
+          <td>Xóa bởi {{this.deletedByName}}, lúc {{this.deletedAt}}</td>
           <td>
             <a href="" class="btn btn-link btn-restore" data-id="{{this._id}}">Khôi phục</a>
             <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa vĩnh viễn</a>
@@ -56,11 +56,14 @@
         {{#if this.deleted}}
           <tr class="align-middle">
             <th scope="row">↳</th>
-            <td>{{this.content}}</td>
-            <td>{{../postTitle}}</td>
             <td>{{this.userName}}</td>
+            <td>
+              <div>Trả lời tới: {{this.replyToUserName}}</div>
+              <div>{{this.content}}</div>
+            </td>
+            <td>{{../postTitle}}</td>
             <td>{{this.createdAt}}</td>
-            <td>{{this.deletedByName}}</td>
+            <td>Xóa bởi {{this.deletedByName}}, lúc {{this.deletedAt}}</td>
             <td>
               <a href="" class="btn btn-link btn-restore-reply" data-id-cmt="{{../this._id}}" data-id-reply="{{this._id}}">Khôi phục</a>
               <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa vĩnh viễn</a>

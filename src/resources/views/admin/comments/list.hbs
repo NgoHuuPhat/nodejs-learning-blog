@@ -27,6 +27,7 @@
         </th>
         {{/if}}
         <th scope="col">STT</th>
+        <th scope="col">Người bình luận</th>
         <th scope="col">
           Nội dung
           {{{sortTable 'content' _sort query}}}
@@ -36,7 +37,6 @@
           Thời gian
           {{{sortTable 'createdAt' _sort query}}}
         </th>
-        <th scope="col">Người bình luận</th>
         <th scope="col">Thao tác</th>
       </tr>
     </thead>
@@ -49,10 +49,10 @@
             </div>
           </td>
           <th scope="row">{{ sum (sum (multiply (sub @root.objectPagination.currentPage 1) @root.objectPagination.limitItems) @index) 1 }}</th>
+          <td>{{this.userName}}</td>
           <td>{{this.content}}</td>
           <td>{{this.postTitle}}</td>
           <td>{{this.createdAt}}</td>
-          <td>{{this.userName}}</td>
           <td>
             <a href="/posts/{{this.slug}}?showComments=true#comment-{{this._id}}" class="btn btn-link">Xem chi tiết</a>
             <a href="#" class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#replies-{{this._id}}" aria-expanded="false" aria-controls="replies-{{this._id}}" >Xem phản hồi ({{this.lengthReplies}}) </a>

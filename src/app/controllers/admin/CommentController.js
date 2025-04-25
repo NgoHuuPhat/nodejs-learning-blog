@@ -119,6 +119,7 @@ class CommentController {
                         comment.deletedByName = deletedBy.fullName
                     }
                     comment.createdAt = dateTime(comment.createdAt)
+                    comment.deletedAt = dateTime(comment.deletedBy.deletedAt)
                 }
 
                 // Xử lí phần reply
@@ -139,6 +140,16 @@ class CommentController {
                                 reply.deletedByName = deletedByReply.fullName
                             }
                         }
+
+                        // Lấy ra tên người trả lời
+                        const replyToUser = await Account.findOne({
+                            _id: reply.replyToUserId,
+                        }).lean()
+                        if (replyToUser) {
+                            reply.replyToUserName = replyToUser.fullName
+                        }
+
+                        reply.deletedAt = dateTime(reply.deletedBy.deletedAt)
                     }
                 }
                 
@@ -175,14 +186,17 @@ class CommentController {
     //[DELETE] /admin/comments/:id //Xóa mềm
     async destroy(req, res, next) {
         try {
-            // Xóa mềm lưu thông tin người xóa
+            const commentId = req.params.id
+            const deletedByInfo = {
+                account_id: res.locals.account.id,
+                deletedAt: new Date(),
+            }
+
+            // Tìm comment cần xóa
             await Comment.updateOne(
                 { _id: req.params.id },
                 {
-                    deletedBy: {
-                        account_id: res.locals.account.id,
-                        deletedAt: new Date(),
-                    },
+                    deletedBy: deletedByInfo,
                 },
             )
 
@@ -191,18 +205,26 @@ class CommentController {
             if (comment) {
                 
                 // Đếm số lượng reply chưa bị xóa trước đó
-                const countDeletedReplies = comment.replies.filter(
+                const activeRepliesCount = comment.replies.filter(
                     (reply) => reply.deleted === false,
                 ).length
 
-                // Cập nhật lại số lượng bình luận của bài viết
-                const totalComment = countDeletedReplies + 1
-
                 await Post.updateOne(
                     { _id: comment.post_id },
-                    { $inc: { commentCount: - totalComment } },
+                    { $inc: { commentCount: -( activeRepliesCount + 1) } },
                 )
             }
+
+            // Cập nhật lại replies
+            await Comment.updateMany(
+                { _id: req.params.id, 'replies.deleted': false },
+                {
+                    $set: { 
+                        'replies.$[].deleted': true,
+                        'replies.$[].deletedBy': deletedByInfo
+                    },
+                },
+            )
 
             //Chính thức xóa mềm
             await Comment.delete({ _id: req.params.id })
