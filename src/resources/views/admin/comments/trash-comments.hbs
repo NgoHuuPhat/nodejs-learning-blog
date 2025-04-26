@@ -37,7 +37,7 @@
   </thead>
   <tbody>
     {{#each comments}}
-      {{#if this.deleted}}
+      {{#if (eq type 'comment')}}
         <tr class="align-middle">
           {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
           <th scope="row">{{sum @index 1}}</th>
@@ -51,9 +51,7 @@
             <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa vĩnh viễn</a>
           </td>
         </tr>
-      {{/if}}
-      {{#each this.replies}}
-        {{#if this.deleted}}
+        {{else if (eq type 'reply')}}
           <tr class="align-middle">
             <th scope="row">↳</th>
             <td>{{this.userName}}</td>
@@ -61,16 +59,15 @@
               <div>Trả lời tới: {{this.replyToUserName}}</div>
               <div>{{this.content}}</div>
             </td>
-            <td>{{../postTitle}}</td>
+            <td>{{this.postTitle}}</td>
             <td>{{this.createdAt}}</td>
             <td>Xóa bởi {{this.deletedByName}}, lúc {{this.deletedAt}}</td>
             <td>
-              <a href="" class="btn btn-link btn-restore-reply" data-id-cmt="{{../this._id}}" data-id-reply="{{this._id}}">Khôi phục</a>
+              <a href="" class="btn btn-link btn-restore-reply" data-id-cmt="{{this.commentId}}" data-id-reply="{{this.replyId}}">Khôi phục</a>
               <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa vĩnh viễn</a>
             </td>
           </tr>
-        {{/if}}
-      {{/each}}
+      {{/if}}
     {{else}}
     <tr>
       <td class="text-center" colspan="8">Thùng rác trống.</td>
