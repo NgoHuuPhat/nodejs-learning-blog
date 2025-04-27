@@ -22,6 +22,7 @@ const CommentSchema = new Schema(
                     account_id: mongoose.Schema.ObjectId,
                     deletedAt: Date,
                 },
+                deletedbyParent: {type: Boolean, default: false},
             }
         ],
 
