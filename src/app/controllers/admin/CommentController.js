@@ -125,7 +125,7 @@ class CommentController {
             // Lấy ra reply đã xóa nhưng chưa xóa comment
             const rawComments = await Comment.find({
                 deleted: false,
-                'replies.deleted': true
+                'replies.deleted': true,
             });
             const deletedReplies = [];
             // Thêm type và lấy nội dung cho từng reply
@@ -135,15 +135,19 @@ class CommentController {
                     // Nếu reply chưa bị xóa thì bỏ qua
                     if (!reply.deleted) continue;
 
-                    // tìm user
+                    // Tìm người bình luận reply
                     const user = await Account.findById(reply.user_id).lean();
 
-                    // tìm bài viết
+                    // Tim bài viết
                     const post = await Post.findOne({_id: comment.post_id}).lean()
 
-                    // tìm người xóa
+                    // Tìm người đã xóa reply
                     const deletedByInfo = await Account.findById(reply.deletedBy.account_id).lean()
                    
+                    // Tìm người gốc của reply
+                    const userReplyTo = await Account.findById(reply.replyToUserId).lean()
+
+
                     deletedReplies.push({
                         type: 'reply',
                         commentId: comment._id,
@@ -153,7 +157,8 @@ class CommentController {
                         deletedAt: dateTime(reply.deletedBy.deletedAt),
                         userName: user?.fullName,
                         postTitle: post.title,
-                        deletedByName: deletedByInfo?.fullName 
+                        deletedByName: deletedByInfo?.fullName,
+                        replyToUserName: userReplyTo?.fullName,
                     });
                     
                 }
@@ -161,31 +166,8 @@ class CommentController {
 
             // 4. Gộp lại
             const comments = [...deletedCommentsWithDetails, ...deletedReplies];   
-            console.log(comments)
             
             res.render('admin/comments/trash-comments', {comments})
-        } catch (error) {
-            next(error)
-        }
-    }
-    
-    //[PATCH] /admin/comments/:id/restore
-    async restore(req, res, next) {
-        try {
-
-            // Khôi phục bình luận
-            await Comment.restore({ _id: req.params.id })
-
-            // Tăng số lượng bình luận của bài viết
-            const comment = await Comment.findById(req.params.id).lean()
-
-            await Post.updateOne(
-                { _id: comment.post_id },
-                { $inc: { commentCount: 1 } },
-            )
-
-            req.flash('success', 'Khôi phục thành công')
-            res.redirect('back')
         } catch (error) {
             next(error)
         }
@@ -194,19 +176,11 @@ class CommentController {
     //[DELETE] /admin/comments/:id //Xóa mềm
     async destroy(req, res, next) {
         try {
-            const commentId = req.params.id
+
             const deletedByInfo = {
                 account_id: res.locals.account.id,
                 deletedAt: new Date(),
             }
-
-            // Tìm comment cần xóa
-            await Comment.updateOne(
-                { _id: req.params.id },
-                {
-                    deletedBy: deletedByInfo,
-                },
-            )
 
             // Giảm số lượng bình luận của bài viết
             const comment = await Comment.findById(req.params.id).lean()
@@ -223,20 +197,90 @@ class CommentController {
                 )
             }
 
-            // Cập nhật lại replies
-            await Comment.updateMany(
-                { _id: req.params.id, 'replies.deleted': false },
+            // Tìm comment cần xóa
+            await Comment.updateOne(
+                { _id: req.params.id },
                 {
-                    $set: { 
-                        'replies.$[].deleted': true,
-                        'replies.$[].deletedBy': deletedByInfo
-                    },
+                    deletedBy: deletedByInfo,
                 },
             )
+
+            // Cập nhật lại replies
+            await Comment.updateMany(
+                { _id: req.params.id },
+                {
+                    $set: { 
+                        'replies.$[reply].deleted': true,
+                        'replies.$[reply].deletedBy': deletedByInfo,
+                        'replies.$[reply].deletedbyParent': true,
+                    },
+                },
+                {
+                    arrayFilters: [
+                        { 'reply.deleted': false },
+                    ],  
+                }
+            )
+
 
             //Chính thức xóa mềm
             await Comment.delete({ _id: req.params.id })
             req.flash('success', 'Đã chuyển bài viết vào thùng rác')
+            res.redirect('back')
+        } catch (error) {
+            next(error)
+        }
+    }
+    
+    //[PATCH] /admin/comments/:id/restore
+    async restore(req, res, next) {
+        try {
+
+            // Cập nhật reply đã xóa
+            const commentExits = await Comment.findOneWithDeleted({ _id: req.params.id, deleted: true }).lean()
+            if(commentExits) {
+                // Khôi phục bình luận
+                await Comment.restore({ _id: req.params.id })
+
+                if(commentExits.replies && commentExits.replies.length > 0){
+                    // Khôi phục lại các reply đã xóa
+                await Comment.updateMany(
+                        { _id: req.params.id },
+                        { $set:
+                            {
+                                'replies.$[reply].deletedbyParent': false,
+                                'replies.$[reply].deleted': false,
+                                'replies.$[reply].deletedBy': {
+                                    account_id: null,
+                                    deletedAt: null,
+                                },
+                            }
+                        },
+                        {
+                            arrayFilters: [
+                                { 'reply.deleted': true, 'reply.deletedbyParent' : true },
+                            ],
+                        }
+                    )
+                }
+            
+                // Tăng số lượng bình luận của bài viết
+                const comment = await Comment.findById(req.params.id).lean()
+                if (comment) {
+                    // Đếm số lượng reply chưa bị xóa trước đó
+                    const activeRepliesCount = comment.replies.filter(
+                        (reply) => reply.deleted === false,
+                    ).length
+
+
+                    await Post.updateOne(
+                        { _id: comment.post_id },
+                        { $inc: { commentCount: 1 + activeRepliesCount} },
+                    )
+                }   
+            }
+
+            req.flash('success', 'Khôi phục thành công')
             res.redirect('back')
         } catch (error) {
             next(error)
