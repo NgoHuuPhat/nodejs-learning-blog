@@ -110,17 +110,17 @@ class CommentController {
                     formattedComment.slug = post.slug
                     formattedComment.postTitle = post.title
                 }
-
+    
                 const deletedByInfo = await Account.findById(comment.deletedBy.account_id).lean()
                 if(deletedByInfo) {
                     formattedComment.deletedByName = deletedByInfo.fullName
                 }
-
+    
                 formattedComment.deletedAt = dateTime(comment.deletedBy.deletedAt)
                 
                 return formattedComment
             }))
-
+    
             
             // Lấy ra reply đã xóa nhưng chưa xóa comment
             const rawComments = await Comment.find({
@@ -128,26 +128,25 @@ class CommentController {
                 'replies.deleted': true,
             });
             const deletedReplies = [];
-            // Thêm type và lấy nội dung cho từng reply
+            
+            // Xử lý từng reply đã xóa
             for (const comment of rawComments) {
                 for (const reply of comment.replies) {
-
                     // Nếu reply chưa bị xóa thì bỏ qua
                     if (!reply.deleted) continue;
-
+    
                     // Tìm người bình luận reply
                     const user = await Account.findById(reply.user_id).lean();
-
+    
                     // Tim bài viết
                     const post = await Post.findOne({_id: comment.post_id}).lean()
-
+    
                     // Tìm người đã xóa reply
                     const deletedByInfo = await Account.findById(reply.deletedBy.account_id).lean()
                    
                     // Tìm người gốc của reply
                     const userReplyTo = await Account.findById(reply.replyToUserId).lean()
-
-
+    
                     deletedReplies.push({
                         type: 'reply',
                         commentId: comment._id,
@@ -159,13 +158,55 @@ class CommentController {
                         postTitle: post.title,
                         deletedByName: deletedByInfo?.fullName,
                         replyToUserName: userReplyTo?.fullName,
+                        deletedbyParent: reply.deletedbyParent || false
                     });
-                    
                 }
             }
-
-            // 4. Gộp lại
-            const comments = [...deletedCommentsWithDetails, ...deletedReplies];   
+    
+            // Lấy ra reply đã xóa trước khi comment bị xóa
+            const deletedCommentsWithReplies = await Comment.findWithDeleted({
+                deleted: true,
+                'replies.deleted': true,
+                'replies.deletedbyParent': false
+            });
+    
+            // Xử lý từng reply đã xóa (không phải do parent xóa)
+            for (const comment of deletedCommentsWithReplies) {
+                for (const reply of comment.replies) {
+                    // Chỉ xử lý các reply đã xóa không phải do parent xóa
+                    if (!reply.deleted || reply.deletedbyParent) continue
+    
+                    // Tìm người bình luận reply
+                    const user = await Account.findById(reply.user_id).lean()
+    
+                    // Tim bài viết
+                    const post = await Post.findOne({_id: comment.post_id}).lean()
+    
+                    // Tìm người đã xóa reply
+                    const deletedByInfo = await Account.findById(reply.deletedBy.account_id).lean()
+                   
+                    // Tìm người gốc của reply
+                    const userReplyTo = await Account.findById(reply.replyToUserId).lean()
+    
+                    deletedReplies.push({
+                        type: 'reply',
+                        commentId: comment._id,
+                        replyId: reply._id,
+                        content: reply.content,
+                        createdAt: dateTime(reply.createdAt),
+                        deletedAt: dateTime(reply.deletedBy.deletedAt),
+                        userName: user?.fullName,
+                        postTitle: post.title || 'Bài viết không tồn tại',
+                        deletedByName: deletedByInfo?.fullName,
+                        replyToUserName: userReplyTo?.fullName,
+                        deletedbyParent: false,
+                        parentDeleted: true
+                    });
+                }
+            }
+    
+            // Gộp lại
+            const comments = [...deletedCommentsWithDetails, ...deletedReplies] 
             
             res.render('admin/comments/trash-comments', {comments})
         } catch (error) {

@@ -51,22 +51,29 @@
             <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa vĩnh viễn</a>
           </td>
         </tr>
-        {{else if (eq type 'reply')}}
-          <tr class="align-middle">
-            <th scope="row">↳</th>
-            <td>{{this.userName}}</td>
-            <td>
-              <div>Trả lời tới: {{this.replyToUserName}}</div>
-              <div>{{this.content}}</div>
-            </td>
-            <td>{{this.postTitle}}</td>
-            <td>{{this.createdAt}}</td>
-            <td>Xóa bởi {{this.deletedByName}}, lúc {{this.deletedAt}}</td>
-            <td>
+      {{else if (eq type 'reply')}}
+        <tr class="align-middle {{#if this.parentDeleted}}table-secondary{{/if}}">
+          <th scope="row">↳</th>
+          <td>{{this.userName}}</td>
+          <td>
+            <div>Trả lời tới: {{this.replyToUserName}}</div>
+            <div>{{this.content}}</div>
+            {{#if this.parentDeleted}}
+              <div class="badge bg-warning text-dark">Bình luận gốc đã bị xóa</div>
+            {{/if}}
+          </td>
+          <td>{{this.postTitle}}</td>
+          <td>{{this.createdAt}}</td>
+          <td>Xóa bởi {{this.deletedByName}}, lúc {{this.deletedAt}}</td>
+          <td>
+            {{#if this.parentDeleted}}
+              <span class="text-muted">Phải khôi phục bình luận gốc trước</span>
+            {{else}}
               <a href="" class="btn btn-link btn-restore-reply" data-id-cmt="{{this.commentId}}" data-id-reply="{{this.replyId}}">Khôi phục</a>
               <a href="" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-comment-modal">Xóa vĩnh viễn</a>
-            </td>
-          </tr>
+            {{/if}}
+          </td>
+        </tr>
       {{/if}}
     {{else}}
     <tr>
