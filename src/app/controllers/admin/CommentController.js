@@ -88,15 +88,16 @@ class CommentController {
     async trashComments(req, res, next) {
         try {
             // Lấy ra bình luận đã xóa
-            const deletedComments = await Comment.findWithDeleted({deleted: true})
+            const deletedComments = await Comment.findWithDeleted({deleted: true}).lean()
             
             // Thêm type và lấy nội dung cho từng bình luận
             const deletedCommentsWithDetails = await Promise.all(deletedComments.map(async (comment) => {
                 const formattedComment = {
-                    ...comment.toObject(),
+                    ...comment,
                     createdAt: dateTime(comment.createdAt),
                     type: 'comment',
                 }
+
                 const user = await Account.findOne({
                     _id: comment.user_id,
                 }).lean()
@@ -115,41 +116,36 @@ class CommentController {
                 if(deletedByInfo) {
                     formattedComment.deletedByName = deletedByInfo.fullName
                 }
-    
                 formattedComment.deletedAt = dateTime(comment.deletedBy.deletedAt)
-                
                 return formattedComment
             }))
-    
-            
+
             // Lấy ra reply đã xóa nhưng chưa xóa comment
             const rawComments = await Comment.find({
                 deleted: false,
                 'replies.deleted': true,
             });
-            const deletedReplies = [];
-            
+
+            const deletedReplies = []
             // Xử lý từng reply đã xóa
             for (const comment of rawComments) {
                 for (const reply of comment.replies) {
                     // Nếu reply chưa bị xóa thì bỏ qua
                     if (!reply.deleted) continue;
+
+                    // Tìm thông tin cần thiết cho reply
+                    const [user, post, deletedByInfo, userReplyTo] = await Promise.all([
+                        Account.findById(reply.user_id).lean(),
+                        Post.findOne({_id: comment.post_id}).lean(),
+                        Account.findById(reply.deletedBy.account_id).lean(),
+                        Account.findById(reply.replyToUserId).lean()
+                    ]);
     
-                    // Tìm người bình luận reply
-                    const user = await Account.findById(reply.user_id).lean();
-    
-                    // Tim bài viết
-                    const post = await Post.findOne({_id: comment.post_id}).lean()
-    
-                    // Tìm người đã xóa reply
-                    const deletedByInfo = await Account.findById(reply.deletedBy.account_id).lean()
-                   
-                    // Tìm người gốc của reply
-                    const userReplyTo = await Account.findById(reply.replyToUserId).lean()
-    
+                    // Thêm thông tin vào mảng deletedReplies
                     deletedReplies.push({
                         type: 'reply',
                         commentId: comment._id,
+                        commentContent: comment.content,
                         replyId: reply._id,
                         content: reply.content,
                         createdAt: dateTime(reply.createdAt),
@@ -168,29 +164,27 @@ class CommentController {
                 deleted: true,
                 'replies.deleted': true,
                 'replies.deletedbyParent': false
-            });
+            })
     
             // Xử lý từng reply đã xóa (không phải do parent xóa)
             for (const comment of deletedCommentsWithReplies) {
                 for (const reply of comment.replies) {
+                    
                     // Chỉ xử lý các reply đã xóa không phải do parent xóa
                     if (!reply.deleted || reply.deletedbyParent) continue
-    
-                    // Tìm người bình luận reply
-                    const user = await Account.findById(reply.user_id).lean()
-    
-                    // Tim bài viết
-                    const post = await Post.findOne({_id: comment.post_id}).lean()
-    
-                    // Tìm người đã xóa reply
-                    const deletedByInfo = await Account.findById(reply.deletedBy.account_id).lean()
-                   
-                    // Tìm người gốc của reply
-                    const userReplyTo = await Account.findById(reply.replyToUserId).lean()
+
+                    // Thông tin cần thiết cho reply
+                    const [user, post, deletedByInfo, userReplyTo] = await Promise.all([
+                        Account.findById(reply.user_id).lean(),
+                        Post.findOne({_id: comment.post_id}).lean(),
+                        Account.findById(reply.deletedBy.account_id).lean(),
+                        Account.findById(reply.replyToUserId).lean()
+                    ]);
     
                     deletedReplies.push({
                         type: 'reply',
                         commentId: comment._id,
+                        commentContent: comment.content,
                         replyId: reply._id,
                         content: reply.content,
                         createdAt: dateTime(reply.createdAt),
@@ -204,11 +198,9 @@ class CommentController {
                     });
                 }
             }
-    
-            // Gộp lại
             const comments = [...deletedCommentsWithDetails, ...deletedReplies] 
-            
             res.render('admin/comments/trash-comments', {comments})
+
         } catch (error) {
             next(error)
         }
@@ -266,7 +258,7 @@ class CommentController {
 
             //Chính thức xóa mềm
             await Comment.delete({ _id: req.params.id })
-            req.flash('success', 'Đã chuyển bài viết vào thùng rác')
+            req.flash('success', 'Đã chuyển bình luận vào thùng rác')
             res.redirect('back')
         } catch (error) {
             next(error)

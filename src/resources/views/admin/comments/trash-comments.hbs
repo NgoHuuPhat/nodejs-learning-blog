@@ -56,8 +56,9 @@
           <th scope="row">↳</th>
           <td>{{this.userName}}</td>
           <td>
-            <div>Trả lời tới: {{this.replyToUserName}}</div>
-            <div>{{this.content}}</div>
+            <div>Nội dung reply: <b>{{this.content}}</b></div>
+            <div>Trả lời tới: <b>{{this.replyToUserName}}</b></div>
+            <div>Bình luận gốc: <b>{{this.commentContent}}</b></div>
             {{#if this.parentDeleted}}
               <div class="badge bg-warning text-dark">Bình luận gốc đã bị xóa</div>
             {{/if}}
