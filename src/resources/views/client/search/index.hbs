@@ -1,0 +1,77 @@
+<link rel="stylesheet" href="/css/search.css">
+
+<div class="search-page container">
+    <h4 class="mb-4 mt-4 title-strong">Tìm kiếm</h4>
+    <p>Tìm kiếm khóa học và các bài viết...</p>
+
+    {{!-- Kết quả Khóa học --}}
+    <section class="search-section mt-4">
+
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+            <a class="nav-link nav-customm {{#if (eq currentTab 'courses')}}active{{/if}}" 
+                href="?type=courses{{#if keyword}}&keyword={{keyword}}{{/if}}">
+                Khóa học</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link nav-customm {{#if (eq currentTab 'posts')}}active{{/if}}" 
+                href="?type=posts{{#if keyword}}&keyword={{keyword}}{{/if}}">
+                Bài viết</a>
+            </li>
+        </ul>
+
+        {{!-- Courses --}}
+        <div class="tab-content {{#if (eq currentTab 'courses')}}active{{/if}}" id="courses">
+            {{#if courses.length}}
+                {{#each courses}}
+                    <div class="course-item">
+                        <div class="course-content">
+                            <a href="courses/{{this.slug}}">
+                                <img src="{{this.image}}" alt="{{this.title}}" />
+                            </a>
+                            <div class="course-info ms-3">
+                                <a href="/courses/{{this.slug}}" class="fw-bold text-dark d-block h5 mb-3 mt-3">{{this.name}}</a>
+                                <small class="text-muted">{{this.description}}</small>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                {{/each}}
+            {{else}}
+                <p>Không tìm thấy khóa học phù hợp.</p>
+            {{/if}}
+        </div>
+
+        {{!-- Posts --}}
+        <div class="tab-content {{#if (eq currentTab 'posts')}}active{{/if}}" id="posts">
+            {{#if posts.length}}
+                {{#each posts}}
+                    <div class="post-item mb-4">
+                        <!-- Ảnh lớn -->
+                        <a href="posts/{{this.slug}}" class="post-thumbnail mb-3">
+                            <img src="{{this.thumbnail}}" alt="{{this.title}}" class="thumbnail-img">
+                        </a>
+                        <!-- Thông tin tiêu đề -->
+                        <div class="post-title">
+                            <a href="/posts/{{this.slug}}" class="fw-bold text-dark d-block h5 mb-1 mt-3">{{this.title}}</a>
+                            <small class="text-muted">Đọc tiếp...</small>
+                        </div>
+                        <!-- Like & comment -->
+                        <div class="post-meta d-flex justify-content-between align-items-center mt-4">
+                            <div class="likes text-muted fw-semibold">
+                                <i class="fa fa-heart"></i> {{this.likes}} 500
+                            </div>
+                            <div class="comments text-muted fw-semibold">
+                                {{this.commentCount}} bình luận
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                {{/each}}
+            {{else}}
+                <p>Không tìm thấy bài viết phù hợp.</p>
+            {{/if}}
+        </div>
+    </section>
+</div>

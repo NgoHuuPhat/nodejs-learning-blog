@@ -1,13 +1,24 @@
 const Course = require('../../models/Course')
+const Post = require('../../models/Post')
 class SeachController {
-    //[GET] /search
+    
+    //[GET] /
     async search(req, res, next) {
         try {
-            const keyWord = req.query.keyword
-            const regex = new RegExp(keyWord, 'i') //Lấy giá trị không phân biệt hoa thường
+            const keyword = req.query.keyword
+            const regex = new RegExp(keyword, 'i') //Lấy giá trị không phân biệt hoa thường
+            const typeSearch = req.query.type || 'courses'
 
-            const courses = await Course.find({ name: regex }).lean()
-            res.render('client/search', { courses, keyWord })
+            if( typeSearch === 'courses') {
+                const courses = await Course.find({ name: regex }).lean()
+                return res.render('client/search/index', { courses, keyword, currentTab: typeSearch })
+            }
+            else if( typeSearch === 'posts') {
+                const posts = await Post.find({ title: regex, status: 'approved' }).lean()
+
+                return res.render('client/search/index', { posts, keyword, currentTab: typeSearch })  //currentTab để xác định tab nào đang được chọn
+            }
+            
         } catch (error) {
             next(error)
         }

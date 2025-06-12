@@ -25,19 +25,6 @@ class SiteController {
             next(error) //Xử lí lỗi ở 1 nơi khác
         }
     }
-
-    //[GET] /search
-    async search(req, res, next) {
-        try {
-            const keyWord = req.query.keyword
-            const regex = new RegExp(keyWord, 'i') //Lấy giá trị không phân biệt hoa thường
-
-            const courses = await Course.find({ name: regex }).lean()
-            res.render('client/home', { courses, keyWord })
-        } catch (error) {
-            next(error)
-        }
-    }
 }
 
 module.exports = new SiteController()

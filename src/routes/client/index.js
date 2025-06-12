@@ -6,6 +6,7 @@ const userRoute = require('./user')
 const postRoute = require('./posts')
 const notificationRoute = require('./notifications')
 const commentRoute = require('./comments')
+const searchRouter = require('./search')
 
 const authMiddleware = require('../../app/middlewares/authMiddleware')
 const notificationsMiddleware = require('../../app/middlewares/notifications')
@@ -20,6 +21,7 @@ function route(app) {
     app.use('/posts', authMiddleware, notificationsMiddleware, postRoute)
     app.use('/notifications', authMiddleware, notificationsMiddleware, notificationRoute)
     app.use('/comments', authMiddleware, notificationsMiddleware, commentRoute)
+    app.use('/search', authMiddleware, notificationsMiddleware, searchRouter)
 }
 
 module.exports = route
