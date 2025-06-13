@@ -1,22 +1,470 @@
-<div class="mt-4">
-    <h3>Đăng khóa học</h3>
-    <form class="mt-4" method="post" action="/admin/courses/store">
-        <div class="mb-3">
-            <label for="name" class="form-label">Tên khóa học</label>
-            <input type="text" class="form-control" id="name" name="name">
+<style>
+    .course-builder {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .chapter-item {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        padding: 15px;
+        position: relative;
+    }
+    .lesson-item {
+        background: #f1f3f4;
+        border-left: 3px solid #007bff;
+        margin: 10px 0;
+        padding: 10px 15px;
+        border-radius: 0 5px 5px 0;
+    }
+    .drag-handle {
+        cursor: move;
+        color: #6c757d;
+    }
+    .add-btn {
+        border: 2px dashed #007bff;
+        background: transparent;
+        color: #007bff;
+        padding: 10px;
+        border-radius: 5px;
+        width: 100%;
+        transition: all 0.3s;
+    }
+    .add-btn:hover {
+        background: #007bff;
+        color: white;
+    }
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+    }
+    .step {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        background: #e9ecef;
+        margin: 0 5px;
+        border-radius: 5px;
+        position: relative;
+    }
+    .step.active {
+        background: #007bff;
+        color: white;
+    }
+    .step.completed {
+        background: #28a745;
+        color: white;
+    }
+    .lesson-type-badge {
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 12px;
+    }
+    .preview-section {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 20px;
+        background: white;
+    }
+</style>
+<div class="container mt-4">
+    <!-- Thanh chỉ báo các bước -->
+    <div class="step-indicator">
+        <div class="step active" id="step1">
+            <i class="fas fa-info-circle"></i><br>
+            <small>Thông tin cơ bản</small>
         </div>
-        <div class="mb-3">
-            <label for="description" class="form-label">Mô tả khóa học</label>
-            <input type="text" class="form-control" id="description" name="description">
+        <div class="step" id="step2">
+            <i class="fas fa-list"></i><br>
+            <small>Chương & Bài học</small>
         </div>
-        <div class="mb-3">
-            <label for="videoID" class="form-label">Video ID</label>
-            <input type="text" class="form-control" id="videoID" name="videoID">
+        <div class="step" id="step3">
+            <i class="fas fa-eye"></i><br>
+            <small>Xem trước</small>
         </div>
-        <div class="mb-3">
-            <label for="level" class="form-label">Level</label>
-            <input type="text" class="form-control" id="level" name="level">
+        <div class="step" id="step4">
+            <i class="fas fa-check"></i><br>
+            <small>Hoàn thành</small>
         </div>
-        <button type="submit" class="btn btn-primary">Thêm khóa học</button>
+    </div>
+
+    <!-- Form nhập thông tin khóa học -->
+    <form id="courseForm" enctype="multipart/form-data">
+        <!-- Bước 1: Thông tin cơ bản -->
+        <div class="step-content" id="content-step1">
+            <div class="course-builder">
+                <h3><i class="fas fa-graduation-cap"></i> Thông tin khóa học</h3>
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label class="form-label">Tên khóa học *</label>
+                            <input type="text" class="form-control" name="courseName" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả ngắn</label>
+                            <textarea class="form-control" rows="3" name="courseDescription"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Trình độ *</label>
+                                <select class="form-select" name="courseLevel" required>
+                                    <option value="">Chọn trình độ</option>
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Giá (VNĐ) *</label>
+                                <input type="number" class="form-control" name="coursePrice" value="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Ảnh thumbnail</label>
+                            <input type="file" class="form-control" name="courseImage" accept="image/*">
+                            <div id="imagePreview" class="mt-2"></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Video giới thiệu</label>
+                            <input type="file" class="form-control" name="courseVideo" accept="video/*">
+                            <div id="videoPreview" class="mt-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bước 2: Quản lý chương và bài học -->
+        <div class="step-content" id="content-step2" style="display: none;">
+            <div class="course-builder">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3><i class="fas fa-list"></i> Nội dung khóa học</h3>
+                    <button type="button" class="btn btn-primary" onclick="addChapter()">
+                        <i class="fas fa-plus"></i> Thêm chương
+                    </button>
+                </div>
+                
+                <div id="chaptersContainer"></div>
+                
+                <button type="button" class="add-btn" onclick="addChapter()">
+                    <i class="fas fa-plus"></i> Thêm chương đầu tiên
+                </button>
+            </div>
+        </div>
+
+        <!-- Bước 3: Xem trước khóa học -->
+        <div class="step-content" id="content-step3" style="display: none;">
+            <div class="preview-section">
+                <h3><i class="fas fa-eye"></i> Xem trước khóa học</h3>
+                <div id="coursePreview"></div>
+            </div>
+        </div>
+
+        <!-- Bước 4: Hoàn thành -->
+        <div class="step-content" id="content-step4" style="display: none;">
+            <div class="text-center">
+                <i class="fas fa-check-circle text-success" style="font-size: 64px;"></i>
+                <h3 class="mt-3">Khóa học đã được tạo thành công!</h3>
+                <p class="text-muted">Bạn có thể chỉnh sửa hoặc xuất bản khóa học ngay bây giờ.</p>
+            </div>
+        </div>
+
+        <!-- Nút điều hướng giữa các bước -->
+        <div class="d-flex justify-content-between mt-4">
+            <button type="button" class="btn btn-secondary" id="prevBtn" onclick="changeStep(-1)" style="display: none;">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </button>
+            <div></div>
+            <button type="button" class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">
+                Tiếp theo <i class="fas fa-arrow-right"></i>
+            </button>
+            <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                <i class="fas fa-save"></i> Lưu khóa học
+            </button>
+        </div>
     </form>
 </div>
+
+<!-- Template cho chương -->
+<template id="chapterTemplate">
+    <div class="chapter-item" data-chapter-id="">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center flex-grow-1">
+                <i class="fas fa-grip-vertical drag-handle me-2"></i>
+                <div class="flex-grow-1">
+                    <input type="text" class="form-control chapter-title" placeholder="Tên chương..." onchange="updateChapterTitle(this)">
+                </div>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addLesson(this)">
+                    <i class="fas fa-plus"></i> Bài học
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeChapter(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+        <div class="lessons-container mt-3"></div>
+    </div>
+</template>
+
+<!-- Template cho bài học -->
+<template id="lessonTemplate">
+    <div class="lesson-item" data-lesson-id="">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center flex-grow-1">
+                <i class="fas fa-grip-vertical drag-handle me-2"></i>
+                <div class="flex-grow-1 me-2">
+                    <input type="text" class="form-control lesson-title" placeholder="Tên bài học...">
+                </div>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeLesson(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        <div class="lesson-content mt-2">
+            <div class="video-content">
+                <input type="file" class="form-control" accept="video/*" placeholder="Chọn video bài học">
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    let currentStep = 1;
+    let chapterCount = 0;
+    let lessonCount = 0;
+
+    // Hàm điều hướng giữa các bước
+    function changeStep(direction) {
+        if (direction === 1 && currentStep < 4) {
+            if (validateCurrentStep()) {
+                currentStep++;
+                updateStepDisplay();
+            }
+        } else if (direction === -1 && currentStep > 1) {
+            currentStep--;
+            updateStepDisplay();
+        }
+    }
+
+    // Cập nhật giao diện hiển thị bước
+    function updateStepDisplay() {
+        // Ẩn tất cả nội dung các bước
+        document.querySelectorAll('.step-content').forEach(content => {
+            content.style.display = 'none';
+        });
+
+        // Hiển thị nội dung bước hiện tại
+        document.getElementById(`content-step${currentStep}`).style.display = 'block';
+
+        // Cập nhật trạng thái chỉ báo bước
+        document.querySelectorAll('.step').forEach((step, index) => {
+            step.classList.remove('active', 'completed');
+            if (index + 1 === currentStep) {
+                step.classList.add('active');
+            } else if (index + 1 < currentStep) {
+                step.classList.add('completed');
+            }
+        });
+
+        // Cập nhật hiển thị các nút điều hướng
+        document.getElementById('prevBtn').style.display = currentStep > 1 ? 'block' : 'none';
+        document.getElementById('nextBtn').style.display = currentStep < 4 ? 'block' : 'none';
+        document.getElementById('submitBtn').style.display = currentStep === 4 ? 'block' : 'none';
+
+        // Tạo xem trước nếu ở bước 3
+        if (currentStep === 3) {
+            generatePreview();
+        }
+    }
+
+    // Kiểm tra dữ liệu bước hiện tại
+    function validateCurrentStep() {
+        if (currentStep === 1) {
+            const courseName = document.querySelector('[name="courseName"]').value;
+            const courseLevel = document.querySelector('[name="courseLevel"]').value;
+            if (!courseName || !courseLevel) {
+                alert('Vui lòng điền đầy đủ thông tin khóa học!');
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Quản lý chương
+    function addChapter() {
+        chapterCount++;
+        const template = document.getElementById('chapterTemplate');
+        const clone = template.content.cloneNode(true);
+        
+        const chapterItem = clone.querySelector('.chapter-item');
+        chapterItem.setAttribute('data-chapter-id', `chapter-${chapterCount}`);
+        
+        document.getElementById('chaptersContainer').appendChild(clone);
+        
+        // Ẩn nút "Thêm chương đầu tiên" khi đã có chương
+        document.querySelector('.add-btn').style.display = 'none';
+    }
+
+    function removeChapter(button) {
+        // Xóa chương sau khi xác nhận
+        if (confirm('Bạn có chắc muốn xóa chương này?')) {
+            button.closest('.chapter-item').remove();
+            
+            // Hiển thị lại nút "Thêm chương đầu tiên" nếu không còn chương nào
+            if (document.querySelectorAll('.chapter-item').length === 0) {
+                document.querySelector('.add-btn').style.display = 'block';
+            }
+        }
+    }
+
+    function updateChapterTitle(input) {
+        // Cập nhật tiêu đề chương
+        console.log('Chapter title updated:', input.value);
+    }
+
+    // Quản lý bài học
+    function addLesson(button) {
+        lessonCount++;
+        const template = document.getElementById('lessonTemplate');
+        const clone = template.content.cloneNode(true);
+        
+        const lessonItem = clone.querySelector('.lesson-item');
+        lessonItem.setAttribute('data-lesson-id', `lesson-${lessonCount}`);
+        
+        const lessonsContainer = button.closest('.chapter-item').querySelector('.lessons-container');
+        lessonsContainer.appendChild(clone);
+    }
+
+    function removeLesson(button) {
+        if (confirm('Bạn có chắc muốn xóa bài học này?')) {
+            button.closest('.lesson-item').remove();
+        }
+    }
+
+    // Tạo nội dung xem trước
+    function generatePreview() {
+        const courseName = document.querySelector('[name="courseName"]').value;
+        const courseDescription = document.querySelector('[name="courseDescription"]').value;
+        const courseLevel = document.querySelector('[name="courseLevel"]').value;
+        const coursePrice = document.querySelector('[name="coursePrice"]').value;
+        
+        let previewHTML = `
+            <div class="card">
+                <div class="card-header">
+                    <h4>${courseName || 'Tên khóa học'}</h4>
+                    <p class="mb-0">${courseDescription || 'Mô tả khóa học'}</p>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Trình độ:</strong> ${courseLevel || 'Chưa chọn'}<br>
+                            <strong>Giá:</strong> ${parseInt(coursePrice) === 0 ? 'Miễn phí' : parseInt(coursePrice).toLocaleString() + ' VNĐ'}
+                        </div>
+                    </div>
+                    <hr>
+                    <h5>Nội dung khóa học:</h5>
+        `;
+
+        // Thêm danh sách chương và bài học
+        const chapters = document.querySelectorAll('.chapter-item');
+        if (chapters.length === 0) {
+            previewHTML += '<p class="text-muted">Chưa có chương nào được thêm.</p>';
+        } else {
+            chapters.forEach((chapter, chapterIndex) => {
+                const chapterTitle = chapter.querySelector('.chapter-title').value || `Chương ${chapterIndex + 1}`;
+                previewHTML += `<div class="mb-3">
+                    <h6><i class="fas fa-folder"></i> ${chapterTitle}</h6>
+                    <ul class="list-unstyled ms-3">`;
+                
+                const lessons = chapter.querySelectorAll('.lesson-item');
+                if (lessons.length === 0) {
+                    previewHTML += '<li class="text-muted">Chưa có bài học nào</li>';
+                } else {
+                    lessons.forEach((lesson, lessonIndex) => {
+                        const lessonTitle = lesson.querySelector('.lesson-title').value || `Bài học ${lessonIndex + 1}`;
+                        previewHTML += `<li><i class="fas fa-play"></i> ${lessonTitle} <span class="badge bg-secondary lesson-type-badge">video</span></li>`;
+                    });
+                }
+                previewHTML += '</ul></div>';
+            });
+        }
+        
+        previewHTML += '</div></div>';
+        document.getElementById('coursePreview').innerHTML = previewHTML;
+    }
+
+    // Xử lý gửi form
+    document.getElementById('courseForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Thu thập dữ liệu từ form
+        const formData = new FormData(this);
+        
+        // Thêm dữ liệu cấu trúc khóa học
+        const courseStructure = [];
+        document.querySelectorAll('.chapter-item').forEach(chapter => {
+            const chapterData = {
+                title: chapter.querySelector('.chapter-title').value,
+                lessons: []
+            };
+            
+            chapter.querySelectorAll('.lesson-item').forEach(lesson => {
+                chapterData.lessons.push({
+                    title: lesson.querySelector('.lesson-title').value,
+                    type: 'video'
+                });
+            });
+            
+            courseStructure.push(chapterData);
+        });
+        
+        formData.append('courseStructure', JSON.stringify(courseStructure));
+        
+        // Mô phỏng gửi form
+        alert('Khóa học đã được lưu thành công!');
+        console.log('Course data:', Object.fromEntries(formData));
+    });
+
+    // Xem trước hình ảnh
+    document.querySelector('[name="courseImage"]').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('imagePreview');
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" class="img-thumbnail" style="max-width: 150px;">`;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            preview.innerHTML = '';
+        }
+    });
+
+    // Xem trước video
+    document.querySelector('[name="courseVideo"]').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const preview = document.getElementById('videoPreview');
+        
+        if (file) {
+            const url = URL.createObjectURL(file);
+            preview.innerHTML = `<video controls style="max-width: 150px; max-height: 100px;"><source src="${url}"></video>`;
+        } else {
+            preview.innerHTML = '';
+        }
+    });
+</script>
