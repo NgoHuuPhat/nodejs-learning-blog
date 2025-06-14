@@ -12,12 +12,23 @@
                 </a>
                 <div class="card-body d-flex flex-column">
                     <a href="/courses/{{this.slug}}" class="card-link">
-                        <h5 class="card-title text-primary">{{this.name}}</h5>
+                        <h5 class="card-title">{{this.name}}</h5>
                     </a>
-                    <p class="card-text text-muted">{{this.description}}</p>
-                    <div class="mt-auto">
-                        <a href="/checkout/{{this.slug}}" class="btn-grad">Mua khóa học</a>
-                    </div>
+
+                    {{!-- Xét điều kiện miễn phí --}}
+                    {{#if (eq this.price '0 đ')}}
+                        <p class="card-text fw-semibold" style="color: rgb(255, 94, 0);">Miễn phí</p>
+                        <div class="mt-auto">
+                            <a href="#" class="btn-grad">Học ngay</a>
+                        </div>
+                    {{else}}
+                        <p class="card-text fw-semibold" style="color: rgb(255, 94, 0);">{{this.price}}</p>
+                            <div class="mt-auto">
+                            <a href="/checkout/{{this.slug}}" class="btn-grad">Mua khóa học</a>
+                        </div>
+                    {{/if}}
+                    
+                    
                 </div>
             </div>
         </div>

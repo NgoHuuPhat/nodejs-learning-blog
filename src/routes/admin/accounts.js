@@ -1,7 +1,7 @@
 var express = require('express')
 var router = express.Router()
 const AccountController = require('../../app/controllers/admin/AccountController')
-const upload = require('../../config/multer')
+const upload = require('../../app/middlewares/multer')
 const uploadCloudinary  = require('../../app/middlewares/uploadCloudinary')
 
 router.get('/', AccountController.index)

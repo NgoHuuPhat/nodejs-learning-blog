@@ -1,7 +1,7 @@
 var express = require('express')
 var router = express.Router()
 const MyAccountController = require('../../app/controllers/admin/MyAccountController')
-const upload = require('../../config/multer')
+const upload = require('../../app/middlewares/multer')
 
 router.get('/', MyAccountController.index)
 router.get('/:id/edit', MyAccountController.edit)

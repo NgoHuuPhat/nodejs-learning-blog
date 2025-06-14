@@ -4,8 +4,7 @@ const Comment = require('../../models/Comment')
 const Notification = require('../../models/Notification')
 const PostDeleteRequest = require('../../models/PostDeleteRequest')
 const paginatitonHelper = require('../../../helpers/pagination')
-const dateTime = require('../../../helpers/dateTime')
-
+const { formatDate } = require('../../../helpers/format')
 
 class CommentController {
     //[GET] /admin/comments
@@ -56,7 +55,7 @@ class CommentController {
                 }
 
                 comment.lengthReplies = comment.replies.filter((reply)=> reply.deleted === false).length
-                comment.createdAt = dateTime(comment.createdAt)
+                comment.createdAt = formatDate(comment.createdAt)
 
                 // Xử lí phần reply
                 if(comment.replies && comment.replies.length > 0) {
@@ -67,7 +66,7 @@ class CommentController {
                         if(userReply) {
                             reply.userName = userReply.fullName
                         }
-                        reply.createdAt = dateTime(reply.createdAt)
+                        reply.createdAt = formatDate(reply.createdAt)
                     }
                 }
 
@@ -94,7 +93,7 @@ class CommentController {
             const deletedCommentsWithDetails = await Promise.all(deletedComments.map(async (comment) => {
                 const formattedComment = {
                     ...comment,
-                    createdAt: dateTime(comment.createdAt),
+                    createdAt: formatDate(comment.createdAt),
                     type: 'comment',
                 }
 
@@ -116,7 +115,7 @@ class CommentController {
                 if(deletedByInfo) {
                     formattedComment.deletedByName = deletedByInfo.fullName
                 }
-                formattedComment.deletedAt = dateTime(comment.deletedBy.deletedAt)
+                formattedComment.deletedAt = formatDate(comment.deletedBy.deletedAt)
                 return formattedComment
             }))
 
@@ -148,8 +147,8 @@ class CommentController {
                         commentContent: comment.content,
                         replyId: reply._id,
                         content: reply.content,
-                        createdAt: dateTime(reply.createdAt),
-                        deletedAt: dateTime(reply.deletedBy.deletedAt),
+                        createdAt: formatDate(reply.createdAt),
+                        deletedAt: formatDate(reply.deletedBy.deletedAt),
                         userName: user?.fullName,
                         postTitle: post.title,
                         deletedByName: deletedByInfo?.fullName,
@@ -187,8 +186,8 @@ class CommentController {
                         commentContent: comment.content,
                         replyId: reply._id,
                         content: reply.content,
-                        createdAt: dateTime(reply.createdAt),
-                        deletedAt: dateTime(reply.deletedBy.deletedAt),
+                        createdAt: formatDate(reply.createdAt),
+                        deletedAt: formatDate(reply.deletedBy.deletedAt),
                         userName: user?.fullName,
                         postTitle: post.title || 'Bài viết không tồn tại',
                         deletedByName: deletedByInfo?.fullName,

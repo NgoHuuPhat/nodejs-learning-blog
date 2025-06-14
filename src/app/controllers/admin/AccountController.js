@@ -5,7 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
-const dateTime = require('../../../helpers/dateTime')
+const { formatDate } = require('../../../helpers/format')
 
 class AccountController {
     //[GET] /admin/accounts
@@ -35,7 +35,7 @@ class AccountController {
                 }).lean()
                 account.role = role
 
-                account.createdAt = dateTime(account.createdAt)
+                account.createdAt = formatDate(account.createdAt)
             }
             res.render('admin/accounts/list', {
                 accounts,

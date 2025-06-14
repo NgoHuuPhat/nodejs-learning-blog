@@ -1,7 +1,9 @@
 const Course = require('../../models/Course')
 const Account = require('../../models/Account')
+const Chapter = require('../../models/Chapter')
+const Lesson = require('../../models/Lesson')
 const paginatitonHelper = require('../../../helpers/pagination')
-const dateTime = require('../../../helpers/dateTime')
+const { formatDate } = require('../../../helpers/format')
 
 class CourseController {
     //[GET] /admin/courses
@@ -38,7 +40,7 @@ class CourseController {
                     course.createdBy.name = user.fullName
                 }
 
-                course.createdAt = dateTime(course.createdBy.createdAt)
+                course.createdAt = formatDate(course.createdBy.createdAt)
                 console.log(course.createdAt)
             }
 
@@ -61,14 +63,77 @@ class CourseController {
     //[POST] /courses/store
     async store(req, res, next) {
         try {
-            //Lưu người tạo khóa học
-            req.body.createdBy = {
-                account_id: res.locals.account.id,
+            console.log(req.uploadResults)
+            // Xử lý upload ảnh và video
+            let courseImage = ''
+            let courseVideoPreview = ''
+            
+            // Kiểm tra xem có file ảnh mới không
+            if (req.uploadResults && req.uploadResults.courseImage) {
+                courseImage = req.uploadResults.courseImage[0].secure_url
             }
 
-            //Gán giá trị image (Tương tự như default ở bên Schema)
-            req.body.image = `https://i.ytimg.com/vi/${req.body.videoID}/hqdefault.jpg?s%E2%80%A6EIYAXABwAEG&rs=AOn4CLBwYwrOaKarfa87-f5y6U_UtM0Cfg`
-            await Course.create(req.body) //Lưu vào database (có thể dùng .save())
+            // Kiểm tra xem có file video giới thiệu mới không
+            if (req.uploadResults && req.uploadResults.courseVideoPreview) {
+                courseVideoPreview = req.uploadResults.courseVideoPreview[0].secure_url
+            }
+            
+            const courseStructure = JSON.parse(req.body.courseStructure)
+
+            // Tạo Object khóa học
+            const course = await Course.create({
+                name: req.body.courseName,
+                description: req.body.courseDescription,
+                level: req.body.courseLevel,
+                price: req.body.coursePrice,
+                createdBy: {
+                    account_id: res.locals.account.id,
+                    createdAt: new Date(),
+                },
+                image: courseImage,
+                videoPreview: courseVideoPreview,
+            })
+
+            // Tạo Object lưu chương trình học
+            const chaptersData = courseStructure.map((chapter) => {
+                return {
+                    course_id: course._id,
+                    title: chapter.title,
+                    createdBy: {
+                        account_id: res.locals.account.id,
+                        createdAt: new Date(),
+                    },
+                }
+            })
+            const savedChapters = await Chapter.insertMany(chaptersData) // Dùng insertMany để lưu nhiều chương cùng lúc thay vì create từng cái
+
+            // Tạo Object lưu bài học
+            let courseVideoLesson = []
+            let indexLesson = 0
+            const lessons = []
+
+            // Kiểm tra xem có file video bài học mới không
+            if( req.uploadResults && req.uploadResults.courseVideoLesson) {
+                courseVideoLesson = req.uploadResults.courseVideoLesson
+            }
+
+            courseStructure.forEach((chapter, index) => {
+                const chapterId = savedChapters[index]._id 
+
+                chapter.lessons.forEach((lesson) => {
+                    lessons.push({
+                        chapter_id: chapterId,
+                        title: lesson.title,
+                        videoID: courseVideoLesson[indexLesson].secure_url,
+                        createdBy: {
+                            account_id: res.locals.account.id,
+                            createdAt: new Date(),
+                        },
+                    })
+                    indexLesson++
+                })
+            })
+            await Lesson.insertMany(lessons)
 
             //Điều hướng về trang home
             res.redirect('/admin/courses')

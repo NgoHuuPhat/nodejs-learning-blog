@@ -1,6 +1,7 @@
 const Course = require('../../models/Course')
 const Post = require('../../models/Post')
 const Account = require('../../models/Account')
+const { formatCurrency } = require('../../../helpers/format')
 class SiteController {
     //[GET] /
     async home(req, res, next) {
@@ -10,6 +11,11 @@ class SiteController {
             C2: toObject() (thay const = let)
             */
             const courses = await Course.find({}).lean() // Đợi Promise return kết quả (find() return Array)
+
+            // Định dạng giá tiền
+            for(const course of courses) {
+                course.price = formatCurrency(course.price)
+            }
             const posts = await Post.find({status: 'approved'}).lean() 
             
             // Lấy ra tên người viết bài viết

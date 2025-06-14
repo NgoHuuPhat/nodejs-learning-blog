@@ -6,15 +6,11 @@ const { sortTable } = require('../../helpers/queryHelper')
 
 const Schema = mongoose.Schema
 
-const CourseSchema = new Schema(
+const LessonSchema = new Schema(
     {
-        name: { type: String, required: true },
-        description: { type: String, maxLength: 600 },
-        image: { type: String },
-        level: { type: String, enum: ['Cơ bản', 'Trung bình', 'Nâng cao'], default: 'Cơ bản' },
-        slug: { type: String, slug: 'name', unique: true },
-        price: { type: Number, default: 0 },
-        videoPreview: { type: String }, // Video giới thiệu khóa học
+        chapter_id: { type: mongoose.Schema.ObjectId, required: true },
+        title: { type: String, required: true },
+        videoID: { type: String }, 
         
         //Thêm người tạo
         createdBy: {
@@ -46,19 +42,19 @@ const CourseSchema = new Schema(
 )
 
 mongoose.plugin(slug)
-CourseSchema.plugin(AutoIncrement,{
-    inc_field: '_id', 
-    id: 'course_seq', 
-    start_seq: 1
-}) 
+//Tránh trùng lặp ID nếu có nhiều collection dùng tăng tự động
+// LessonSchema.plugin(AutoIncrement, {
+//     inc_field: '_id', // Tên trường tự động tăng
+//     id: 'course_seq', // Tên ID cho bộ đếm
+// }) 
 
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
-CourseSchema.plugin(mongooseDelete, {
+LessonSchema.plugin(mongooseDelete, {
     deletedAt: false,
     overrideMethods: 'all',
 })
 
 // Sử dụng query helper chung
-CourseSchema.query.sortTable = sortTable
+LessonSchema.query.sortTable = sortTable
 
-module.exports = mongoose.model('Course', CourseSchema) //Collection - Schema
+module.exports = mongoose.model('Lesson', LessonSchema) //Collection - Schema

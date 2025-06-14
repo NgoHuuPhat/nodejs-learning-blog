@@ -3,7 +3,7 @@ const Account = require('../../models/Account')
 const Notification = require('../../models/Notification')
 const PostDeleteRequest = require('../../models/PostDeleteRequest')
 const paginatitonHelper = require('../../../helpers/pagination')
-const dateTime = require('../../../helpers/dateTime')
+const { formatDate } = require('../../../helpers/format')
 
 class PostController {
     //[GET] /admin/posts
@@ -43,7 +43,7 @@ class PostController {
                 }
 
                 // Chuyển đổi createdAt sang định dạng DD/MM/YYYY
-                post.createdAt = dateTime(post.createdAt)
+                post.createdAt = formatDate(post.createdAt)
             }
 
             res.render('admin/posts/list', {
@@ -84,7 +84,7 @@ class PostController {
                 }
 
                 // Chuyển đổi createdAt sang định dạng DD/MM/YYYY
-                post.createdAt = dateTime(post.createdAt)
+                post.createdAt = formatDate(post.createdAt)
             }
 
             res.render('admin/posts/trash-posts', { posts })
@@ -235,7 +235,7 @@ class PostController {
                 if (postDetails) {
                     post.postDetails = postDetails
                     post.accountDetails = accountDetails
-                    post.postDetails.createdAt = dateTime(post.postDetails.createdAt)
+                    post.postDetails.createdAt = formatDate(post.postDetails.createdAt)
                 }
             }
 

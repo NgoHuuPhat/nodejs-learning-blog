@@ -1,11 +1,11 @@
 const Account = require('../../models/Account')
 const Role = require('../../models/Role')
-const upload = require('../../../config/multer')
+const upload = require('../../../app/middlewares/multer')
 const fs = require('fs')
 const path = require('path')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
-const dateTime = require('../../../helpers/dateTime')
+const { formatDate } = require('../../../helpers/format')
 
 class MyAccountController {
     //[GET] /admin/my-account
@@ -20,7 +20,7 @@ class MyAccountController {
             const myRole = await Role.findOne({ _id: myAccount.role_id }).lean()
 
             // Chuyển đổi createdAt sang định dạng DD/MM/YYYY
-            myAccount.createdAt =  dateTime(myAccount.createdAt)
+            myAccount.createdAt =  formatDate(myAccount.createdAt)
 
             res.render('admin/my-account/details', { myAccount, myRole })
         } catch (error) {

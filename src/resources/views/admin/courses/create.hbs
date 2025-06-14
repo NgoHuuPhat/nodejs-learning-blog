@@ -94,7 +94,8 @@
     </div>
 
     <!-- Form nhập thông tin khóa học -->
-    <form id="courseForm" enctype="multipart/form-data">
+    {{!-- enctype="multipart/form-data" --}}
+    <form id="courseForm">
         <!-- Bước 1: Thông tin cơ bản -->
         <div class="step-content" id="content-step1">
             <div class="course-builder">
@@ -103,7 +104,7 @@
                 <div class="row">
                     <div class="col-md-8">
                         <div class="mb-3">
-                            <label class="form-label">Tên khóa học *</label>
+                            <label class="form-label">Tên khóa học <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="courseName" required>
                         </div>
                         
@@ -114,16 +115,16 @@
                         
                         <div class="row">
                             <div class="col-md-6">
-                                <label class="form-label">Trình độ *</label>
+                                <label class="form-label">Trình độ <span class="text-danger">*</span></label>
                                 <select class="form-select" name="courseLevel" required>
                                     <option value="">Chọn trình độ</option>
-                                    <option value="Beginner">Beginner</option>
-                                    <option value="Intermediate">Intermediate</option>
-                                    <option value="Advanced">Advanced</option>
+                                    <option value="Cơ bản">Cơ bản</option>
+                                    <option value="Trung bình">Trung bình</option>
+                                    <option value="Nâng cao">Nâng cao</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Giá (VNĐ) *</label>
+                                <label class="form-label">Giá (VNĐ) <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" name="coursePrice" value="0" required>
                             </div>
                         </div>
@@ -138,7 +139,7 @@
                         
                         <div class="mb-3">
                             <label class="form-label">Video giới thiệu</label>
-                            <input type="file" class="form-control" name="courseVideo" accept="video/*">
+                            <input type="file" class="form-control" name="courseVideoPreview" accept="video/*">
                             <div id="videoPreview" class="mt-2"></div>
                         </div>
                     </div>
@@ -236,7 +237,7 @@
         </div>
         <div class="lesson-content mt-2">
             <div class="video-content">
-                <input type="file" class="form-control" accept="video/*" placeholder="Chọn video bài học">
+                <input type="file" name="courseVideoLesson" class="form-control" accept="video/*" placeholder="Chọn video bài học">
             </div>
         </div>
     </div>
@@ -407,8 +408,10 @@
         document.getElementById('coursePreview').innerHTML = previewHTML;
     }
 
+    const courseForm = document.getElementById('courseForm');
+
     // Xử lý gửi form
-    document.getElementById('courseForm').addEventListener('submit', function(e) {
+    courseForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
         // Thu thập dữ liệu từ form
@@ -431,12 +434,24 @@
             
             courseStructure.push(chapterData);
         });
+
+        // Tạo input ẩn để gửi cấu trúc khóa học
+        let hiddenInput = document.querySelector('input[name="courseStructure"]')
+        if(hiddenInput){
+            hiddenInput.value = JSON.stringify(courseStructure);
+        } else {
+            hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'courseStructure';
+            hiddenInput.value = JSON.stringify(courseStructure);
+            this.appendChild(hiddenInput);
+        }
         
-        formData.append('courseStructure', JSON.stringify(courseStructure));
-        
-        // Mô phỏng gửi form
-        alert('Khóa học đã được lưu thành công!');
-        console.log('Course data:', Object.fromEntries(formData));
+        // set action và method cho form
+        courseForm.action = '/admin/courses/store';
+        courseForm.method = 'POST';
+        courseForm.enctype = 'multipart/form-data';
+        courseForm.submit();
     });
 
     // Xem trước hình ảnh
@@ -456,7 +471,7 @@
     });
 
     // Xem trước video
-    document.querySelector('[name="courseVideo"]').addEventListener('change', function(e) {
+    document.querySelector('[name="courseVideoPreview"]').addEventListener('change', function(e) {
         const file = e.target.files[0];
         const preview = document.getElementById('videoPreview');
         
