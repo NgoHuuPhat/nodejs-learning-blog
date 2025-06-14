@@ -1,4 +1,4 @@
-module.exports = (date) => {
+function formatDate(date) {
     if (!date) {
         throw new Error('Date is required')
     }
@@ -16,4 +16,21 @@ module.exports = (date) => {
     catch (e) {
         throw new Error('Error formatting date: ' + e.message)
     }
+}
+
+function formatCurrency(price) {
+    if (price === undefined || price === null) {
+        throw new Error('Price is required')
+    }
+    try {
+        return Number(price).toLocaleString('vi-VN') + ' đ'
+    }
+    catch (e) {
+        throw new Error('Error formatting Currency: ' + e.message)
+    }
+}
+
+module.exports = {
+    formatDate,
+    formatCurrency,
 }
