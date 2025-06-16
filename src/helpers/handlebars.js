@@ -73,5 +73,10 @@ module.exports = {
 
     timeAgo: (date) => {
         return dayjs(date).fromNow() // So sánh thời gian với thời gian hiện tại
+    },
+
+    json: function(context) {
+        return JSON.stringify(context)
     }
+    
 }

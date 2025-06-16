@@ -66,7 +66,7 @@ class CourseController {
             console.log(req.uploadResults)
             // Xử lý upload ảnh và video
             let courseImage = ''
-            let courseVideoPreview = ''
+            let videoPreview = null
             
             // Kiểm tra xem có file ảnh mới không
             if (req.uploadResults && req.uploadResults.courseImage) {
@@ -75,7 +75,11 @@ class CourseController {
 
             // Kiểm tra xem có file video giới thiệu mới không
             if (req.uploadResults && req.uploadResults.courseVideoPreview) {
-                courseVideoPreview = req.uploadResults.courseVideoPreview[0].secure_url
+                videoPreview = {
+                    video_id: req.uploadResults.courseVideoPreview[0].public_id,
+                    url: req.uploadResults.courseVideoPreview[0].secure_url,
+                    duration: req.uploadResults.courseVideoPreview[0].duration,
+                }
             }
             
             const courseStructure = JSON.parse(req.body.courseStructure)
@@ -91,7 +95,7 @@ class CourseController {
                     createdAt: new Date(),
                 },
                 image: courseImage,
-                videoPreview: courseVideoPreview,
+                videoPreview: videoPreview,
             })
 
             // Tạo Object lưu chương trình học
@@ -124,7 +128,11 @@ class CourseController {
                     lessons.push({
                         chapter_id: chapterId,
                         title: lesson.title,
-                        videoID: courseVideoLesson[indexLesson].secure_url,
+                        videoLesson: {
+                            video_id: courseVideoLesson[indexLesson].public_id,
+                            url: courseVideoLesson[indexLesson].secure_url,
+                            duration: courseVideoLesson[indexLesson].duration,
+                        },
                         createdBy: {
                             account_id: res.locals.account.id,
                             createdAt: new Date(),
@@ -157,29 +165,29 @@ class CourseController {
     //[GET] /admin/courses/:id/edit
     async edit(req, res, next) {
         try {
-            //Lấy khóa học trường _id = giá trị req.params.id
-            const course = await Course.findById(req.params.id).lean()
-            res.render('admin/courses/edit', { course })
-        } catch (error) {
-            next(error)
-        }
-    }
 
-    //[PUT] /admin/courses/:id
-    async update(req, res, next) {
-        try {
-            //Thêm người cập nhật
-            const updatedBy = {
-                account_id: res.locals.account.id,
-                updatedAt: new Date(),
+            //Lấy khóa học theo ID
+            const course = await Course.findOne({ _id: req.params.id }).lean()
+            if (!course) {
+                return res.status(404).send('Course not found')
             }
+            course.price = course.price.toString()
+            
+            //Lấy danh sách chương học
+            const chapters = await Chapter.find({ course_id: course._id }).lean()
+            if (!chapters) {
+                return res.status(404).send('Chapters not found')
+            }
+            
+            //Lấy danh sách bài học
+            const lessons = await Lesson.find({ chapter_id: {$in: chapters.map(chapter => chapter._id)} }).lean()
+            
+            res.render('admin/courses/edit', {
+                course,
+                chapters,
+                lessons,
+            })
 
-            //Cập nhật khóa học
-            await Course.updateOne(
-                { _id: req.params.id },
-                { ...req.body, $push: { updatedBy: updatedBy } },
-            )
-            res.redirect('/admin/courses')
         } catch (error) {
             next(error)
         }

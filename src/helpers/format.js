@@ -23,7 +23,7 @@ function formatCurrency(price) {
         throw new Error('Price is required')
     }
     try {
-        return Number(price).toLocaleString('vi-VN') + ' đ'
+        return Number(price).toLocaleString('vi-VN') + ' VNĐ'
     }
     catch (e) {
         throw new Error('Error formatting Currency: ' + e.message)
