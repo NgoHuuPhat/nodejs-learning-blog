@@ -14,7 +14,14 @@ router.post('/store',
     ]),
     uploadCloudinary, 
     courseController.store)
-router.patch('/:id', courseController.update)
+router.patch('/:id',
+    upload.fields([
+    { name: 'courseImage', maxCount: 1 },
+    { name: 'courseVideoPreview', maxCount: 1 },
+    { name: 'courseVideoLesson' } 
+    ]),
+    uploadCloudinary, 
+    courseController.update)
 router.get('/trash', courseController.trashCourses)
 router.get('/:id/edit', courseController.edit)
 router.post('/handle-form-actions', courseController.handleFormActions) //Xử lý select tất cả

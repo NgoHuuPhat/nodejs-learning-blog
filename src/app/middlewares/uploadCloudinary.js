@@ -35,7 +35,7 @@ module.exports =  function (req, res, next) {
     const processUploads = async (req, res, next) => {
       try {
         const uploadPromises = []
-
+        
         // Kiểm tra và upload từng file
         if(req.files){
           for(const fieldName in req.files) {

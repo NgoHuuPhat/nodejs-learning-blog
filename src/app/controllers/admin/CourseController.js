@@ -4,8 +4,6 @@ const Chapter = require('../../models/Chapter')
 const Lesson = require('../../models/Lesson')
 const paginatitonHelper = require('../../../helpers/pagination')
 const { formatDate } = require('../../../helpers/format')
-const { uploadCloudinary } = require('../../middlewares/uploadCloudinary')
-const { image } = require('../../../config/cloudinary')
 
 class CourseController {
     //[GET] /admin/courses
@@ -199,6 +197,139 @@ class CourseController {
         }
     }
 
+    //[PATCH] /admin/courses/:id
+    async update(req, res, next) {
+        try {
+           
+            // Kiểm tra khóa học có tồn tại không
+            const exittingCourse = await Course.findById(req.params.id)
+            if (!exittingCourse) {
+                return res.status(404).send('Khóa học không tồn tại')
+            }
+
+            // Xử lý upload ảnh và video
+            let courseImage = exittingCourse.image || ''
+            let videoPreview = exittingCourse.videoPreview || null
+            
+            // Kiểm tra xem có file ảnh mới không
+            if (req.uploadResults && req.uploadResults.courseImage) {
+                courseImage = req.uploadResults.courseImage[0].secure_url
+            }
+
+            // Kiểm tra xem có file video giới thiệu mới không
+            if (req.uploadResults && req.uploadResults.courseVideoPreview) {
+                videoPreview = {
+                    video_id: req.uploadResults.courseVideoPreview[0].public_id,
+                    url: req.uploadResults.courseVideoPreview[0].secure_url,
+                    duration: req.uploadResults.courseVideoPreview[0].duration,
+                }
+            }
+
+            // Tạo Object khóa học
+            const course = await Course.findByIdAndUpdate(req.params.id, {
+                name: req.body.courseName,
+                description: req.body.courseDescription,
+                level: req.body.courseLevel,
+                price: req.body.coursePrice,
+                updatedBy: {
+                    account_id: res.locals.account.id,
+                    createdAt: new Date(),
+                },
+                image: courseImage,
+                videoPreview: videoPreview,
+            }, {new: true}) 
+
+            // Kiểm tra xem có dữ liệu courseStructure không
+            const courseStructure = JSON.parse(req.body.courseStructure)
+            if(courseStructure){
+    
+                // Xóa các chương không có trong courseStructure
+                const chapterIds = courseStructure.map(chapter => chapter._id)
+                const chaptersToDelete = await Chapter.find({ course_id: course._id, _id: {$nin: chapterIds} }).lean()
+                await Chapter.deleteMany({
+                    _id: { $nin: chapterIds }, 
+                    course_id: course._id,
+                })
+                await Lesson.deleteMany({
+                    chapter_id: { $in: chaptersToDelete.map(chapter => chapter._id) },
+                })
+                
+                // Cập nhật và tạo chương hiện có
+                for (const chapter of courseStructure) {
+                    if(chapter.isExisting && chapter._id) {
+                        // Cập nhật chương hiện có
+                        await Chapter.updateOne(
+                            { _id: chapter._id },
+                            {
+                                title: chapter.title,
+                                updatedBy: {
+                                    account_id: res.locals.account.id,
+                                    updatedAt: new Date(),
+                                },
+                            },
+                        )
+                    } else {
+                        // Tạo chương mới
+                        const newChapter = await Chapter.create({
+                            course_id: course._id,
+                            title: chapter.title,
+                            createdBy: {
+                                account_id: res.locals.account.id,
+                                createdAt: new Date(),
+                            },
+                        })
+                        chapter._id = newChapter._id // Cập nhật ID của chương mới vào chapter
+                    }
+
+                    // Xử lí bài học
+                    // Xóa bài học không có trong chapter.lessons
+                    const existingLessonIds = chapter.lessons
+                        .filter(lesson => lesson.isExisting && lesson._id)
+                        .map(lesson => lesson._id)
+                    
+                    await Lesson.deleteMany({
+                        chapter_id: chapter._id,
+                        _id: { $nin: existingLessonIds },
+                    })
+
+                    for(const lesson of chapter.lessons) {
+                        if(lesson.isExisting && lesson._id) {
+                            // Cập nhật bài học hiện có
+                            await Lesson.updateOne(
+                                { _id: lesson._id },
+                                {
+                                    title: lesson.title,
+                                    updatedBy: {
+                                        account_id: res.locals.account.id,
+                                        updatedAt: new Date(),
+                                    },
+                                },
+                            )
+                        } else {
+                            // Tạo bài học mới
+                            await Lesson.create({
+                                chapter_id: chapter._id,
+                                title: lesson.title,
+                                videoLesson: {
+                                    video_id: lesson.videoLesson?.video_id || '',
+                                    url: lesson.videoLesson?.url || '',
+                                    duration: lesson.videoLesson?.duration || 0,
+                                },
+                                createdBy: {
+                                    account_id: res.locals.account.id,
+                                    createdAt: new Date(),
+                                },
+                            })
+                        }
+                    }
+                }
+            }
+            
+            res.redirect('/admin/courses')
+        } catch (error) {
+            next(error)
+        }
+    }
 
     //[DELETE] /admin/courses/:id
     async destroy(req, res, next) {

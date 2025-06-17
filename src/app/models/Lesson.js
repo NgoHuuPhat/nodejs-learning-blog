@@ -10,7 +10,11 @@ const LessonSchema = new Schema(
     {
         chapter_id: { type: mongoose.Schema.ObjectId, required: true },
         title: { type: String, required: true },
-        videoID: { type: String }, 
+        videoLesson: { 
+            video_id: { type: String, },
+            url: { type: String,  }, 
+            duration: { type: Number, default: 0 }, 
+         }, 
         
         //Thêm người tạo
         createdBy: {
@@ -36,7 +40,6 @@ const LessonSchema = new Schema(
         ],
     },
     {
-        _id: false,
         timestamps: false,
     },
 )

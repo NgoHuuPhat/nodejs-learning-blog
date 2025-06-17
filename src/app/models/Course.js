@@ -14,7 +14,11 @@ const CourseSchema = new Schema(
         level: { type: String, enum: ['Cơ bản', 'Trung bình', 'Nâng cao'], default: 'Cơ bản' },
         slug: { type: String, slug: 'name', unique: true },
         price: { type: Number, default: 0 },
-        videoPreview: { type: String }, // Video giới thiệu khóa học
+        videoPreview: { 
+            video_id: { type: String,},
+            url: { type: String,}, 
+            duration: { type: Number, default: 0 },
+        }, 
         
         //Thêm người tạo
         createdBy: {
