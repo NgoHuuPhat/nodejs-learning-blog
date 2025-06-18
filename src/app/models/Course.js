@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const slug = require('mongoose-slug-updater')
 const mongooseDelete = require('mongoose-delete')
 const AutoIncrement = require('mongoose-sequence')(mongoose)
-const { sortTable } = require('../../helpers/queryHelper')
+const { sortTable } = require('../../utils/queryHelper')
 
 const Schema = mongoose.Schema
 
@@ -10,7 +10,10 @@ const CourseSchema = new Schema(
     {
         name: { type: String, required: true },
         description: { type: String, maxLength: 600 },
-        image: { type: String },
+        image: { 
+            image_id: { type: String, required: true },
+            url: { type: String, required: true },
+         },
         level: { type: String, enum: ['Cơ bản', 'Trung bình', 'Nâng cao'], default: 'Cơ bản' },
         slug: { type: String, slug: 'name', unique: true },
         price: { type: Number, default: 0 },
@@ -44,17 +47,11 @@ const CourseSchema = new Schema(
         ],
     },
     {
-        _id: false,
         timestamps: false,
     },
 )
 
 mongoose.plugin(slug)
-CourseSchema.plugin(AutoIncrement,{
-    inc_field: '_id', 
-    id: 'course_seq', 
-    start_seq: 1
-}) 
 
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
 CourseSchema.plugin(mongooseDelete, {

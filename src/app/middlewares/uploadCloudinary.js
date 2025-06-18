@@ -1,35 +1,8 @@
 const cloudinary = require('../../config/cloudinary')
 const streamifier = require('streamifier')
+const { uploadToCloudinary } = require('../../utils/cloudinary')
 
 module.exports =  function (req, res, next) {
-
-  // Hàm uppload một file lên Cloudinary
-  const uploadToCloudinary = (file) => {
-      return new Promise((resolve, reject) => {
-        
-        const uploadOptions = {
-          folder: `${file.fieldname}s`
-        }
-
-        // Nếu là video, thêm tùy chọn resource_type
-        if (file.mimetype.startsWith('video/')) {
-          uploadOptions.resource_type = 'video'
-          uploadOptions.chunk_size = 6000000 
-        }
-
-        const stream = cloudinary.uploader.upload_stream(
-          uploadOptions,
-          (error, result) => {
-            if (result) {
-              resolve(result)
-            } else {
-              reject(error)
-            }
-          }
-        )
-        streamifier.createReadStream(file.buffer).pipe(stream)
-      })
-  }
 
     // Xử lí upload files
     const processUploads = async (req, res, next) => {

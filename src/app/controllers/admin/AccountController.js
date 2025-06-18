@@ -1,11 +1,11 @@
 const Account = require('../../models/Account')
 const Role = require('../../models/Role')
-const paginatitonHelper = require('../../../helpers/pagination')
+const paginatitonHelper = require('../../../utils/pagination')
 const fs = require('fs')
 const path = require('path')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
-const { formatDate } = require('../../../helpers/format')
+const { formatDate } = require('../../../utils/format')
 
 class AccountController {
     //[GET] /admin/accounts

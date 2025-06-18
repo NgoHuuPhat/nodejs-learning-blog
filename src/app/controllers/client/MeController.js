@@ -1,7 +1,7 @@
 const Course = require('../../models/Course')
 const Account = require('../../models/Account')
 const Post = require('../../models/Post')
-const paginatitonHelper = require('../../../helpers/pagination')
+const paginatitonHelper = require('../../../utils/pagination')
 
 class MeController {
     //[GET] /me/stored/courses

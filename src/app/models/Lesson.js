@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const slug = require('mongoose-slug-updater')
 const mongooseDelete = require('mongoose-delete')
 const AutoIncrement = require('mongoose-sequence')(mongoose)
-const { sortTable } = require('../../helpers/queryHelper')
+const { sortTable } = require('../../utils/queryHelper')
 
 const Schema = mongoose.Schema
 
@@ -43,13 +43,6 @@ const LessonSchema = new Schema(
         timestamps: false,
     },
 )
-
-mongoose.plugin(slug)
-//Tránh trùng lặp ID nếu có nhiều collection dùng tăng tự động
-// LessonSchema.plugin(AutoIncrement, {
-//     inc_field: '_id', // Tên trường tự động tăng
-//     id: 'course_seq', // Tên ID cho bộ đếm
-// }) 
 
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
 LessonSchema.plugin(mongooseDelete, {

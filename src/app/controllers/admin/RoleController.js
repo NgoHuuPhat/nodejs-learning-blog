@@ -1,6 +1,6 @@
 const Role = require('../../models/Role')
-const paginatitonHelper = require('../../../helpers/pagination')
-const { formatDate } = require('../../../helpers/format')
+const paginatitonHelper = require('../../../utils/pagination')
+const { formatDate } = require('../../../utils/format')
 
 class RoleController {
     //[GET] /admin/roles

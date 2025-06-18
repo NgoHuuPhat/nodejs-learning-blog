@@ -3,7 +3,7 @@ const ForgotPassword = require('../../models/ForgotPassword')
 const Role = require('../../models/Role')
 var jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
-const sendMailHelper = require('../../../helpers/sendMail')
+const sendMailHelper = require('../../../services/sendMail')
 
 class UserController {
     //[GET] /register

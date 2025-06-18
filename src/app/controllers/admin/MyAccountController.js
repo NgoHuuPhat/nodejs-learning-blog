@@ -5,7 +5,7 @@ const fs = require('fs')
 const path = require('path')
 const bcrypt = require('bcrypt')
 const saltRounds = 10
-const { formatDate } = require('../../../helpers/format')
+const { formatDate } = require('../../../utils/format')
 
 class MyAccountController {
     //[GET] /admin/my-account

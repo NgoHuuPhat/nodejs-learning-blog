@@ -2,8 +2,8 @@ const Post = require('../../models/Post')
 const Account = require('../../models/Account')
 const Notification = require('../../models/Notification')
 const PostDeleteRequest = require('../../models/PostDeleteRequest')
-const paginatitonHelper = require('../../../helpers/pagination')
-const { formatDate } = require('../../../helpers/format')
+const paginatitonHelper = require('../../../utils/pagination')
+const { formatDate } = require('../../../utils/format')
 
 class PostController {
     //[GET] /admin/posts

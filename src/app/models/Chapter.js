@@ -1,14 +1,12 @@
 const mongoose = require('mongoose')
-const slug = require('mongoose-slug-updater')
 const mongooseDelete = require('mongoose-delete')
-const AutoIncrement = require('mongoose-sequence')(mongoose)
-const { sortTable } = require('../../helpers/queryHelper')
+const { sortTable } = require('../../utils/queryHelper')
 
 const Schema = mongoose.Schema
 
 const ChapterSchema = new Schema(
     {
-        course_id: { type: Number, required: true },
+        course_id: { type: mongoose.Schema.ObjectId},
         title: { type: String, required: true },  
 
         //Thêm người tạo
@@ -38,13 +36,6 @@ const ChapterSchema = new Schema(
         timestamps: false,
     },
 )
-
-mongoose.plugin(slug)
-//Tránh trùng lặp ID nếu có nhiều collection dùng tăng tự động
-// ChapterSchema.plugin(AutoIncrement, {
-//     inc_field: '_id', // Tên trường tự động tăng
-//     id: 'course_seq', // Tên ID cho bộ đếm
-// }) 
 
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
 ChapterSchema.plugin(mongooseDelete, {

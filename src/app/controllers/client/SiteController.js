@@ -1,7 +1,7 @@
 const Course = require('../../models/Course')
 const Post = require('../../models/Post')
 const Account = require('../../models/Account')
-const { formatCurrency } = require('../../../helpers/format')
+const { formatCurrency } = require('../../../utils/format')
 class SiteController {
     //[GET] /
     async home(req, res, next) {

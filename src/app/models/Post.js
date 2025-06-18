@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const slug = require('mongoose-slug-updater')
 const mongooseDelete = require('mongoose-delete')
-const { sortTable } = require('../../helpers/queryHelper')
+const { sortTable } = require('../../utils/queryHelper')
 
 const Schema = mongoose.Schema
 

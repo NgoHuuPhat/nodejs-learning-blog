@@ -2,8 +2,10 @@ const Course = require('../../models/Course')
 const Account = require('../../models/Account')
 const Chapter = require('../../models/Chapter')
 const Lesson = require('../../models/Lesson')
-const paginatitonHelper = require('../../../helpers/pagination')
-const { formatDate } = require('../../../helpers/format')
+const paginatitonHelper = require('../../../utils/pagination')
+const { formatDate } = require('../../../utils/format')
+const { deleteFromCloudinary } = require('../../../utils/cloudinary')
+const { default: mongoose } = require('mongoose')
 
 class CourseController {
     //[GET] /admin/courses
@@ -41,7 +43,6 @@ class CourseController {
                 }
 
                 course.createdAt = formatDate(course.createdBy.createdAt)
-                console.log(course.createdAt)
             }
 
             res.render('admin/courses/list', {
@@ -63,14 +64,16 @@ class CourseController {
     //[POST] /courses/store
     async store(req, res, next) {
         try {
-            console.log(req.uploadResults)
             // Xử lý upload ảnh và video
-            let courseImage = ''
+            let courseImage = null
             let videoPreview = null
             
             // Kiểm tra xem có file ảnh mới không
             if (req.uploadResults && req.uploadResults.courseImage) {
-                courseImage = req.uploadResults.courseImage[0].secure_url
+                courseImage = {
+                    image_id: req.uploadResults.courseImage[0].public_id,
+                    url: req.uploadResults.courseImage[0].secure_url,
+                }
             }
 
             // Kiểm tra xem có file video giới thiệu mới không
@@ -80,7 +83,6 @@ class CourseController {
                     url: req.uploadResults.courseVideoPreview[0].secure_url,
                     duration: req.uploadResults.courseVideoPreview[0].duration,
                 }
-                console.log('videoPreview:', videoPreview)
             }
             
             const courseStructure = JSON.parse(req.body.courseStructure)
@@ -210,7 +212,7 @@ class CourseController {
             // Xử lý upload ảnh và video
             let courseImage = exittingCourse.image || ''
             let videoPreview = exittingCourse.videoPreview || null
-            
+
             // Kiểm tra xem có file ảnh mới không
             if (req.uploadResults && req.uploadResults.courseImage) {
                 courseImage = req.uploadResults.courseImage[0].secure_url
@@ -286,7 +288,7 @@ class CourseController {
                     const existingLessonIds = chapter.lessons
                         .filter(lesson => lesson.isExisting && lesson._id)
                         .map(lesson => lesson._id)
-                    
+
                     await Lesson.deleteMany({
                         chapter_id: chapter._id,
                         _id: { $nin: existingLessonIds },
@@ -399,7 +401,6 @@ class CourseController {
 
     //[POST] /admin/courses/handle-form-actions
     async handleFormActions(req, res, next) {
-        console.log(req.body)
         switch (req.body.action) {
             case 'delete':
                 try {
@@ -417,12 +418,32 @@ class CourseController {
     //[DELETE] /admin/courses/:id/force
     async forceDestroy(req, res, next)  {
         try {
-            const chapters = await Chapter.find({ course_id: req.params.id }).lean()
+            const course = await Course.findOneWithDeleted({ _id: req.params.id }).lean()
+            const chapters = await Chapter.findWithDeleted({ course_id: req.params.id }).lean()
             const chapterIds = chapters.map(chapter => chapter._id)
+            const lessons = await Lesson.findWithDeleted({ chapter_id: { $in: chapterIds } }).lean()
 
-            await Lesson.deleteMany({ chapter_id: { $in: chapterIds } })
+            // Kiểm tra xóa ở Cloudinary
+            if (course && course.videoPreview && course.videoPreview.video_id) {
+                const result = await deleteFromCloudinary(course.videoPreview.video_id, 'video')
+                console.log('Deleted video preview from Cloudinary:', result)
+            } 
+            else if (course && course.image && course.image.image_id) {
+                const result = await deleteFromCloudinary(course.image.image_id, 'image')
+                console.log('Deleted course image from Cloudinary:', result)
+            }
+
+            for (const lesson of lessons) {
+                if (lesson.videoLesson && lesson.videoLesson.video_id) {
+                    const result = await deleteFromCloudinary(lesson.videoLesson.video_id, 'video')
+                    console.log('Deleted lesson video from Cloudinary:', result)
+                }
+            }
+
+            // Xóa vĩnh viễn khóa học, chương và bài học
             await Course.deleteOne({ _id: req.params.id })
             await Chapter.deleteMany({ course_id: req.params.id })
+            await Lesson.deleteMany({ chapter_id: { $in: chapterIds } })
 
             res.redirect(req.get('Referrer') || '/') //'back' về lại trang trước đó
         } catch (error) {
