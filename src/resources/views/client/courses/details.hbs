@@ -1,19 +1,610 @@
-<div class="mt-4">
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f8f9fa;
+    }
     
-    <!-- Nút quay lại -->
+    .course-sidebar {
+        background: linear-gradient(135deg, #1dd1a1 0%, #55a3ff 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        position: sticky;
+        top: 2rem;
+    }
+    
+    .video-preview {
+        box-shadow: 0 0px 15px rgba(0, 0, 0, 0.09);
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .video-preview:hover {
+        background: rgba(255,255,255,0.15);
+        transform: translateY(-2px);
+    }
+    
+    .video-preview .play-btn {
+        width: 80px;
+        height: 80px;
+        background: rgba(255,255,255,0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .video-preview .play-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(29, 209, 161, 0.2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.4s ease;
+    }
+    
+    .video-preview:hover .play-btn::before {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .video-preview .play-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    
+    .video-preview .play-btn i {
+        color: #1dd1a1;
+        font-size: 24px;
+        margin-left: 4px;
+        z-index: 2;
+        position: relative;
+    }
+    
+    .register-btn {
+        background: white;
+        color: #1dd1a1;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 16px;
+        width: 100%;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .register-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        background: #f8f9fa;
+        color: #1dd1a1;
+    }
+    
+    .course-info {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .course-info li {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-size: 14px;
+    }
+    
+    .course-info li i {
+        width: 20px;
+        margin-right: 12px;
+        opacity: 0.8;
+    }
+    
+    .chapter-section {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+    }
+    
+    .chapter-header {
+        background: #f8f9fa;
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .chapter-header:hover {
+        background: #e9ecef;
+    }
+    
+    .chapter-header.expanded {
+        background: #fff3cd;
+        border-bottom: 1px solid #ffeaa7;
+    }
+    
+    .chapter-title {
+        font-weight: 600;
+        margin: 0;
+        flex-grow: 1;
+    }
+    
+    .chapter-meta {
+        color: #6c757d;
+        font-size: 14px;
+    }
+    
+    .chapter-toggle {
+        transition: transform 0.3s ease;
+    }
+    
+    .chapter-toggle.expanded {
+        transform: rotate(90deg);
+    }
+    
+    .chapter-lessons {
+        display: none;
+        background: white;
+    }
+    
+    .chapter-lessons.show {
+        display: block;
+    }
+    
+    .lesson-item {
+        padding: 0.75rem 1.5rem;
+        border-bottom: 1px solid #f1f3f4;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+    
+    .lesson-item:hover {
+        background: #f8f9fa;
+    }
+    
+    .lesson-item:last-child {
+        border-bottom: none;
+    }
+    
+    .lesson-number {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #f1f3f4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        margin-right: 12px;
+        color: #6c757d;
+    }
+    
+    .lesson-title {
+        flex-grow: 1;
+        font-size: 14px;
+        margin: 0;
+    }
+    
+    .lesson-duration {
+        color: #6c757d;
+        font-size: 12px;
+    }
+    
+    .back-btn {
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.3s ease;
+    }
+    
+    .back-btn:hover {
+        color: #495057;
+    }
+    
+    .course-stats {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-number {
+        display: block;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+    
+    .stat-label {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+    
+    .free-badge {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 18px;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+    }
+    
+    .expand-btn {
+        color: rgb(255, 94, 0);
+        font-size: 12px;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .expand-btn:hover {
+        color: #ee5a52;
+    }
+
+    /* Modal Styles */
+    .modal-content {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .modal-title {
+        font-weight: 600;
+    }
+    
+    .btn-close {
+        filter: invert(1);
+    }
+    
+    .modal-body {
+        padding: 0;
+        background: #000;
+    }
+    
+    .video-container {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 56.25%;
+        background: #000;
+    }
+    
+    .video-container video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    
+    .loading-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 2rem;
+        z-index: 1;
+    }
+
+    .custom-modal-width {
+        max-width: 950px;
+        width: 100%;
+    }
+</style>
+
+<div class="container mt-4">
+    <!-- Back Button -->
     <div class="mb-3">
-        <a onclick="history.back()" class="text-muted" style="cursor: pointer;"><i class="fa-solid fa-reply fa-sm me-2"></i>Quay lại</a>
+        <a href="#" class="back-btn ps-4" onclick="history.back()">
+            <i class="fa-solid fa-arrow-left me-2"></i>Quay lại
+        </a>
     </div>
 
     <div class="row">
-        <div class="col-lg-9">
-            <h2>{{course.name}}</h2>
-            <p>{{course.description}}</p>
+        <!-- Main Content -->
+        <div class="col-lg-8 mb-4">
+            <div class="course-content">
+                <!-- Course Header -->
+                <div class="course-hero">
+                    <div class="container p-4 py-1">
+                        <h1 class="display-6 fw-bold mb-3">{{course.name}}</h1>
+                        <p class="text-muted">{{course.description}}</p>
+                    </div>
+                </div>
+
+                <!-- Course Content -->
+                <div class="p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h3 class="fw-bold">Nội dung khóa học</h3>
+                        <a href="#" class="expand-btn fs-6" onclick="expandAll()">Mở rộng tất cả</a>
+                    </div>
+
+                    <div class="mb-4">
+                        <small class="d-flex flex-wrap gap-2 text-muted">
+                            <span><strong>{{countChapters}}</strong> chương</span>
+                            <span>•</span>
+                            <span><strong>{{countLessons}}</strong> bài học</span>
+                            <span>•</span>
+                            <span>Thời lượng <strong>{{totalDuration.hours}} giờ {{totalDuration.minutes}} phút</strong></span>
+                        </small>
+                    </div>
+
+                    <!-- Chapters List -->
+                    {{#each chapters}}
+                        <div class="chapter-section">
+                            <div class="chapter-header" onclick="toggleChapter({{@index}})">
+                                <i class="fa-solid fa-plus chapter-toggle" style="color: rgb(255, 94, 0);"></i>
+                                <h6 class="chapter-title ms-2">{{this.title}}</h6>
+                                <span class="chapter-meta">{{this.countLessonsInChapter}} bài học</span>
+                            </div>
+                            <div class="chapter-lessons" id="chapter-{{@index}}">
+                                {{#each this.lessons}}
+                                <div class="lesson-item">
+                                    <p class="lesson-title mb-0">
+                                        <i class="fa-solid fa-play-circle me-3" style="color: rgb(255, 94, 0);"></i>{{sum @index 1}}. {{this.title}}
+                                    </p>
+                                    <span class="lesson-duration">
+                                        {{this.duration.minutes}}:{{this.duration.seconds}}
+                                    </span>
+                                </div>
+                                {{/each}}
+                            </div>
+                        </div>
+                    {{/each}}
+                </div>
+            </div>
         </div>
-        <div class="col-lg-3">
-            <iframe width="360" height="200" src="https://www.youtube.com/embed/{{course.videoID}}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            <button>Đăng ký học</button>
-            <h5>{{course.level}}</h5>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="course-sidebar">
+                <!-- Video Preview (Click để mở modal) -->
+                <div class="video-preview" onclick="playPreview()" style="cursor: pointer;">
+                    <div class="play-btn">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
+                    <h5 class="text-center mb-2">{{course.name}}</h5>
+                    <small class="d-block text-center opacity-75">Xem giới thiệu khóa học</small>
+                </div>
+
+                <!-- Free Badge -->
+                <div class="text-center">
+                    <span class="free-badge">
+                        {{#if (eq course.price '0 VNĐ')}}Miễn phí{{else}} {{course.price}} {{/if}}
+                    </span>
+                </div>
+
+                <!-- Register -->
+                <a href="/learning/{{course.slug}}?id={{lessons.0._id}}" class="btn btn-primary register-btn">
+                    <i class="fa-solid fa-user-plus me-2"></i>
+                    ĐĂNG KÝ HỌC
+                </a>
+
+                <!-- Course Stats -->
+                <div class="course-stats">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="stat-item">
+                                <span class="stat-number">{{countLessons}}</span>
+                                <span class="stat-label">Tổng số bài học</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-item">
+                                <span class="stat-number">{{totalDuration.hours}}h : {{totalDuration.minutes}}p</span> 
+                                <span class="stat-label">Thời lượng</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Info -->
+                <ul class="course-info">
+                    <li>
+                        <i class="fa-solid fa-signal"></i>
+                        <span>Trình độ cơ bản</span>
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Tổng số <strong>{{countLessons}}</strong> bài học</span>
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-clock"></i>
+                        <span>Thời lượng <strong>{{totalDuration.hours}}</strong> giờ <strong>{{totalDuration.minutes}}</strong> phút</span>
+                    </li>
+                    <li>
+                        <i class="fa-solid fa-desktop"></i>
+                        <span>Học mọi lúc, mọi nơi</span>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Video Modal -->
+<div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered custom-modal-width">
+        <div class="modal-content p-4">
+            <div class="modal-content position-relative">
+                <button type="button" class="btn position-absolute top-0 end-0 m-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fa-solid fa-xmark fs-5" aria-hidden="true"></i>
+                </button>
+
+                <div class="modal-header p-0 border-0">
+                    <div class="d-flex flex-column">
+                    <h6 class="mb-2">Giới thiệu khóa học</h6>
+                    <h5 class="title-strong mb-4" id="videoModalLabel">{{course.name}}</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="video-container">
+                    <video id="modalVideo" width="100%" controls>
+                        <source src="{{course.videoPreview.url}}" type="video/mp4">
+                        Trình duyệt không hỗ trợ video.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleChapter(chapterNum) {
+        const chapterLessons = document.getElementById(`chapter-${chapterNum}`);
+        const chapterHeader = chapterLessons.previousElementSibling;
+        const toggleIcon = chapterHeader.querySelector('.chapter-toggle');
+        
+        if (chapterLessons.classList.contains('show')) {
+            chapterLessons.classList.remove('show');
+            chapterHeader.classList.remove('expanded');
+            toggleIcon.classList.remove('expanded');
+            toggleIcon.classList.remove('fa-minus');
+            toggleIcon.classList.add('fa-plus');
+        } else {
+            chapterLessons.classList.add('show');
+            chapterHeader.classList.add('expanded');
+            toggleIcon.classList.add('expanded');
+            toggleIcon.classList.remove('fa-plus');
+            toggleIcon.classList.add('fa-minus');
+        }
+    }
+    
+    function expandAll() {
+        const chapters = document.querySelectorAll('.chapter-section');
+        const expandBtn = document.querySelector('.expand-btn');
+        const isExpanded = expandBtn.textContent.includes('Thu gọn');
+        
+        chapters.forEach((chapter, index) => {
+            const chapterNum = index + 1;
+            const chapterLessons = document.getElementById(`chapter-${chapterNum}`);
+            const chapterHeader = chapterLessons?.previousElementSibling;
+            const toggleIcon = chapterHeader?.querySelector('.chapter-toggle');
+            
+            if (chapterLessons && chapterHeader && toggleIcon) {
+                if (!isExpanded) {
+                    chapterLessons.classList.add('show');
+                    chapterHeader.classList.add('expanded');
+                    toggleIcon.classList.add('expanded');
+                    toggleIcon.classList.remove('fa-plus');
+                    toggleIcon.classList.add('fa-minus');
+                } else {
+                    chapterLessons.classList.remove('show');
+                    chapterHeader.classList.remove('expanded');
+                    toggleIcon.classList.remove('expanded');
+                    toggleIcon.classList.remove('fa-minus');
+                    toggleIcon.classList.add('fa-plus');
+                }
+            }
+        });
+        
+        expandBtn.textContent = isExpanded ? 'Mở rộng tất cả' : 'Thu gọn tất cả';
+    }
+
+    function playPreview() {
+        const modalEl = document.getElementById('videoModal');
+        const modalVideo = document.getElementById('modalVideo');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+
+        showLoading(true);
+        modalVideo.onloadeddata = () => showLoading(false); // Ẩn spinner khi video tải xong
+        modalVideo.play(); // Tự động phát video
+
+        modal.show();
+    }
+
+    // Xử lý khi modal đóng
+    const videoModal = document.getElementById('videoModal');
+    videoModal.addEventListener('hidden.bs.modal', function () {
+        const modalVideo = document.getElementById('modalVideo');
+        modalVideo.pause(); // Dừng video
+        modalVideo.currentTime = 0; // Reset thời gian video
+
+        // Xóa modal-backdrop nếu còn tồn tại
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+        document.body.classList.remove('modal-open');
+        document.body.style.paddingRight = '';
+        document.body.style.overflow = ''; // Khôi phục cuộn
+    });
+
+    function showLoading(show) {
+        const spinner = document.querySelector('.loading-spinner');
+        if (spinner) {
+            spinner.style.display = show ? 'block' : 'none';
+        }
+    }
+
+    function showAlert(message, type = 'info') {
+        const alertTypes = {
+            'info': 'info',
+            'warning': 'warning',
+            'error': 'danger',
+            'success': 'success'
+        };
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${alertTypes[type]} alert-dismissible fade show position-fixed`;
+        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alertDiv.innerHTML = `
+            <i class="fa-solid fa-${type === 'error' ? 'exclamation-triangle' : type === 'warning' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(alertDiv);
+        
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 5000);
+    }
+    
+    // Animate course stats on load
+    document.addEventListener('DOMContentLoaded', function() {
+        const statNumbers = document.querySelectorAll('.stat-number');
+        statNumbers.forEach((stat, index) => {
+            stat.style.opacity = '0';
+            stat.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                stat.style.transition = 'all 0.6s ease';
+                stat.style.opacity = '1';
+                stat.style.transform = 'translateY(0)';
+            }, 300 + (index * 100));
+        });
+    });
+</script>

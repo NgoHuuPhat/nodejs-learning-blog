@@ -11,8 +11,8 @@ const CourseSchema = new Schema(
         name: { type: String, required: true },
         description: { type: String, maxLength: 600 },
         image: { 
-            image_id: { type: String, required: true },
-            url: { type: String, required: true },
+            image_id: { type: String },
+            url: { type: String },
          },
         level: { type: String, enum: ['Cơ bản', 'Trung bình', 'Nâng cao'], default: 'Cơ bản' },
         slug: { type: String, slug: 'name', unique: true },

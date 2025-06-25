@@ -1,14 +1,68 @@
 const Course = require('../../models/Course')
+const Chapter = require('../../models/Chapter')
+const Lesson = require('../../models/Lesson')
+const {formatDuration, formatCurrency} = require('../../../utils/format')
 
 class CourseController {
     //[GET] /courses/:slug
     async details(req, res, next) {
         try {
-            //Lấy khóa học trường slug = giá trị req.params.slug
+
+            let countChapters = 0
+            let countLessons = 0
+            let totalDuration = 0 
+            let chapters =  []
+            let lessons = []
+
+            // Lấy khóa học trường slug = giá trị req.params.slug
             const course = await Course.findOne({
                 slug: req.params.slug,
             }).lean()
-            res.render('client/courses/details', { course })
+            
+            if(course){
+                
+                // Định dạng giá tiền
+                course.price = formatCurrency(course.price) 
+
+                // Đếm số chương của khóa học
+                chapters = await Chapter.find({ course_id: course._id }).lean()
+                countChapters = chapters.length
+
+                const chapterIds = chapters.map(chapter => chapter._id)
+                lessons = await Lesson.find({ chapter_id: { $in: chapterIds } }).lean()
+
+                // Gắn bài học vào từng chương
+                chapters = chapters.map(chapter => {
+                    // Lọc các bài học thuộc chapter hiện tại
+                    const chapterLessons = lessons.filter(lesson => lesson.chapter_id.toString() === chapter._id.toString())
+                    const countLessonsInChapter = chapterLessons.length
+                    return {
+                        ...chapter,
+                        countLessonsInChapter,
+                        lessons: chapterLessons.map(lesson => ({
+                            ...lesson,
+                            duration: formatDuration(lesson.videoLesson.duration),
+                        }))
+                    }
+                })
+
+                // Tổng số lượng thời gian của bài học
+                totalDuration = lessons.reduce((total, lesson)=> {
+                    return total + lesson.videoLesson.duration
+                }, 0)
+                
+                // Đếm số bài học  của khóa học
+                countLessons = await Lesson.countDocuments({ chapter_id: { $in: chapterIds } })
+
+            }
+            res.render('client/courses/details', { 
+                course, 
+                chapters, 
+                lessons, 
+                countChapters, 
+                countLessons, 
+                totalDuration: formatDuration(totalDuration),
+            })
         } catch (error) {
             next(error)
         }
