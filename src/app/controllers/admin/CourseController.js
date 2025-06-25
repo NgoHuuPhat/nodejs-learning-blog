@@ -206,16 +206,24 @@ class CourseController {
             // Kiểm tra khóa học có tồn tại không
             const exittingCourse = await Course.findById(req.params.id)
             if (!exittingCourse) {
-                return res.status(404).send('Khóa học không tồn tại')
+                req.flash('error', 'Khóa học không tồn tại')
+                return res.redirect('/admin/courses')
             }
 
             // Xử lý upload ảnh và video
-            let courseImage = exittingCourse.image || ''
+            let courseImage = exittingCourse.image || null
             let videoPreview = exittingCourse.videoPreview || null
-
+            
             // Kiểm tra xem có file ảnh mới không
             if (req.uploadResults && req.uploadResults.courseImage) {
-                courseImage = req.uploadResults.courseImage[0].secure_url
+                courseImage = {
+                    image_id: req.uploadResults.courseImage[0].public_id,
+                    url: req.uploadResults.courseImage[0].secure_url,
+                }
+
+                if (exittingCourse.image && exittingCourse.image.image_id) {
+                    deleteFromCloudinary(exittingCourse.image.image_id, 'image')
+                }
             }
 
             // Kiểm tra xem có file video giới thiệu mới không
@@ -225,9 +233,14 @@ class CourseController {
                     url: req.uploadResults.courseVideoPreview[0].secure_url,
                     duration: req.uploadResults.courseVideoPreview[0].duration,
                 }
+
+                if (exittingCourse.videoPreview && exittingCourse.videoPreview.video_id) {
+                    // Xóa video cũ khỏi Cloudinary nếu có
+                    deleteFromCloudinary(exittingCourse.videoPreview.video_id, 'video')
+                } 
             }
 
-            // Tạo Object khóa học
+            // Tạo Object khóa học và cap nhật thông tin
             const course = await Course.findByIdAndUpdate(req.params.id, {
                 name: req.body.courseName,
                 description: req.body.courseDescription,
@@ -235,27 +248,39 @@ class CourseController {
                 price: req.body.coursePrice,
                 updatedBy: {
                     account_id: res.locals.account.id,
-                    createdAt: new Date(),
+                    updatedAt: new Date(),
                 },
                 image: courseImage,
                 videoPreview: videoPreview,
             }, {new: true}) 
 
             // Kiểm tra xem có dữ liệu courseStructure không
+            if (!req.body.courseStructure) {
+                return res.redirect('/admin/courses')
+            }
             const courseStructure = JSON.parse(req.body.courseStructure)
             if(courseStructure){
     
-                // Xóa các chương không có trong courseStructure
+                // Xóa các chương không có trong courseStructure 
                 const chapterIds = courseStructure.map(chapter => chapter._id)
                 const chaptersToDelete = await Chapter.find({ course_id: course._id, _id: {$nin: chapterIds} }).lean()
                 await Chapter.deleteMany({
                     _id: { $nin: chapterIds }, 
                     course_id: course._id,
                 })
+                // Xóa video bài học tương ứng trong Cloudinary
+                for (const chapter of chaptersToDelete) {
+                    const lessonsToDelete = await Lesson.find({ chapter_id: chapter._id })
+                    for (const lesson of lessonsToDelete) {
+                        if (lesson.videoLesson && lesson.videoLesson.video_id) {
+                            await deleteFromCloudinary(lesson.videoLesson.video_id, 'video')
+                        }
+                    }
+                }
                 await Lesson.deleteMany({
                     chapter_id: { $in: chaptersToDelete.map(chapter => chapter._id) },
                 })
-                
+             
                 // Cập nhật và tạo chương hiện có
                 for (const chapter of courseStructure) {
                     if(chapter.isExisting && chapter._id) {
@@ -284,44 +309,83 @@ class CourseController {
                     }
 
                     // Xử lí bài học
-                    // Xóa bài học không có trong chapter.lessons
                     const existingLessonIds = chapter.lessons
                         .filter(lesson => lesson.isExisting && lesson._id)
                         .map(lesson => lesson._id)
+
+                    // Xử lí xóa trong Cloudinary
+                    const lessonsToDelete = await Lesson.find({
+                        chapter_id: chapter._id,
+                        _id: { $nin: existingLessonIds },
+                    }).lean()
+
+                    // Xóa bài học không có trong chapter.lessons
+                    for (const lesson of lessonsToDelete) {
+                        if (lesson.videoLesson && lesson.videoLesson.video_id) {
+                            await deleteFromCloudinary(lesson.videoLesson.video_id, 'video')
+                        }
+                    }
 
                     await Lesson.deleteMany({
                         chapter_id: chapter._id,
                         _id: { $nin: existingLessonIds },
                     })
 
+                    // Xử lý từng bài học
+                    let videoLessonIndex = 0
                     for(const lesson of chapter.lessons) {
                         if(lesson.isExisting && lesson._id) {
                             // Cập nhật bài học hiện có
-                            await Lesson.updateOne(
-                                { _id: lesson._id },
-                                {
-                                    title: lesson.title,
-                                    updatedBy: {
-                                        account_id: res.locals.account.id,
-                                        updatedAt: new Date(),
+                            const existingLesson = await Lesson.findById(lesson._id)
+                            if(req.uploadResults && req.uploadResults.courseVideoLesson && req.uploadResults.courseVideoLesson[videoLessonIndex]) {
+                                if (existingLesson.videoLesson && existingLesson.videoLesson.video_id) {
+                                    await deleteFromCloudinary(existingLesson.videoLesson.video_id, 'video')
+                                }
+                                
+                                await Lesson.updateOne(
+                                    { _id: lesson._id },
+                                    {
+                                        title: lesson.title,
+                                        videoLesson: {
+                                            video_id: req.uploadResults.courseVideoLesson[videoLessonIndex].public_id || '',
+                                            url: req.uploadResults.courseVideoLesson[videoLessonIndex].url || '',
+                                            duration: req.uploadResults.courseVideoLesson[videoLessonIndex].duration || 0,
+                                        },
+                                        updatedBy: {
+                                            account_id: res.locals.account.id,
+                                            updatedAt: new Date(),
+                                        },
                                     },
-                                },
-                            )
+                                )
+                            } else {
+                                await Lesson.updateOne(
+                                    { _id: lesson._id },
+                                    {
+                                        title: lesson.title,
+                                        updatedBy: {
+                                            account_id: res.locals.account.id,
+                                            updatedAt: new Date(),
+                                        },
+                                    },
+                                )
+                            }
+                            videoLessonIndex++
                         } else {
                             // Tạo bài học mới
                             await Lesson.create({
                                 chapter_id: chapter._id,
                                 title: lesson.title,
                                 videoLesson: {
-                                    video_id: lesson.videoLesson?.video_id || '',
-                                    url: lesson.videoLesson?.url || '',
-                                    duration: lesson.videoLesson?.duration || 0,
+                                    video_id: req.uploadResults.courseVideoLesson[videoLessonIndex].public_id || '',
+                                    url: req.uploadResults.courseVideoLesson[videoLessonIndex].url || '',
+                                    duration: req.uploadResults.courseVideoLesson[videoLessonIndex].duration || 0,
                                 },
                                 createdBy: {
                                     account_id: res.locals.account.id,
                                     createdAt: new Date(),
                                 },
                             })
+                            videoLessonIndex++
                         }
                     }
                 }
@@ -425,18 +489,15 @@ class CourseController {
 
             // Kiểm tra xóa ở Cloudinary
             if (course && course.videoPreview && course.videoPreview.video_id) {
-                const result = await deleteFromCloudinary(course.videoPreview.video_id, 'video')
-                console.log('Deleted video preview from Cloudinary:', result)
+                await deleteFromCloudinary(course.videoPreview.video_id, 'video')
             } 
             else if (course && course.image && course.image.image_id) {
-                const result = await deleteFromCloudinary(course.image.image_id, 'image')
-                console.log('Deleted course image from Cloudinary:', result)
+                await deleteFromCloudinary(course.image.image_id, 'image')
             }
 
             for (const lesson of lessons) {
                 if (lesson.videoLesson && lesson.videoLesson.video_id) {
-                    const result = await deleteFromCloudinary(lesson.videoLesson.video_id, 'video')
-                    console.log('Deleted lesson video from Cloudinary:', result)
+                    await deleteFromCloudinary(lesson.videoLesson.video_id, 'video')
                 }
             }
 

@@ -221,7 +221,7 @@
             <div class="d-flex align-items-center flex-grow-1">
                 <i class="fas fa-grip-vertical drag-handle me-2"></i>
                 <div class="flex-grow-1">
-                    <input type="text" class="form-control chapter-title" placeholder="Tên chương..." onchange="updateChapterTitle(this)">
+                    <input type="text" class="form-control chapter-title" placeholder="Tên chương...">
                 </div>
             </div>
             <div class="btn-group">
@@ -337,10 +337,6 @@
                 document.querySelector('.add-btn').style.display = 'block';
             }
         }
-    }
-
-    function updateChapterTitle(input) {
-        console.log('Chapter title updated:', input.value);
     }
 
     // Quản lý bài học
@@ -504,7 +500,7 @@
         lessonTitleInput.value = lessonData.name || lessonData.title || '';
         
         const videoInput = clone.querySelector('input[name="courseVideoLesson"]');
-        videoInput.name = `courseVideoLesson-${lessonData._id || lessonCount}`;
+        videoInput.name = `courseVideoLesson`;
         if (lessonData.videoLesson && lessonData.videoLesson.url) {
             const existingVideoDiv = document.createElement('div');
             existingVideoDiv.className = 'existing-video mb-2';
