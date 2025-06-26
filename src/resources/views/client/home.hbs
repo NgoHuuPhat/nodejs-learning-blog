@@ -8,7 +8,7 @@
         <div class="col-sm-6 col-lg-4 mb-4 ">
             <div class="border-0 bg-light card rounded-4 card-course-item h-100 shadow-sm ">
                 <a href="/courses/{{this.slug}}">
-                    <img src="{{this.image}}" class="card-img-top rounded-top-4 " alt="{{this.name}}" style="height: 200px; object-fit: cover;">
+                    <img src="{{this.image.url}}" class="card-img-top rounded-top-4 " alt="{{this.name}}" style="height: 200px; object-fit: cover;">
                 </a>
                 <div class="card-body d-flex flex-column">
                     <a href="/courses/{{this.slug}}" class="card-link">
@@ -16,15 +16,15 @@
                     </a>
 
                     {{!-- Xét điều kiện miễn phí --}}
-                    {{#if (eq this.price '0 đ')}}
+                    {{#if (eq this.price '0 VNĐ')}}
                         <p class="card-text fw-semibold" style="color: rgb(255, 94, 0);">Miễn phí</p>
                         <div class="mt-auto">
-                            <a href="#" class="btn-grad">Học ngay</a>
+                            <a href="#" class="btn-grad fw-semibold">Học ngay</a>
                         </div>
                     {{else}}
                         <p class="card-text fw-semibold" style="color: rgb(255, 94, 0);">{{this.price}}</p>
                             <div class="mt-auto">
-                            <a href="/checkout/{{this.slug}}" class="btn-grad">Mua khóa học</a>
+                            <a href="/checkout/{{this.slug}}" class="btn-grad fw-semibold">Mua khóa học</a>
                         </div>
                     {{/if}}
                     
