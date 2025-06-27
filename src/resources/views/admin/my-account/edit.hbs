@@ -33,25 +33,7 @@
     </form>
 </div>
 
-<!-- Hiển thị thông báo thành công -->
-{{#if success}}
-  <div class="alert alert-success alert-dismissible mt-5" role="alert">
-    {{success}}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <i class="fa-solid fa-circle-xmark"></i>
-    </button>
-  </div>
-{{/if}}
 
-<!-- Hiển thị thông báo lỗi -->
-{{#if error}}
-  <div class="alert alert-danger alert-dismissible mt-5" role="alert">
-    {{error}}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <i class="fa-solid fa-circle-xmark"></i>
-    </button>
-  </div>
-{{/if}}
 
 <div id="successMessage" class="alert alert-success alert-dismissible mt-5 d-none" role="alert">
     <span id="successText"></span>

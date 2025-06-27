@@ -22,35 +22,6 @@ document.addEventListener('DOMContentLoaded', function () {
         })
     }
 
-    // Timeout toast
-    const toastEl = document.getElementById('toast-error')
-
-    if (toastEl) {
-        const toast = new bootstrap.Toast(toastEl, {
-            delay: 2500,
-            autohide: true,
-        })
-        toast.show()
-    }
-
-    // Timeout alert
-    const alerts = document.querySelectorAll('.alert')
-
-    alerts.forEach((alert) => {
-        // Tự động tắt thông báo sau 3 giây
-        setTimeout(() => {
-            alert.classList.add('fade-out')
-        }, 3000) //
-
-        // Nếu người dùng nhấn nút đóng, tắt thông báo ngay lập tức
-        const closeButton = alert.querySelector('.close')
-        if (closeButton) {
-            closeButton.addEventListener('click', function () {
-                alert.classList.add('fade-out')
-            })
-        }
-    })
-
     // Permissions
     const tablePermissions = document.querySelector('.table-permissions')
     if (tablePermissions) {

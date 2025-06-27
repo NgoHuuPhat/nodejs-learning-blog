@@ -1,0 +1,78 @@
+{{#if success}}
+  <div class="alert alert-success flash-alert" role="alert">
+    {{success}}
+    <button type="button" class="close" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+{{#if error}}
+  <div class="alert alert-danger flash-alert" role="alert">
+    {{error}}
+    <button type="button" class="close" aria-label="Close">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </button>
+  </div>
+{{/if}}
+
+<style>
+
+    .alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 8px;
+    font-size: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: all 0.5s ease;
+    }
+
+    .alert .close {
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin-left: 12px;
+    cursor: pointer;
+    }
+
+    .alert .close i {
+    color: white;
+    font-size: 18px;
+    }
+
+    .flash-alert.fade-out {
+    opacity: 0;
+    max-height: 0;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    transition: all 0.5s ease-out;
+    }
+
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const alerts = document.querySelectorAll('.flash-alert');
+
+        alerts.forEach(alert => {
+            setTimeout(() => {
+            alert.classList.add('fade-out');
+            }, 3000);
+
+            const closeBtn = alert.querySelector('.close');
+            if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                alert.classList.add('fade-out');
+            });
+            }
+        });
+    });
+</script>
