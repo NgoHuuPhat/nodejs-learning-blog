@@ -166,7 +166,9 @@ class CourseController {
                 }
                 break
             default:
-                res.json({ message: 'Action in valid' })
+                res.flash('error', 'Hành động không hợp lệ!')
+                res.redirect('back') //'back' về lại trang trước đó
+                break
         }
     }
 }

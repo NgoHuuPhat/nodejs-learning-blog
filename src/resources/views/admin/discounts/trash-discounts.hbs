@@ -1,0 +1,94 @@
+
+  <div>
+    <h3>Khóa học đã xóa</h3>
+    <a href="/admin/discounts">Quay lại</a>
+  </div>
+
+  <table class="table mt-4">
+  <thead>
+    <tr>
+      <th scope="col">STT</th>
+      <th scope="col">Mã giảm giá</th>
+      <th scope="col">Loại</th>
+      <th scope="col">Giá trị</th>
+      <th scope="col">Ngày bắt đầu</th>
+      <th scope="col">Ngày kết thúc</th>
+      <th scope="col">Thao tác</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each discounts}}
+    <tr class="align-middle">
+      <th scope="row">{{sum @index 1}}</th>
+      <td>{{this.code}}</td>
+      <td>
+        {{#if (eq this.type 'fixed')}} Giảm cố định (VNĐ)
+        {{else}} Giảm theo phần trăm (%)
+        {{/if}}
+      </td>
+      <td>{{this.value}}</td>
+      <td>{{this.startDate}}</td>
+      <td>{{this.endDate}}</td>
+      <td>
+        <a href="#" class="btn btn-link btn-restore" data-id="{{this._id}}">Khôi phục</a>
+        <a href="#" class="btn btn-link" data-bs-toggle="modal" data-id="{{this._id}}" data-bs-target="#delete-discount-modal">Xóa vĩnh viễn</a>
+      </td>
+    </tr>
+    {{else}}
+    <tr>
+      <td class="text-center" colspan="7">Không có mã giảm giá nào trong thùng rác.</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+<!-- Modal xác nhận xóa vĩnh viễn -->
+<div class="modal fade" id="delete-discount-modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Xóa vĩnh viễn?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+      </div>
+      <div class="modal-body">
+        Bạn chắc chắn muốn xóa vĩnh viễn mã giảm giá này?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button id="btn-delete-discount" type="button" class="btn btn-danger">Xóa vĩnh viễn</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Form ẩn để gửi yêu cầu -->
+<form id="delete-discount-form" method="POST"></form>
+<form id="restore-discount-form" method="POST"></form>
+
+<script>
+  let discountID
+  const deleteForm = document.getElementById('delete-discount-form')
+  const btnDeleteDiscount = document.getElementById('btn-delete-discount')
+  const restoreForm = document.getElementById('restore-discount-form')
+  const restoreBtns = document.querySelectorAll('.btn-restore')
+
+  const deleteModal = document.getElementById('delete-discount-modal')
+  deleteModal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget
+    discountID = button.getAttribute('data-id')
+  })
+
+  btnDeleteDiscount.onclick = function () {
+    deleteForm.action = '/admin/discounts/' + discountID + '/force?_method=DELETE'
+    deleteForm.submit()
+  }
+
+  restoreBtns.forEach(btn => {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault()
+      const id = this.getAttribute('data-id')
+      restoreForm.action = '/admin/discounts/' + id + '/restore?_method=PATCH'
+      restoreForm.submit()
+    })
+  })
+</script>

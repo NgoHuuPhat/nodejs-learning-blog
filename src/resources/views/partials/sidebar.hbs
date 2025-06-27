@@ -1,4 +1,4 @@
-<div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark sidebar" style="width: 240px;">
+<div class="d-flex flex-column flex-shrink-0 p-3 text-bg-dark sidebar" style="width: 250px;">
     <a class="navbar-brand text-center d-block logo-white" href="/admin/dashboard">
         <img src="/img/LOGO FINAL.png" alt="logo" style="width: 100px; height: auto;">
     </a>  
@@ -16,6 +16,15 @@
                 <a href="/admin/courses" class="nav-link text-white">
                     <i class="fas fa-graduation-cap me-2"></i>
                     Quản lý khóa học
+                </a>
+            </li>
+        {{/includes}}
+
+        {{#includes account.role_permissions 'discounts_view'}}
+            <li>
+                <a href="/admin/discounts" class="nav-link text-white">
+                    <i class="fas fa-ticket-alt me-2"></i>
+                    Quản lý mã giảm giá
                 </a>
             </li>
         {{/includes}}

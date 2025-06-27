@@ -5,23 +5,16 @@ const { sortTable } = require('../../utils/queryHelper')
 
 const Schema = mongoose.Schema
 
-const CourseSchema = new Schema(
+const DiscountCodeSchema = new Schema(
     {
-        name: { type: String, required: true },
-        description: { type: String, maxLength: 600 },
-        image: { 
-            image_id: { type: String },
-            url: { type: String },
-         },
-        level: { type: String, enum: ['Cơ bản', 'Trung bình', 'Nâng cao'], default: 'Cơ bản' },
-        slug: { type: String, slug: 'name', unique: true },
-        price: { type: Number, default: 0 },
-        videoPreview: { 
-            video_id: { type: String,},
-            url: { type: String,}, 
-            duration: { type: Number, default: 0 },
-        }, 
-        discountCode: { type: mongoose.Schema.ObjectId },
+        code: { type: String, required: true, unique: true, uppercase: true, trim: true },
+        description: { type: String },
+        type: { type: String, enum: ['percentage', 'fixed'], default: 'fixed' },
+        value: { type: Number, required: true }, // 10% hoặc 100000
+        maxUses: { type: Number, default: 100 },
+        usedCount: { type: Number, default: 0 },
+        startDate: { type: Date, required: true },
+        endDate: { type: Date, required: true },
         
         //Thêm người tạo
         createdBy: {
@@ -54,12 +47,12 @@ const CourseSchema = new Schema(
 mongoose.plugin(slug)
 
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
-CourseSchema.plugin(mongooseDelete, {
+DiscountCodeSchema.plugin(mongooseDelete, {
     deletedAt: false,
     overrideMethods: 'all',
 })
 
 // Sử dụng query helper chung
-CourseSchema.query.sortTable = sortTable
+DiscountCodeSchema.query.sortTable = sortTable
 
-module.exports = mongoose.model('Course', CourseSchema) //Collection - Schema
+module.exports = mongoose.model('DiscountCode', DiscountCodeSchema) //Collection - Schema

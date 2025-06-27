@@ -1,0 +1,237 @@
+
+{{!-- Kiểm tra quyền truy cập --}}
+{{#if (includes account.role_permissions 'discounts_view')}}
+<form method="POST" action="/admin/discounts/handle-form-actions">
+  <div>
+    <h3>Danh sách mã giảm giá</h3>
+    <a href="/admin/discounts/trash">Thùng rác ({{countDeleted}})</a>
+  </div>
+
+  <div class="d-flex justify-content-between mt-3">
+    
+    <!-- Nút thêm mới -->
+    <a href="/admin/discounts/create" class="btn btn-success me-2">
+      <i class="fas fa-plus-circle me-1"></i> Thêm mới
+    </a>
+
+    <div class="d-flex gap-3">
+      <select class="form-select-sm" name="action" required>
+        <option value="">-- Hành động --</option>
+        <option value="delete">Xóa</option>
+      </select>
+      <button class="btn btn-primary btn-submit btn-sm disabled">Thực hiện</button>
+    </div>
+    </div>
+
+  <table class="table mt-4">
+      <thead>
+          <tr>
+              {{!-- Nếu có giá trị truthy thì nó sẽ hiển thị --}}
+              {{#if discounts.length}}
+              <th scope="col">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="checkbox-all" >
+                </div>
+              </th>
+              {{/if}}
+              <th scope="col">STT</th>
+              <th scope="col" style="width: 11%;">
+                Mã giảm giá
+                {{{sortTable 'code' _sort query}}}
+              </th>
+              <th scope="col">
+                Loại mã
+              </th>
+              <th scope="col">
+                Giá trị giảm
+              </th>
+              <th scope="col">
+                Số lần sử dụng tối đa
+              </th>
+              <th scope="col">
+                Số lần đã sử dụng
+              </th>
+              <th scope="col">
+                Ngày hiệu lực
+                {{{sortTable 'startDate' _sort query}}}
+              </th>
+              <th scope="col">
+                Ngày kết thúc
+                {{{sortTable 'endDate' _sort query}}}
+              </th>
+              <th scope="col">
+                Người tạo
+              </th>
+              <th scope="col">Thao tác</th>
+          </tr>
+      </thead>
+      <tbody>
+          {{#each discounts}}
+          <tr class="align-middle">
+              {{!-- Sử dụng helpers: Để tạo hàm sum index --}}
+              <td>
+                <div class="form-check">
+                  {{!-- name="discountIDs[]" Luôn luôn trả về mảng --}}
+                  <input class="form-check-input" type="checkbox" name="discountIDs[]" value="{{this._id}}">
+                </div>
+              </td>
+              {{!-- STT=(currentPage−1)×itemsPerPage+index+1 --}}
+              <th scope="row"> {{ sum (sum (multiply (sub @root.objectPagination.currentPage 1) @root.objectPagination.limitItems) @index) 1 }}</th>  
+              <td>{{this.code}}</td>
+              {{#if (eq this.type 'fixed')}}
+                <td>Giảm cố định (VNĐ)</td>
+              {{else}}
+                <td>Giảm theo phần trăm (%)</td>
+              {{/if}}
+              <td>{{this.value}}</td>
+              <td>{{this.maxUses}}</td>
+              <td>{{this.usedCount}}</td>
+              <td>{{this.startDate}}</td>
+              <td>{{this.endDate}}</td>
+              <td>{{this.createdBy.fullName}}</td>
+              <td>
+                  <a href="/admin/discounts/{{this._id}}/edit" class="btn btn-link">Sửa</a>
+                  <!-- Button trigger modal 
+                        Trước tiên phải lấy được ID-->
+                  <a href="" class="btn btn-link" data-bs-toggle="modal" data-id = "{{this._id}}" data-bs-target="#delete-discount-modal">Xóa</a> 
+              </td>
+          </tr>
+          {{else}}
+          <tr>
+            <td class="text-center align-middle" colspan="10">Bạn chưa khuyến mãi cho học viên mã giảm giá nào.
+              <a href="/admin/discounts/create">Thêm mã giảm giá</a>
+            </td>   
+          </tr>
+          {{/each}}
+      </tbody>
+  </table>
+</form>
+
+{{else}}
+  {{> 404}}
+{{/if}}
+
+
+{{!-- Confirm delete discount --}}
+
+<!-- Modal -->
+<div class="modal fade" id="delete-discount-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Xóa mã giảm giá này?</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Bạn chắn chắn muốn xóa mã giảm giá này?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+        <button id="btn-delete-discount" type="button" class="btn btn-danger">Xóa bỏ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mt-4">
+  {{!-- Page number --}}
+    <div class="">
+      <span class="pagination-text small">{{objectPagination.startIndex}} to {{objectPagination.endIndex}} of {{objectPagination.count}}</span>
+    </div>
+  {{!-- End Page number --}}
+  {{!-- 1 to 10 of 100 discounts --}}
+
+  {{!-- Pagination --}}
+  <nav aria-label="...">
+    <ul class="pagination pagination-sm d-flex mb-0 justify-content-end">
+      <li class="page-item">
+        <a class="page-link{{#if (eq objectPagination.currentPage 1)}} disabled {{/if}}" href="?page={{sub objectPagination.currentPage 1}}">Previous</a>
+      </li>
+      {{#for 1 objectPagination.totalPage}}
+        <li class="page-item {{#if (eq @root.objectPagination.currentPage this)}}active{{/if}}">
+        {{!-- C1: Dùng thẻ a để tạo link --}}
+          <a class="page-link" href="?page={{this}}">{{this}}</a> 
+        {{!-- C2: Dùng thẻ button để tạo page-id thay đổi link href
+          <button class="page-link" page-pagination={{this}}>{{this}}</button> 
+        </li> --}}
+      {{/for}}
+      <li class="page-item">
+        <a class="page-link{{#if (eq objectPagination.currentPage objectPagination.totalPage)}} disabled {{/if}}" href="?page={{sum objectPagination.currentPage 1}}">Next</a>
+      </li>
+    </ul>
+  </nav>  
+  {{!-- End Pagination --}}
+</div>
+
+{{!-- Delete hidden form --}}
+<form id="delete-discount-form" method="POST"></form>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+
+    var discountID
+    var deleteForm = document.getElementById('delete-discount-form')
+    var btnDeleteCourse = document.getElementById('btn-delete-discount')
+    var checkboxAll = $('#checkbox-all') //Jquery
+    var discountItemCheckbox = $('input[name="discountIDs[]"]')
+    console.log(discountItemCheckbox)
+    var checkAllSubmitBtn = $('.btn-submit')
+
+    //Khi hộp thoại modal show
+    const deleteModal = document.getElementById('delete-discount-modal')
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget
+        discountID = button.getAttribute('data-id') //Lấy ra được id
+    })
+
+    //Khi click vào button xóa bỏ
+    btnDeleteCourse.onclick = function(event){
+      //Đẩy form xuống và gán action cho nó
+      deleteForm.action = '/admin' + '/discounts/' + discountID + '?_method=DELETE'
+      deleteForm.submit()
+    }
+
+    //Khi click checkboxAll
+    checkboxAll.change(function(){
+      var isCheckedAll = $(this).prop('checked')
+      discountItemCheckbox.prop('checked', isCheckedAll)
+      renderCheckAllSubmitBtn()
+    })
+
+    //Khi click checkboxItem (Phải biết được tổng số lượng đang check = Tổng số lượng checkbox đang có hay không ?)
+    discountItemCheckbox.change(function(){ 
+      var isCheckedAll = discountItemCheckbox.length === $('input[name="discountIDs[]"]:checked').length
+      checkboxAll.prop('checked', isCheckedAll )
+      renderCheckAllSubmitBtn()
+    })
+
+    //Xử lí với disable khi change checkBox
+    function renderCheckAllSubmitBtn(){
+      var checkedCound = $('input[name="discountIDs[]"]:checked').length
+      if(checkedCound > 0) {
+        checkAllSubmitBtn.removeClass('disabled')
+      } 
+      else {
+        checkAllSubmitBtn.addClass('disabled')
+      }
+    }
+
+    /* //Pagination
+    const buttonPagination = document.querySelectorAll('[page-pagination]').forEach(item => {
+      item.onclick = function(event){
+        event.preventDefault()
+        var url = this.getAttribute('page-pagination')
+        window.location.href = '/me/stored/discounts?page=' + url
+
+        //Hoặc
+        var url = new URL(window.location.href)
+        url.searchParams.set('page', this.getAttribute('page-pagination'))
+        window.location.href = url
+      }
+    })
+    //End Pagination */
+    
+}
+
+</script>

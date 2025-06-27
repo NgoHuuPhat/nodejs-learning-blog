@@ -1,0 +1,77 @@
+
+<div class="container mt-4">
+    <h3><i class="fas fa-tags"></i> Thêm mã giảm giá</h3>
+    <form action="/admin/discounts/store" method="POST" onsubmit="return validateDates()">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Mã giảm giá <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="code" id="discountCodeInput" placeholder="Nhập mã hoặc tạo tự động" required>
+                        <button class="btn btn-outline-secondary" type="button" onclick="generateDiscountCode()">
+                            <i class="fas fa-bolt"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mô tả</label>
+                    <textarea name="description" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Loại giảm giá <span class="text-danger">*</span></label>
+                    <select name="type" class="form-select" required>
+                        <option value="fixed">Giảm cố định (VNĐ)</option>
+                        <option value="percentage" selected >Giảm theo phần trăm (%)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Giá trị <span class="text-danger">*</span></label>
+                    <input type="number" name="value" class="form-control" required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label class="form-label">Số lần sử dụng tối đa</label>
+                    <input type="number" name="maxUses" class="form-control" value="100">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ngày bắt đầu <span class="text-danger">*</span></label>
+                    <input type="date" name="startDate" class="form-control"  required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Ngày kết thúc <span class="text-danger">*</span></label>
+                    <input type="date" name="endDate" class="form-control" required>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-save"></i> Lưu mã giảm giá
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+
+    // Hàm tạo mã giảm giá tự động
+    function generateDiscountCode() {
+        const prefix = "SURU";
+        const random = Math.random().toString(36).substring(2, 8).toUpperCase(); 
+        const code = `${prefix}${random}`;
+        document.getElementById("discountCodeInput").value = code;
+    }
+
+    // Validate date nhập vào
+    function validateDates() {
+        const startDate = new Date(document.querySelector('input[name="startDate"]').value);
+        const endDate = new Date(document.querySelector('input[name="endDate"]').value);
+
+        if (startDate >= endDate) {
+            alert("Ngày bắt đầu phải trước ngày kết thúc.");
+            return false;
+        }
+        return true;
+    }
+
+</script>

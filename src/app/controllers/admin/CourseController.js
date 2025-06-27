@@ -5,7 +5,6 @@ const Lesson = require('../../models/Lesson')
 const paginatitonHelper = require('../../../utils/pagination')
 const { formatDate } = require('../../../utils/format')
 const { deleteFromCloudinary } = require('../../../utils/cloudinary')
-const { default: mongoose } = require('mongoose')
 
 class CourseController {
     //[GET] /admin/courses
