@@ -33,7 +33,10 @@ function formatDuration(seconds) {
         throw new Error('Cần truyền vào thời lượng');
     }
 
-    const pad = (num) => (num < 10 ? '0' + num : num);
+    const pad = (num) => {
+        if (num === 0) return '0';
+        return num < 10 ? '0' + num : String(num);
+    };
 
     try {
         const totalSeconds = Math.floor(Number(seconds));

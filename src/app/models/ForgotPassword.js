@@ -5,7 +5,7 @@ const ForgotPasswordSchema = new Schema(
     {
         email: { type: String, required: true },
         otp: { type: String, required: true },
-        expireAt: { type: Date, expires: 180 }, // Thời gian hết hạn là 3 phút
+        expireAt: { type: Date, default: Date.now ,expires: 180 }, // Thời gian hết hạn là 3 phút
     },
     { timestamps: true },
 )

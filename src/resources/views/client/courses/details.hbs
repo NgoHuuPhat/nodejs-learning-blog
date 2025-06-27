@@ -320,6 +320,188 @@
         max-width: 950px;
         width: 100%;
     }
+
+    /* Payment Modal Styles */
+    .payment-modal .modal-content {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .payment-modal .modal-header {
+        background: linear-gradient(135deg, #1dd1a1 0%, #55a3ff 100%);
+        color: white;
+        border: none;
+        justify-self: center;
+        padding: 1.5rem;
+        position: relative;
+        
+    }
+    
+    .payment-modal .modal-header .btn-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        filter: none;
+    }
+    
+    .payment-modal .modal-header .btn-close i {
+        color: white;
+        font-size: 16px;
+    }
+    
+    .payment-modal .modal-body {
+        padding: 2rem;
+        background: white;
+    }
+    
+    .course-icon {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-size: 2rem; /* hoặc dùng fa-xl, fa-2xl */
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.2);
+    }
+    
+    .course-icon i {
+        font-size: 24px;
+        color: white;
+        display: block;
+    }
+    
+    .price-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    
+    .price-row:last-child {
+        margin-bottom: 0;
+        padding-top: 0.75rem;
+        border-top: 2px solid #dee2e6;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .original-price {
+        text-decoration: line-through;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .discount-price {
+        color: #dc3545;
+        font-weight: 600;
+    }
+    
+    .total-price {
+        color: #1dd1a1;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+    
+    .discount-input-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    .discount-input-group input {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        padding-right: 100px;
+    }
+    
+    .discount-input-group input:focus {
+        border-color: #1dd1a1;
+        box-shadow: 0 0 0 0.2rem rgba(29, 209, 161, 0.25);
+    }
+    
+    .discount-apply-btn {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #1dd1a1;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .discount-apply-btn:hover {
+        background: #17a085;
+    }
+    
+    .payment-btn {
+        background: linear-gradient(135deg, #1dd1a1 0%, #55a3ff 100%);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 16px;
+        width: 100%;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+    
+    .payment-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(29, 209, 161, 0.3);
+    }
+    
+    .security-note {
+        background: #e8f5e8;
+        border: 1px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+        color: #155724;
+        font-size: 0.875rem;
+    }
+    
+    .security-note i {
+        color: #28a745;
+        margin-right: 0.5rem;
+    }
+    
+    .discount-code-link {
+        color: #1dd1a1;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .discount-code-link:hover {
+        color: #17a085;
+        text-decoration: underline;
+    }
 </style>
 
 <div class="container mt-4">
@@ -405,10 +587,18 @@
                 </div>
 
                 <!-- Register -->
-                <a href="/learning/{{course.slug}}?id={{lessons.0._id}}" class="btn btn-primary register-btn">
-                    <i class="fa-solid fa-user-plus me-2"></i>
-                    ĐĂNG KÝ HỌC
-                </a>
+                {{#if (eq course.price '0 VNĐ')}}
+                    <a href="/learning/{{course.slug}}?id={{lessons.0._id}}" class="btn btn-primary register-btn">
+                        <i class="fa-solid fa-user-plus me-2"></i>
+                        ĐĂNG KÝ HỌC
+                    </a>
+                {{else}} 
+                    <button class="btn btn-primary register-btn" onclick="openPaymentModal()">
+                        <i class="fa-solid fa-credit-card me-2"></i>
+                        MUA NGAY
+                    </button>
+                {{/if}}
+                
 
                 <!-- Course Stats -->
                 <div class="course-stats">
@@ -480,7 +670,93 @@
     </div>
 </div>
 
+<!-- Payment Modal -->
+<div class="modal fade payment-modal" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <div class="w-100">
+                    <div class="course-icon">
+                        <i class="fa-solid fa-code text-center"></i>
+                    </div>
+                    <h5 class="modal-title mb-1" id="paymentModalLabel">Chi tiết thanh toán</h5>
+                    <h6 class="mb-0 opacity-90">{{course.name}}</h6>
+                </div>
+                <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Price Section -->
+                <div class="price-section">
+                    <div class="price-row">
+                        <span>Giá gốc</span>
+                        <span class="original-price">{{course.price}}</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Giá ưu đãi hôm nay</span>
+                        <span class="discount-price">{{course.price}}</span>
+                    </div>
+                    <div class="price-row">
+                        <span><strong>TỔNG</strong></span>
+                        <span class="total-price">{{course.price}}</span>
+                    </div>
+                </div>
+
+                <!-- Discount Code Section -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label for="discountCode" class="form-label mb-0">Mã giảm giá</label>
+                        <a href="#" class="discount-code-link">
+                            <i class="fa-solid fa-tags me-1"></i>
+                            Xem danh sách mã giảm giá
+                        </a>
+                    </div>
+                    <div class="discount-input-group">
+                        <input type="text" class="form-control" id="discountCode" placeholder="Nhập mã giảm giá">
+                        <button class="discount-apply-btn" onclick="applyDiscount()">Áp dụng</button>
+                    </div>
+                </div>
+
+                <!-- Payment Button -->
+                <button class="payment-btn" data-course-id="{{{course._id}}}">
+                    <i class="fa-solid fa-credit-card me-2"></i>
+                    Tiếp tục thanh toán
+                </button>
+
+                <!-- Security Note -->
+                <div class="security-note">
+                    <i class="fa-solid fa-shield-alt"></i>
+                    Thanh toán an toàn với VNPay
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{!-- Tạo form hidden để gửi dữ liệu thanh toán --}}
+<form id="paymentForm" method="POST" class="d-none">
+
 <script>
+
+    // Xử lí thanh toán
+    const paymentForm = document.getElementById('paymentForm');
+    const paymentModal =  document.getElementById('paymentModal');
+    const btnPayment = document.querySelector('.payment-btn');
+    
+    // Khi mở hộp thoại modal thanh toán
+    if(paymentModal){
+        paymentModal.addEventListener('show.bs.modal', function () {
+            const courseId = btnPayment.getAttribute('data-course-id');
+            //Khi click vào button xóa bỏ
+            btnPayment.onclick = function(e){
+                e.preventDefault(); 
+                paymentForm.action = '/payment/' + courseId 
+                paymentForm.submit()
+            }
+        });
+    }
+
     function toggleChapter(chapterNum) {
         const chapterLessons = document.getElementById(`chapter-${chapterNum}`);
         const chapterHeader = chapterLessons.previousElementSibling;
@@ -594,7 +870,7 @@
         }, 5000);
     }
     
-    // Animate course stats on load
+    //Animate khi tải trang
     document.addEventListener('DOMContentLoaded', function() {
         const statNumbers = document.querySelectorAll('.stat-number');
         statNumbers.forEach((stat, index) => {
@@ -607,4 +883,108 @@
             }, 300 + (index * 100));
         });
     });
+
+    function openPaymentModal() {
+            const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+            paymentModal.show();
+        }
+
+        function applyDiscount() {
+            const discountCode = document.getElementById('discountCode').value.trim();
+            
+            if (!discountCode) {
+                showAlert('Vui lòng nhập mã giảm giá', 'warning');
+                return;
+            }
+
+            // Simulate discount code validation
+            const validCodes = {
+                'SAVE20': { discount: 20, amount: 279800 },
+                'NEWUSER': { discount: 15, amount: 209850 },
+                'SUMMER2024': { discount: 25, amount: 349750 }
+            };
+
+            if (validCodes[discountCode.toUpperCase()]) {
+                const discount = validCodes[discountCode.toUpperCase()];
+                const newTotal = 1399000 - discount.amount;
+                
+                // Update price display
+                updatePriceDisplay(discount.amount, newTotal, discount.discount);
+                showAlert(`Áp dụng mã giảm giá thành công! Giảm ${discount.discount}%`, 'success');
+                
+                // Disable input and button
+                document.getElementById('discountCode').disabled = true;
+                document.querySelector('.discount-apply-btn').disabled = true;
+                document.querySelector('.discount-apply-btn').textContent = 'Đã áp dụng';
+            } else {
+                showAlert('Mã giảm giá không hợp lệ hoặc đã hết hạn', 'error');
+            }
+        }
+
+        function updatePriceDisplay(discountAmount, newTotal, discountPercent) {
+            const priceSection = document.querySelector('.price-section');
+            
+            // Add discount row if not exists
+            if (!priceSection.querySelector('.discount-row')) {
+                const discountRow = document.createElement('div');
+                discountRow.className = 'price-row discount-row';
+                discountRow.innerHTML = `
+                    <span>Giảm giá (${discountPercent}%)</span>
+                    <span style="color: #28a745; font-weight: 600;">-${discountAmount.toLocaleString('vi-VN')}đ</span>
+                `;
+                
+                // Insert before total row
+                const totalRow = priceSection.querySelector('.price-row:last-child');
+                priceSection.insertBefore(discountRow, totalRow);
+            }
+            
+            // Update total
+            document.querySelector('.total-price').textContent = `${newTotal.toLocaleString('vi-VN')}đ`;
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertTypes = {
+                'info': 'info',
+                'warning': 'warning', 
+                'error': 'danger',
+                'success': 'success'
+            };
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${alertTypes[type]} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                <i class="fa-solid fa-${type === 'error' ? 'exclamation-triangle' : type === 'warning' ? 'exclamation-circle' : type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Close modal when clicking backdrop
+        document.getElementById('paymentModal').addEventListener('hidden.bs.modal', function () {
+            // Reset form when modal closes
+            document.getElementById('discountCode').value = '';
+            document.getElementById('discountCode').disabled = false;
+            document.querySelector('.discount-apply-btn').disabled = false;
+            document.querySelector('.discount-apply-btn').textContent = 'Áp dụng';
+            
+            // Remove discount row if exists
+            const discountRow = document.querySelector('.discount-row');
+            if (discountRow) {
+                discountRow.remove();
+            }
+            
+            // Reset total price
+            document.querySelector('.total-price').textContent = '1.399.000đ';
+        });
 </script>
+
+

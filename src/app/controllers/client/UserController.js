@@ -185,7 +185,6 @@ class UserController {
             const forgotPassword = {
                 email,
                 otp,
-                expireAt: Date.now(),
             }
             await ForgotPassword.create(forgotPassword)
 

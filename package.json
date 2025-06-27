@@ -57,7 +57,8 @@
     "nodemailer": "^6.10.0",
     "prettier": "^3.3.3",
     "streamifier": "^0.1.1",
-    "tinymce": "^7.8.0"
+    "tinymce": "^7.8.0",
+    "vnpay": "^2.3.2"
   },
   "devDependencies": {
     "morgan": "^1.10.0",

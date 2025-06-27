@@ -1,6 +1,7 @@
 const Course = require('../../models/Course')
 const Chapter = require('../../models/Chapter')
 const Lesson = require('../../models/Lesson')
+const UserCourse = require('../../models/UserCourse')
 const {formatDuration, formatCurrency} = require('../../../utils/format')
 
 class CourseController {
@@ -20,6 +21,22 @@ class CourseController {
             }).lean()
             
             if(course){
+                // Kiểm tra người dùng đã mua khóa học chưa
+                const userCourse = await UserCourse.findOne({
+                    user_id: res.locals.account.id,
+                    course_id: course._id,
+                    status: 'active'
+                })
+
+                if(userCourse) {
+                    const firstChapter = await Chapter.findOne({ course_id: course._id }).sort({ _id: 1 })
+                    if( firstChapter) {
+                        const lessonIdFirst = await Lesson.findOne({ chapter_id: firstChapter._id }).sort({ _id: 1 })
+                        if(lessonIdFirst) {
+                            res.redirect(`/learning/${course.slug}?id=${lessonIdFirst._id}`)
+                        }      
+                    }   
+                }
                 
                 // Định dạng giá tiền
                 course.price = formatCurrency(course.price) 

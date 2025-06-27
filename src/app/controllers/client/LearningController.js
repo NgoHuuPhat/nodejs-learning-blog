@@ -1,9 +1,12 @@
 const Course = require('../../models/Course')
 const Chapter = require('../../models/Chapter')
 const Lesson = require('../../models/Lesson')
+const UserCourse = require('../../models/UserCourse')
 const {formatDuration, formatCurrency} = require('../../../utils/format')
 
 class LearningController {  
+
+    //[GET] /learning/:slug
     async learning(req, res, next) {
         try {   
 
@@ -11,11 +14,31 @@ class LearningController {
             let lessonList = []
             let countLessons = 0
             let totalDuration = 0
-            let countLessonsInChapter = 0
 
             const course = await Course.findOne({
                 slug: req.params.slug
             }).lean()
+
+            if(course.price > 0) {
+                // Kiểm tra người dùng đã mua khóa học chưa
+                const userCourse = await UserCourse.findOne({
+                    user_id: res.locals.account.id,
+                    course_id: course._id,
+                    status: 'active'
+                })
+
+                if (!userCourse) {
+                    req.flash('error', 'Bạn chưa mua khóa học này!')
+                    return res.redirect(`/courses/${course.slug}`)
+                } 
+            }
+
+            // Thêm người dùng đã học khóa học này
+            await UserCourse.create({
+                user_id: res.locals.account.id,
+                course_id: course._id,
+                status: 'active',
+            })
 
             // Lấy bài học tương ứng với id từ query string
             const lesson = await Lesson.findOne({
