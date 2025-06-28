@@ -77,6 +77,11 @@ module.exports = {
 
     json: function(context) {
         return JSON.stringify(context)
+    },
+
+    inArray: function(value, array) {
+        if (!Array.isArray(array)) return false
+        return array.includes(value)
     }
     
 }

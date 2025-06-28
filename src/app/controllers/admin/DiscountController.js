@@ -3,6 +3,7 @@ const Account = require('../../models/Account')
 const { formatDate } = require('../../../utils/format')
 const moment = require('moment')
 const paginatitonHelper = require('../../../utils/pagination')
+const Course = require('../../models/Course')
 
 class DiscountController {
     //[GET] /admin/discounts
@@ -37,7 +38,7 @@ class DiscountController {
                 discount.endDate = formatDate(discount.endDate)
             }
 
-            res.render('admin/discounts/list',{
+            res.render('admin/discounts/list',{                
                 discounts,
                 countDeleted,
                 objectPagination,
@@ -49,13 +50,20 @@ class DiscountController {
     }  
     
     //[GET] /admin/discounts/create
-    create(req, res, next) {
-        res.render('admin/discounts/create')
+    async create(req, res, next) {
+        try {
+            // Lấy danh sách khóa học để áp dụng mã giảm giá
+            const courses = await Course.find({ deleted: false }).lean()
+            res.render('admin/discounts/create', {courses})
+        } catch (error) {
+            next(error)
+        }
     }
 
     //[POST] /admin/discounts/store
     async store(req, res, next) {
         try {
+            console.log(req.body)
 
             // Set lại thời gian bắt đầu và kết thúc
             const startDate = new Date(req.body.startDate)
@@ -68,6 +76,8 @@ class DiscountController {
                 code: req.body.code,
                 description: req.body.description,
                 type: req.body.type,
+                applyToAllCourses: req.body.applyToAllCourses ? true : false, 
+                courseIds: req.body.applyToAllCourses ? [] : req.body.courseIds, 
                 value: req.body.value,
                 maxUses: req.body.maxUses,
                 startDate: startDate,
@@ -113,14 +123,19 @@ class DiscountController {
                 req.flash('error', 'Mã giảm giá không tồn tại!')
                 return res.redirect('/admin/discounts')
             }
+            discount.courseIds = discount.courseIds.map((courseId) => courseId.toString()) 
 
             // Chuyển đổi định dạng ngày tháng
             discount.startDate = moment(discount.startDate).format('YYYY-MM-DD')
             discount.endDate = moment(discount.endDate).format('YYYY-MM-DD')
 
-            console.log(discount)
+            // Lấy danh sách khóa học để áp dụng mã giảm giá
+            const courses = await Course.find({ deleted: false }).lean()
+            courses.forEach(course => {
+                course._id = course._id.toString() 
+            })
 
-            res.render('admin/discounts/edit', { discount })
+            res.render('admin/discounts/edit', { discount, courses })
         } catch (error) {
             next(error)
         }
@@ -140,8 +155,10 @@ class DiscountController {
                 { _id: req.params.id },
                 {
                     code: req.body.code,
-                    description: req.body.description,
+                    description: req.body.description || '',
                     type: req.body.type,
+                    applyToAllCourses: req.body.applyToAllCourses ? true : false,
+                    courseIds: req.body.applyToAllCourses ? [] : req.body.courseIds,
                     value: req.body.value,
                     maxUses: req.body.maxUses,
                     startDate: startDate,

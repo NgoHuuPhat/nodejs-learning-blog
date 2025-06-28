@@ -25,6 +25,24 @@
                     </select>
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">Áp dụng cho khóa học</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="applyToAllCheckbox" name="applyToAllCourses" checked>
+                        <label class="form-check-label" for="applyToAllCheckbox">
+                            Áp dụng cho tất cả khóa học
+                        </label>
+                    </div>
+                </div>
+                <div class="mb-3" id="courseSelection" style="display: none;">
+                    <label class="form-label">Chọn khóa học áp dụng</label>
+                    <select name="courseIds[]" class="form-select" multiple>
+                        {{#each courses}}
+                            <option value="{{this._id}}">{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                    <small class="text-muted">Giữ Ctrl (hoặc Cmd) để chọn nhiều khóa học.</small>
+                </div>
+                <div class="mb-3">
                     <label class="form-label">Giá trị <span class="text-danger">*</span></label>
                     <input type="number" name="value" class="form-control" required>
                 </div>
@@ -53,6 +71,11 @@
 </div>
 
 <script>
+
+     document.getElementById('applyToAllCheckbox').addEventListener('change', function () {
+        const courseSelection = document.getElementById('courseSelection');
+        courseSelection.style.display = this.checked ? 'none' : 'block';
+    });
 
     // Hàm tạo mã giảm giá tự động
     function generateDiscountCode() {

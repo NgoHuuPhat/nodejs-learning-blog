@@ -21,7 +21,6 @@ const CourseSchema = new Schema(
             url: { type: String,}, 
             duration: { type: Number, default: 0 },
         }, 
-        discountCode: { type: mongoose.Schema.ObjectId },
         
         //Thêm người tạo
         createdBy: {

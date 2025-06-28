@@ -18,6 +18,7 @@ const PaymentSchema = new Schema(
             }, 
             expires: 3600
         },
+        discount_code: { type: mongoose.Schema.ObjectId }, // Mã giảm giá nếu có
     }, 
     { 
       timestamps: true,

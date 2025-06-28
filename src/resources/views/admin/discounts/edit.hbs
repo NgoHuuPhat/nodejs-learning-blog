@@ -19,6 +19,33 @@
                     </select>
                 </div>
                 <div class="mb-3">
+                    <label class="form-label">Áp dụng cho khóa học</label>
+                    <div class="form-check">
+                        <input 
+                            class="form-check-input" 
+                            type="checkbox" 
+                            id="applyToAllCheckbox" 
+                            name="applyToAllCourses"
+                            {{#if discount.applyToAllCourses}}checked{{/if}}>
+                        <label class="form-check-label" for="applyToAllCheckbox">
+                            Áp dụng cho tất cả khóa học
+                        </label>
+                    </div>
+                </div>
+                <div class="mb-3" id="courseSelection" style="{{#if discount.applyToAllCourses}}display: none;{{/if}}">
+                    <label class="form-label">Chọn khóa học áp dụng</label>
+                    <select name="courseIds[]" class="form-select" multiple>
+                        {{#each courses}}
+                        {{log this._id}}  
+                            <option value="{{this._id}}" {{#if (inArray this._id @root.discount.courseIds)}}selected{{/if}}>
+                                {{this.name}}
+                            </option>
+                        {{/each}}
+                    </select>
+                    <small class="text-muted">Giữ Ctrl (hoặc Cmd) để chọn nhiều khóa học.</small>
+                </div>
+
+                <div class="mb-3">
                     <label class="form-label">Giá trị <span class="text-danger">*</span></label>
                     <input type="number" name="value" class="form-control" value="{{discount.value}}" required>
                 </div>
@@ -47,6 +74,7 @@
 </div>
 
 <script>
+    
     function validateDates() {
         const startDate = new Date(document.querySelector('input[name="startDate"]').value);
         const endDate = new Date(document.querySelector('input[name="endDate"]').value);
@@ -56,4 +84,22 @@
         }
         return true;
     }
+
+    // Hiển thị/ẩn lựa chọn khóa học dựa trên checkbox
+    document.getElementById('applyToAllCheckbox').addEventListener('change', function () {
+        const courseSelection = document.getElementById('courseSelection');
+        courseSelection.style.display = this.checked ? 'none' : 'block';
+    });
+
+    // Kiểm tra khi gửi form
+    document.querySelector('form').addEventListener('submit', function (e) {
+        const applyAll = document.querySelector('input[name="applyToAllCourses"]').checked;
+        const selectedCourses = document.querySelector('select[name="courseIds[]"]').selectedOptions;
+
+        if (!applyAll && selectedCourses.length === 0) {
+            e.preventDefault();
+            alert('Vui lòng chọn ít nhất một khóa học hoặc tick áp dụng cho tất cả.');
+        }
+    });
+
 </script>
