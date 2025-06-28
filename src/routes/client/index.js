@@ -9,6 +9,7 @@ const commentRoute = require('./comments')
 const searchRoute = require('./search')
 const learningRoute = require('./learning')
 const paymentRoute = require('./payment')
+const discountRoute = require('./discounts')
 
 const authMiddleware = require('../../app/middlewares/authMiddleware')
 const notificationsMiddleware = require('../../app/middlewares/notifications')
@@ -26,6 +27,7 @@ function route(app) {
     app.use('/comments', authMiddleware, notificationsMiddleware, commentRoute)
     app.use('/search', authMiddleware, notificationsMiddleware, searchRoute)
     app.use('/payment', authMiddleware, notificationsMiddleware, paymentRoute)
+    app.use('/discounts', authMiddleware, notificationsMiddleware, discountRoute)
 }
 
 module.exports = route

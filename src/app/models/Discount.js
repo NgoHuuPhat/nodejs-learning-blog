@@ -5,7 +5,7 @@ const { sortTable } = require('../../utils/queryHelper')
 
 const Schema = mongoose.Schema
 
-const DiscountCodeSchema = new Schema(
+const DiscountSchema = new Schema(
     {
         code: { type: String, required: true, unique: true, uppercase: true, trim: true },
         description: { type: String },
@@ -49,12 +49,12 @@ const DiscountCodeSchema = new Schema(
 mongoose.plugin(slug)
 
 // { overrideMethods: 'all' } Thay thế các phương thức bằng phương thức xóa mềm
-DiscountCodeSchema.plugin(mongooseDelete, {
+DiscountSchema.plugin(mongooseDelete, {
     deletedAt: false,
     overrideMethods: 'all',
 })
 
 // Sử dụng query helper chung
-DiscountCodeSchema.query.sortTable = sortTable
+DiscountSchema.query.sortTable = sortTable
 
-module.exports = mongoose.model('DiscountCode', DiscountCodeSchema) //Collection - Schema
+module.exports = mongoose.model('Discount', DiscountSchema) //Collection - Schema
