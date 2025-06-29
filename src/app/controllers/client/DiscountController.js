@@ -9,7 +9,19 @@ class DiscountController {
     //[GET] /client/discounts
     async index(req, res, next) {
         try {
-            const discounts = await Discount.find({}).lean()
+
+            const courseSlug = req.query.course 
+            let course = null
+
+            // Lấy khóa học theo slug
+            if(courseSlug) { 
+                course = await Course.findOne({ slug: courseSlug }).lean()
+                if(!course) {
+                    return res.status(404).send('Khóa học không tồn tại.')
+                }
+            }
+
+            const discounts = await Discount.find({ $or: [{ applyToAllCourses: true }, { courseIds: course._id }] }).lean()
             const totalCourseCount = await Course.countDocuments({ deleted: false })
 
             // Lấy danh sách mã giảm giá còn hiệu lực
@@ -39,16 +51,14 @@ class DiscountController {
                     validDiscounts.push(discount)
                 }   
             }
-            
-            console.log(validDiscounts)
 
-            res.render('client/discounts/index', {discounts: validDiscounts})
+            res.render('client/discounts/index', {discounts: validDiscounts, course})
             
         } catch (error) {
             next(error)
         }
     }
-    
+
 }
 
 module.exports = new DiscountController()

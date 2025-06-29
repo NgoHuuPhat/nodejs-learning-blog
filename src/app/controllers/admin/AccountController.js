@@ -21,13 +21,20 @@ class AccountController {
                 req.query,
                 countAccounts,
             )
-            const accounts = await Account.find({})
+
+            // Truy vấn tài khoản Admin
+            const adminRole = await Role.findOne({ name: 'admin' })
+
+            const accounts = await Account.find({
+                role_id: {$ne: adminRole._id} // Loại trừ tài khoản có role là admin
+            })
                 .sortTable(req)
                 .skip(objectPagination.skip)
                 .limit(objectPagination.limitItems)
                 .select('-password -token')
-                .lean() //Loại trừ passowrd token để tránh lộ thông tin mật
+                .lean() 
 
+                
             //Lấy name theo role
             for (const account of accounts) {
                 const role = await Role.findById({

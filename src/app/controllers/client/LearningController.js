@@ -31,15 +31,25 @@ class LearningController {
                     req.flash('error', 'Bạn chưa mua khóa học này!')
                     return res.redirect(`/courses/${course.slug}`)
                 } 
+            } else {
+
+                // Kiểm tra người dùng đã học khóa học chưa
+                const existingUserCourse = await UserCourse.findOne({
+                    user_id: res.locals.account.id,
+                    course_id: course._id,
+                    status: 'active'
+                })
+
+                if (!existingUserCourse) {
+                    // Thêm người dùng đã học khóa học này
+                    await UserCourse.create({
+                        user_id: res.locals.account.id,
+                        course_id: course._id,
+                        status: 'active',
+                    })
+                }
             }
-
-            // Thêm người dùng đã học khóa học này
-            await UserCourse.create({
-                user_id: res.locals.account.id,
-                course_id: course._id,
-                status: 'active',
-            })
-
+            
             // Lấy bài học tương ứng với id từ query string
             const lesson = await Lesson.findOne({
                 _id: req.query.id

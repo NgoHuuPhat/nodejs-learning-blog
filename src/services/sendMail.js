@@ -11,6 +11,7 @@ module.exports.sendMail = (email, subject, html) => {
             pass: process.env.EMAIL_PASS, // generated ethereal password
         },
     })
+    
 
     // async..await is not allowed in global scope, must use a wrapper
     async function main() {

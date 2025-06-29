@@ -10,6 +10,7 @@ router.put('/:id', courseController.update)
 router.patch('/:id/restore', courseController.restore)
 router.delete('/:id', courseController.destroy)
 router.delete('/:id/force', courseController.forceDestroy)
+router.get('/:slug/apply-discount', courseController.applyDiscount)
 router.get('/:slug', courseController.details)
 
 module.exports = router

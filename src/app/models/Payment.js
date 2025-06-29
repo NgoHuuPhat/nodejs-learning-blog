@@ -10,15 +10,10 @@ const PaymentSchema = new Schema(
         order_id: { type: String}, // mã đơn hàng sinh ra từ hệ thống thanh toán (tham số vnp_Txnref)
         bank_code: { type: String }, // mã ngân hàng thanh toán (tham số vnp_BankCode)
         vnp_ResponseCode: { type: String }, // mã phản hồi từ hệ thống thanh toán (tham số vnp_ResponseCode)
-        payDate: { type: Date, default: Date.now }, // Thời gian thanh toán (vnp_PayDate)
-        exprireAt: { 
-            type: Date, 
-            default: function() {
-              return this.status === 'pending' ? Date.now() : null; // Hết hạn trong 1 giờ nếu trạng thái là pending
-            }, 
-            expires: 3600
-        },
+        payDate: { type: Date }, // Thời gian thanh toán (vnp_PayDate)
+        expireAt: { type: Date, expires: 3600 },
         discount_code: { type: mongoose.Schema.ObjectId }, // Mã giảm giá nếu có
+        discount_amount: { type: Number, default: 0 }, // Số tiền giảm giá nếu có
     }, 
     { 
       timestamps: true,

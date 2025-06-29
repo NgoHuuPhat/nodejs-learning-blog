@@ -19,12 +19,12 @@
                     {{#if (eq this.price '0 VNĐ')}}
                         <p class="card-text fw-semibold" style="color: rgb(255, 94, 0);">Miễn phí</p>
                         <div class="mt-auto">
-                            <a href="#" class="btn-grad fw-semibold">Học ngay</a>
+                            <a href="/courses/{{this.slug}}" class="btn-grad fw-semibold">Học ngay</a>
                         </div>
                     {{else}}
                         <p class="card-text fw-semibold" style="color: rgb(255, 94, 0);">{{this.price}}</p>
                             <div class="mt-auto">
-                            <a href="/checkout/{{this.slug}}" class="btn-grad fw-semibold">Mua khóa học</a>
+                            <a href="/courses/{{this.slug}}" class="btn-grad fw-semibold">Mua khóa học</a>
                         </div>
                     {{/if}}
                     

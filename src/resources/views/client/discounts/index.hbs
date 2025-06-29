@@ -107,67 +107,107 @@
         -webkit-text-fill-color: transparent;
     }
 
+    .back-btn {
+        color: #6c757d;
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.3s ease;
+    }
+    
+    .back-btn:hover {
+        color: #495057;
+    }
+
 </style>
+
+<div class="my-4">
+    <a href="#" class="back-btn ps-4" onclick="history.back()">
+        <i class="fa-solid fa-arrow-left me-2" aria-hidden="true"></i>Quay lại
+    </a>
+</div>
 
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-7">
-            <h2 class="text-center custom-text mt-3 mb-5 fw-bold">Mã giảm giá HOT nhất</h2>
-            {{#each discounts}}
-                <div class="card voucher-card mb-4">
-                    <div class="card-body p-4">
-                        <div class="row g-0">
-                            <!-- Left side -->
-                            <div class="col-md-4 p-1 d-flex flex-column align-items-center justify-content-center voucher-divider">
-                                <div class="voucher-logo mb-2">
-                                    <img src="/img/LOGO FINAL.png" alt="Logo" class="voucher-img">
-                                </div>
-                                <div class="voucher-code mb-3">{{this.code}}</div>
-                                <div class="border border-secondary rounded px-3 py-1 text-secondary d-inline-block small fst-italic">
-                                    Dành cho mọi người
-                                </div>
-                            </div>
-                            
-                            <!-- Right side -->
-                            <div class="col-md-8 ps-md-4">
-                                <div class="h-100 d-flex flex-column justify-content-center">
-                                    <div class="mb-1">
-                                        Giảm 
-                                        {{#if (eq this.type 'percentage')}}
-                                            <span class="discount-amount">{{this.value}}%</span>
-                                        {{else}}
-                                            <span class="discount-amount">{{this.value}}</span>
-                                        {{/if}}
-                                        <span class="discount-unit">/khóa</span>
-                                    </div>
-    
-                                    <div class="text-muted mb-2">
-                                        <strong>Áp dụng cho:</strong> {{this.courseDisplay}}
-                                    </div>
-                                    
-                                    <div class="text-muted fst-italic mb-4 small">
-                                        Còn <strong>{{this.remaining}}</strong> lượt sử dụng. Hết hạn: <strong>{{this.endDateFormatted}}</strong>
-                                    </div>
-                                    
-                                    <div class="d-flex justify-content-between align-items-center gap-2">
-                                        <div class="countdown" id="countdown" data-endtime="{{this.endDateISO}}">
-                                            <i class="fas fa-clock"></i> Đang tính toán...
+            {{#if discounts.length}}
+                <h2 class="text-center custom-text mt-3 mb-5 fw-bold">Mã giảm giá HOT nhất</h2>
+                {{#each discounts}}
+                    <form action="/discounts/apply" method="POST">
+                        <input type="hidden" name="discountId" value="{{this._id}}">
+                        <input type="hidden" name="courseId" value="{{@root.course._id}}">
+                        <div class="card voucher-card mb-4">
+                            <div class="card-body p-4">
+                                <div class="row g-0">
+                                    <!-- Left side -->
+                                    <div class="col-md-4 p-1 d-flex flex-column align-items-center justify-content-center voucher-divider">
+                                        <div class="voucher-logo mb-2">
+                                            <img src="/img/LOGO FINAL.png" alt="Logo" class="voucher-img">
                                         </div>
-                                        <button class="btn btn-grad px-4 fw-semibold">
-                                            Sử dụng ngay
-                                        </button>
+                                        <div class="voucher-code mb-3">{{this.code}}</div>
+                                        <div class="border border-secondary rounded px-3 py-1 text-secondary d-inline-block small fst-italic">
+                                            Dành cho mọi người
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Right side -->
+                                    <div class="col-md-8 ps-md-4">
+                                        <div class="h-100 d-flex flex-column justify-content-center">
+                                            <div class="mb-1">
+                                                Giảm 
+                                                {{#if (eq this.type 'percentage')}}
+                                                    <span class="discount-amount">{{this.value}}%</span>
+                                                {{else}}
+                                                    <span class="discount-amount">{{this.value}}</span>
+                                                {{/if}}
+                                                <span class="discount-unit">/khóa</span>
+                                            </div>
+                                            <div class="text-muted mb-2">
+                                                <strong>Áp dụng cho:</strong> {{this.courseDisplay}}
+                                            </div>
+                                            
+                                            <div class="text-muted fst-italic mb-4 small">
+                                                Còn <strong>{{this.remaining}}</strong> lượt sử dụng. Hết hạn: <strong>{{this.endDateFormatted}}</strong>
+                                            </div>
+                                            
+                                            <div class="d-flex justify-content-between align-items-center gap-2">
+                                                <div class="countdown" id="countdown" data-endtime="{{this.endDateISO}}">
+                                                    <i class="fas fa-clock"></i> Đang tính toán...
+                                                </div>
+                                                <a class="btn btn-grad px-4 fw-semibold" data-course-slug="{{@root.course.slug}}" onclick="applyCode()" data-code-discount="{{this.code}}" data-course-id="{{this.courseIds}}">
+                                                    Sử dụng ngay
+                                                </a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </form>
+                {{/each}}
+            {{else}}
+                <div class="text-center py-5">
+                    <img src="/img/nodata.svg" alt="logo" style="width: 150px; height: auto;">
+                    <p class="text-muted fs-5 mt-3 mb-3">Hiện tại không có chương trình khuyến mãi nào.</p>
+                    <div class="d-flex justify-content-center">
+                        <a href="javascript:history.back()" class="btn btn-grad mt-3 px-5">Quay lại</a>
                     </div>
                 </div>
-            {{/each}}
+            {{/if}}
         </div>
     </div>
 </div>
 
 <script>
+
+    // Xử lý sự kiện click để áp dụng mã giảm giá
+    function applyCode() {
+        const code = event.target.getAttribute('data-code-discount');
+        const courseId = event.target.getAttribute('data-course-id');
+        const courseSlug = event.target.getAttribute('data-course-slug');
+        
+        window.location.href = `/courses/${courseSlug}/apply-discount?discount_code=${encodeURIComponent(code)}&course_id=${courseId}`;
+    }
+
     function startAllCountdowns() {
         const countdownElements = document.querySelectorAll('.countdown');
 

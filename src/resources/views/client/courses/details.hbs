@@ -412,11 +412,6 @@
         font-size: 0.9rem;
     }
     
-    .discount-price {
-        color: #dc3545;
-        font-weight: 600;
-    }
-    
     .total-price {
         color: #1dd1a1;
         font-weight: 700;
@@ -690,31 +685,38 @@
                 <!-- Price Section -->
                 <div class="price-section">
                     <div class="price-row">
-                        <span>Giá gốc</span>
-                        <span class="original-price">{{course.price}}</span>
+                        <span>Giá ưu đãi</span>
+                        <span class="fw-semibold text-muted">{{course.price}}</span>
                     </div>
-                    <div class="price-row">
-                        <span>Giá ưu đãi hôm nay</span>
-                        <span class="discount-price">{{course.price}}</span>
-                    </div>
-                    <div class="price-row">
-                        <span><strong>TỔNG</strong></span>
-                        <span class="total-price">{{course.price}}</span>
-                    </div>
+                    {{#if useDiscount}}
+                        <div class="price-row">
+                            <span>Giảm giá</span>
+                            <span class="fw-semibold text-danger">-{{useDiscount}}</span>
+                        </div>
+                        <div class="price-row">
+                            <span><strong>TỔNG</strong></span>
+                            <span class="total-price">{{course.totalPrice}}</span>
+                        </div>
+                    {{else}}
+                        <div class="price-row">
+                            <span><strong>TỔNG</strong></span>
+                            <span class="total-price">{{course.price}}</span>
+                        </div>
+                    {{/if}}
                 </div>
 
                 <!-- Discount Code Section -->
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label for="discountCode" class="form-label mb-0">Mã giảm giá</label>
-                        <a href="/discounts" class="discount-code-link">
+                        <a href="/discounts/?course={{course.slug}}" class="discount-code-link">
                             <i class="fa-solid fa-tags me-1"></i>
                             Xem danh sách mã giảm giá
                         </a>
                     </div>
                     <div class="discount-input-group">
-                        <input type="text" class="form-control" id="discountCode" placeholder="Nhập mã giảm giá">
-                        <button class="discount-apply-btn" onclick="applyDiscount()">Áp dụng</button>
+                        <input type="text" class="form-control" id="discountCode" value="{{course.discountCode}}" placeholder="Nhập mã giảm giá">
+                        <a href="#" class="discount-apply-btn" data-course-id="{{course._id}}" data-course-slug="{{course.slug}}" onclick="applyCode()">Áp dụng</a>
                     </div>
                 </div>
 
@@ -735,9 +737,22 @@
 </div>
 
 {{!-- Tạo form hidden để gửi dữ liệu thanh toán --}}
-<form id="paymentForm" method="POST" class="d-none">
+<form id="paymentForm" method="POST" class="d-none"></form>
 
 <script>
+
+    // Xử lý áp dụng mã giảm giá
+    function applyCode() {
+        const code = document.getElementById('discountCode').value.trim();
+        const courseSlug = document.querySelector('.discount-apply-btn').getAttribute('data-course-slug');
+        const courseId = document.querySelector('.discount-apply-btn').getAttribute('data-course-id');
+        if(!code){
+            alert('Vui lòng nhập mã giảm giá');
+            return;
+        }
+
+        window.location.href = `/courses/${courseSlug}/apply-discount?discount_code=${encodeURIComponent(code)}&course_id=${courseId}`;
+    }
 
     // Xử lí thanh toán
     const paymentForm = document.getElementById('paymentForm');
@@ -843,32 +858,6 @@
             spinner.style.display = show ? 'block' : 'none';
         }
     }
-
-    function showAlert(message, type = 'info') {
-        const alertTypes = {
-            'info': 'info',
-            'warning': 'warning',
-            'error': 'danger',
-            'success': 'success'
-        };
-        
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert alert-${alertTypes[type]} alert-dismissible fade show position-fixed`;
-        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-        alertDiv.innerHTML = `
-            <i class="fa-solid fa-${type === 'error' ? 'exclamation-triangle' : type === 'warning' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-        
-        document.body.appendChild(alertDiv);
-        
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
-            }
-        }, 5000);
-    }
     
     //Animate khi tải trang
     document.addEventListener('DOMContentLoaded', function() {
@@ -885,106 +874,27 @@
     });
 
     function openPaymentModal() {
+        const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+        paymentModal.show();
+    }
+
+    // Xử lý mở modal khi có tham số trong URL
+    document.addEventListener('DOMContentLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const openModal = urlParams.get('openDiscountModal');
+
+        if (openModal === 'true') {
             const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
             paymentModal.show();
         }
 
-        function applyDiscount() {
-            const discountCode = document.getElementById('discountCode').value.trim();
-            
-            if (!discountCode) {
-                showAlert('Vui lòng nhập mã giảm giá', 'warning');
-                return;
-            }
+        urlParams.delete('openDiscountModal');
+        const queryString = urlParams.toString();
+        const newUrl = window.location.pathname + (queryString ? '?' + queryString : '');
+        window.history.replaceState({}, document.title, newUrl);
+    });
 
-            // Simulate discount code validation
-            const validCodes = {
-                'SAVE20': { discount: 20, amount: 279800 },
-                'NEWUSER': { discount: 15, amount: 209850 },
-                'SUMMER2024': { discount: 25, amount: 349750 }
-            };
-
-            if (validCodes[discountCode.toUpperCase()]) {
-                const discount = validCodes[discountCode.toUpperCase()];
-                const newTotal = 1399000 - discount.amount;
-                
-                // Update price display
-                updatePriceDisplay(discount.amount, newTotal, discount.discount);
-                showAlert(`Áp dụng mã giảm giá thành công! Giảm ${discount.discount}%`, 'success');
-                
-                // Disable input and button
-                document.getElementById('discountCode').disabled = true;
-                document.querySelector('.discount-apply-btn').disabled = true;
-                document.querySelector('.discount-apply-btn').textContent = 'Đã áp dụng';
-            } else {
-                showAlert('Mã giảm giá không hợp lệ hoặc đã hết hạn', 'error');
-            }
-        }
-
-        function updatePriceDisplay(discountAmount, newTotal, discountPercent) {
-            const priceSection = document.querySelector('.price-section');
-            
-            // Add discount row if not exists
-            if (!priceSection.querySelector('.discount-row')) {
-                const discountRow = document.createElement('div');
-                discountRow.className = 'price-row discount-row';
-                discountRow.innerHTML = `
-                    <span>Giảm giá (${discountPercent}%)</span>
-                    <span style="color: #28a745; font-weight: 600;">-${discountAmount.toLocaleString('vi-VN')}đ</span>
-                `;
-                
-                // Insert before total row
-                const totalRow = priceSection.querySelector('.price-row:last-child');
-                priceSection.insertBefore(discountRow, totalRow);
-            }
-            
-            // Update total
-            document.querySelector('.total-price').textContent = `${newTotal.toLocaleString('vi-VN')}đ`;
-        }
-
-        function showAlert(message, type = 'info') {
-            const alertTypes = {
-                'info': 'info',
-                'warning': 'warning', 
-                'error': 'danger',
-                'success': 'success'
-            };
-            
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${alertTypes[type]} alert-dismissible fade show position-fixed`;
-            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-            alertDiv.innerHTML = `
-                <i class="fa-solid fa-${type === 'error' ? 'exclamation-triangle' : type === 'warning' ? 'exclamation-circle' : type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                if (alertDiv.parentNode) {
-                    alertDiv.remove();
-                }
-            }, 5000);
-        }
-
-        // Close modal when clicking backdrop
-        document.getElementById('paymentModal').addEventListener('hidden.bs.modal', function () {
-            // Reset form when modal closes
-            document.getElementById('discountCode').value = '';
-            document.getElementById('discountCode').disabled = false;
-            document.querySelector('.discount-apply-btn').disabled = false;
-            document.querySelector('.discount-apply-btn').textContent = 'Áp dụng';
-            
-            // Remove discount row if exists
-            const discountRow = document.querySelector('.discount-row');
-            if (discountRow) {
-                discountRow.remove();
-            }
-            
-            // Reset total price
-            document.querySelector('.total-price').textContent = '1.399.000đ';
-        });
+    
 </script>
 
 
