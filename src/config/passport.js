@@ -12,6 +12,9 @@ passport.use(new GoogleStrategy({
     async (accessToken, refreshToken, profile, done) => {
         try {
             const user = await handleGoogleLogin(profile)
+            if (!user) {
+                return done(null, false, { message: 'Email đã được sử dụng! Vui lòng đăng nhập bằng phương thức khác.' })
+            }
             return done(null, user)
         } catch (error) {
             return done(error, null)

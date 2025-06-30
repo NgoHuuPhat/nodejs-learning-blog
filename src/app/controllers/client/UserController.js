@@ -283,7 +283,7 @@ class UserController {
     googleCallback(req, res, next) {
         passport.authenticate('google', { failureRedirect: '/user/login' }, (err, user, info) => {
             if (err || !user) {
-                req.flash('error', info.message || 'Đăng nhập bằng Google thất bại!')
+                req.flash('error', info.message || 'Đăng nhập thất bại!')
                 return res.redirect('/user/login')
             }
 

@@ -7,9 +7,9 @@ const handleGoogleLogin = async (profile) => {
 
     if (user) {
         if(user.loginType !== 'google') {
-            // Nếu người dùng đã đăng ký bằng email nhưng không phải qua Google
-            return done(null, false, { message: 'Email này đã được sử dụng !' })
+            return null; 
         }
+        return user;
     } else {
         // Lấy giá trị ID của role 'user'
         const role = await Role.findOne({ name: 'user' })
@@ -22,6 +22,7 @@ const handleGoogleLogin = async (profile) => {
             status: 'active',
             loginType: 'google'
         })
+        return user;
     } 
 }
 

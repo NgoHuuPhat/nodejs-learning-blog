@@ -154,59 +154,57 @@
     <div class="profile-card">
         <div class="profile-header mt-5">
             <div class="profile-avatar">
-                {{#if account.avatar}}
-                    <img src="{{account.avatar}}" alt="Profile Avatar" class="img-fluid rounded-circle">
+                {{#if user.avatar}}
+                    <img src="{{user.avatar}}" alt="Profile Avatar" class="img-fluid rounded-circle">
                 {{else}}
                     <i class="fas fa-user-circle"></i>
                 {{/if}}
             </div>
             <div class="profile-info mt-3">
-                <h1>{{account.fullName}}</h1>
-                <p class="profile-email">{{account.email}}</p>
+                <h1>{{user.fullName}}</h1>
+                <p class="profile-email">{{user.email}}</p>
                 <div class="profile-stats d-flex gap-2">
-                    <span><i class="fas fa-pencil-alt"></i> 3 bài viết</span>  •  
-                    <span><i class="fas fa-book"></i> 6 khóa học đã đăng ký</span>
+                    <span><i class="fas fa-pencil-alt"></i> {{user.postCount}} bài viết</span>  •  
+                    <span><i class="fas fa-book"></i> {{user.courseCount}} khóa học đã đăng ký</span>
                 </div>
                 <div class="profile-stats">
-                    <span><i class="fas fa-calendar-alt"></i> Tham gia SURU từ 3 năm trước</span>
+                    <span><i class="fas fa-calendar-alt"></i> Tham gia SURU từ {{timeAgo user.createdAt}}</span>
                 </div>
             </div>
         </div>
     </div>
     <div class="course-list">
-        <h2 class="section-title mt-5"><i class="fas fa-graduation-cap"></i> Khóa học đã đăng ký (6)</h2>
-        <div class="course-card">
-            <div class="course-subtitle"><i class="fas fa-book-open"></i> Node & ExpressJS</div>
-            <h3 class="course-title">Node & ExpressJS</h3>
-            <div class="course-price"><i class="fas fa-tag"></i> Miễn phí</div>
-            <div class="course-stats">
-                <span><i class="fas fa-check-circle completed-badge"></i>47.090</span>
-                <span><i class="far fa-file-alt"></i>36</span>
-                <span><i class="far fa-clock"></i>12h8p</span>
+        <div class="row d-flex align-items-stretch">
+        <h5 class="mt-5 mb-4 title-strong"><i class="fas fa-graduation-cap"></i> Khóa học đã đăng ký ({{user.courseCount}})</h5>
+        {{#each courses}}
+        <div class="col-sm-6 col-lg-4 mb-4 ">
+            <div class="border-0 bg-light card rounded-4 card-course-item h-100 shadow-sm ">
+                <a href="/courses/{{this.slug}}">
+                    <img src="{{this.image.url}}" class="card-img-top rounded-top-4 " alt="{{this.name}}" style="height: 200px; object-fit: cover;">
+                </a>
+                <div class="card-body d-flex flex-column">
+                    <a href="/courses/{{this.slug}}" class="card-link">
+                        <h5 class="card-title">{{this.name}}</h5>
+                    </a>
+
+                    {{!-- Xét điều kiện miễn phí --}}
+                    {{#if (eq this.price '0 VNĐ')}}
+                        <p class="card-text fw-semibold" style="color: rgb(255, 94, 0);">Miễn phí</p>
+                        <div class="mt-auto">
+                            <a href="/courses/{{this.slug}}" class="btn-grad fw-semibold">Học ngay</a>
+                        </div>
+                    {{else}}
+                        <p class="card-text fw-semibold" style="color: rgb(255, 94, 0);">{{this.price}}</p>
+                            <div class="mt-auto">
+                            <a href="/courses/{{this.slug}}" class="btn-grad fw-semibold">Mua khóa học</a>
+                        </div>
+                    {{/if}}
+                    
+                    
+                </div>
             </div>
         </div>
-        <div class="course-card">
-            <div class="course-subtitle"><i class="fas fa-book-open"></i> Kiến thức nhập môn</div>
-            <h3 class="course-title">Kiến Thức Nhập Môn IT</h3>
-            <div class="course-price"><i class="fas fa-tag"></i> Miễn phí</div>
-            <div class="course-stats">
-                <span><i class="fas fa-check-circle completed-badge"></i>133.845</span>
-                <span><i class="far fa-file-alt"></i>9</span>
-                <span><i class="far fa-clock"></i>3h12p</span>
-            </div>
-        </div>
-        <div class="course-card">
-            <h3 class="course-title">Lập Trình JavaScript Nâng Cao</h3>
-            <div class="course-price"><i class="fas fa-tag"></i> Miễn phí</div>
-            <div class="course-stats">
-                <span><i class="fas fa-check-circle completed-badge"></i>40.348</span>
-                <span><i class="far fa-file-alt"></i>19</span>
-                <span><i class="far fa-clock"></i>8h41p</span>
-            </div>
-        </div>
-        <div class="course-card">
-            <h3 class="course-title">JavaScript</h3>
-            <div class="course-subtitle"><i class="fas fa-laptop-code"></i> Nâng cao</div>
-        </div>
+        {{/each}}
+    </div>
     </div>
 </div>
