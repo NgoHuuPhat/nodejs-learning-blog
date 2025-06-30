@@ -6,11 +6,18 @@ const AccountSchema = new Schema(
     {
         fullName: { type: String, required: true },
         email: { type: String, required: true, unique: true },
-        password: { type: String, required: true },
+        password: { 
+            type: String, 
+            required: function() {
+                // Chỉ yêu cầu password nếu loginType là 'local'
+                return this.loginType === 'local';
+            }
+         },
         phone: { type: String },
         avatar: { type: String },
         role_id: { type: mongoose.Schema.ObjectId, required: true },
         status: { type: String, required: true },
+        loginType: { type: String, enum:['local','google'], required: true, default: 'local' },
     },
     { timestamps: true },
 )

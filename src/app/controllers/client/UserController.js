@@ -4,6 +4,7 @@ const Role = require('../../models/Role')
 var jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const sendMailHelper = require('../../../services/sendMail')
+const passport = require('passport')
 
 class UserController {
     //[GET] /register
@@ -272,6 +273,53 @@ class UserController {
             next(error)
         }
     }
+
+    //[GET] /google
+    googleLogin(req, res, next) {
+        return passport.authenticate('google', {scope: ['profile', 'email'],})(req, res, next)
+    }
+
+    // [GET] /google/callback
+    googleCallback(req, res, next) {
+        passport.authenticate('google', { failureRedirect: '/user/login' }, (err, user, info) => {
+            if (err || !user) {
+                req.flash('error', info.message || 'Đăng nhập bằng Google thất bại!')
+                return res.redirect('/user/login')
+            }
+
+            req.logIn(user, (err) => {
+                if (err) return next(err)
+
+                // Create Access Token (Lưu ý không truyền password ...)
+                const payload = {
+                    id: user._id,
+                    email: user.email,
+                    fullName: user.fullName,
+                    avatar: user.avatar,
+                    role_id: user.role_id,
+                }
+
+                // Tạo accessToken - refreshToken
+                const accessToken = jwt.sign(payload, process.env.JWT_SECRET, {
+                    expiresIn: process.env.JWT_EXPIRE,
+                })
+                const refreshToken = jwt.sign(
+                    payload,
+                    process.env.JWT_REFRESH_SECRET,
+                    {
+                        expiresIn: process.env.JWT_REFRESH_EXPIRE,
+                    },
+                )
+
+                // Lưu accessToken - refreshToken vào cookie
+                res.cookie('accessToken', accessToken, { httpOnly: true })
+                res.cookie('refreshToken', refreshToken, { httpOnly: true })
+
+                return res.redirect('/') 
+            })
+        })(req, res, next) 
+    }
+
 }
 
 module.exports = new UserController()

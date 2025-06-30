@@ -16,6 +16,8 @@ const setLayout = require('./app/middlewares/setLayout')
 const flash = require('connect-flash')
 const session = require('express-session')
 const cookieParser = require('cookie-parser')
+const passport = require('passport')
+require('./config/passport') 
 
 // Sử dụng cookie-parse
 app.use(cookieParser())
@@ -28,6 +30,10 @@ app.use(
         saveUninitialized: true,
     }),
 )
+
+app.use(passport.initialize())
+app.use(passport.session())
+
 app.use(flash())
 app.use((req, res, next) => {
     res.locals.success = req.flash('success')

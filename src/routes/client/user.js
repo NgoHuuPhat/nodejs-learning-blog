@@ -14,5 +14,7 @@ router.get('/verify-otp', UserController.showVerifyForm)
 router.post('/verify-otp', UserController.verifyOTPPost)
 router.get('/reset-password', UserController.showResetPasswordrForm)
 router.post('/reset-password', UserController.resetPasswordrPost)
+router.get('/google', UserController.googleLogin)
+router.get('/google/callback', UserController.googleCallback)
 
 module.exports = router
