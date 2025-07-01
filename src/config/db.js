@@ -5,8 +5,13 @@ async function connect() {
     try {
         await mongoose.connect(process.env.MONGODB_URL)
         console.log('Connect successfully!!!')
+
+        const {autoSeed} = require('../database/seeder')
+        await autoSeed() 
+        console.log('Auto seed successfully!!!')
+
     } catch (error) {
-        console.log('Connect failure!!!')
+        console.error('Connect failure!!!', error.message)
     }
 }
 
